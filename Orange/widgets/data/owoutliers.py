@@ -40,7 +40,7 @@ def run(data: Table, learner: Learner, state: TaskState) -> Results:
         if state.is_interruption_requested():
             raise Exception
 
-    callback(0, "Initializing...")
+    callback(0, "初始化...")
     model = learner(data, wrap_callback(callback, end=0.6))
     pred = model(data, wrap_callback(callback, start=0.6, end=0.99))
 
@@ -82,8 +82,8 @@ class SVMEditor(ParametersEditor):
     def __init__(self, parent):
         super().__init__(parent)
 
-        tooltip = "An upper bound on the fraction of training errors and a " \
-                  "lower bound of the fraction of support vectors"
+        tooltip = "训练误差和" \
+                  "支持向量分数的下限"
         gui.widgetLabel(self.param_box, "Nu:", tooltip=tooltip)
         gui.hSlider(self.param_box, self, "nu", minValue=1, maxValue=100,
                     ticks=10, labelFormat="%d %%", tooltip=tooltip,
@@ -97,9 +97,9 @@ class SVMEditor(ParametersEditor):
                 "gamma": self.gamma}
 
     def get_report_parameters(self):
-        return {"Detection method": "One class SVM with non-linear kernel (RBF)",
-                 "Regularization (nu)": f"{self.nu/100:.0%}",
-                 "Kernel coefficient": self.gamma}
+        return {"检测方法": "具有非线性内核(RBF)的单类SVM",
+                 "正则化(nu)": f"{self.nu/100:.0%}",
+                 "内核系数": self.gamma}
 
 
 class CovarianceEditor(ParametersEditor):
@@ -128,15 +128,15 @@ class CovarianceEditor(ParametersEditor):
 
     def get_report_parameters(self):
         fraction = self.support_fraction if self.empirical_covariance else None
-        return {"Detection method": "Covariance estimator",
-                "Contamination": f"{self.cont/100:.0%}",
-                 "Support fraction": fraction}
+        return {"检测方法": "协方差估计",
+                "污染": f"{self.cont/100:.0%}",
+                 "支持分数": fraction}
 
 
 class LocalOutlierFactorEditor(ParametersEditor):
     METRICS = ("euclidean", "manhattan", "cosine", "jaccard",
                "hamming", "minkowski")
-    METRICS_NAMES = ["Euclidean", "Manhattan", "Cosine", "Jaccard", "Hamming", "Minkowski"]
+    METRICS_NAMES = ["欧几里得", "曼哈顿", "余弦", "杰卡德", "汉明", "明科夫斯基"]
 
     n_neighbors = Setting(20)
     cont = Setting(10)
@@ -164,11 +164,11 @@ class LocalOutlierFactorEditor(ParametersEditor):
                 "metric": self.METRICS[self.metric_index]}
 
     def get_report_parameters(self):
-        return {"Detection method": "Local Outlier Factor",
-                 "Contamination": f"{self.cont/100:.0%}",
-                 "Number of neighbors": self.n_neighbors,
+        return {"检测方法": "局部异常因子",
+                 "污染": f"{self.cont/100:.0%}",
+                 "邻居数量": self.n_neighbors,
                  # pylint: disable=invalid-sequence-index
-                 "Metric": self.METRICS_NAMES[self.metric_index]}
+                 "度量": self.METRICS_NAMES[self.metric_index]}
 
 
 class IsolationForestEditor(ParametersEditor):
@@ -183,32 +183,32 @@ class IsolationForestEditor(ParametersEditor):
                     maxValue=100, ticks=10, labelFormat="%d %%",
                     callback=self.parameter_changed)
         gui.checkBox(self.param_box, self, "replicable",
-                     "Replicable training", callback=self.parameter_changed)
+                     "可复制训练", callback=self.parameter_changed)
 
     def get_parameters(self):
         return {"contamination": self.cont / 100,
                 "random_state": 42 if self.replicable else None}
 
     def get_report_parameters(self):
-        return {"Detection method": "Isolation Forest",
-                "Contamination": f"{self.cont/100:.0%}",
-                "Replicable training": bool_str(self.replicable)}
+        return {"检测方法": "隔离森林",
+                "污染": f"{self.cont/100:.0%}",
+                "可复制训练": bool_str(self.replicable)}
 
 class OWOutliers(OWWidget, ConcurrentWidgetMixin):
-    name = "Outliers"
-    description = "Detect outliers."
+    name = "异常值 Outliers"
+    description = "检测异常值。"
     icon = "icons/Outliers.svg"
     priority = 3000
-    category = "Unsupervised"
-    keywords = "outliers, inlier"
+    category = "无监督"
+    keywords = "异常值,内层"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        inliers = Output("Inliers", Table)
-        outliers = Output("Outliers", Table)
-        data = Output("Data", Table)
+        inliers = Output("内层", Table)
+        outliers = Output("异常值", Table)
+        data = Output("数据", Table)
 
     want_main_area = False
     resizing_enabled = False
@@ -228,11 +228,11 @@ class OWOutliers(OWWidget, ConcurrentWidgetMixin):
     MAX_FEATURES = 1500
 
     class Warning(OWWidget.Warning):
-        disabled_cov = Msg("Too many features for covariance estimation.")
+        disabled_cov = Msg("协方差估计的特征太多。")
 
     class Error(OWWidget.Error):
-        singular_cov = Msg("Singular covariance matrix.")
-        memory_error = Msg("Not enough memory")
+        singular_cov = Msg("奇异协方差矩阵。")
+        memory_error = Msg("内存不足")
 
     def __init__(self):
         OWWidget.__init__(self)
@@ -246,7 +246,7 @@ class OWOutliers(OWWidget, ConcurrentWidgetMixin):
         self.init_gui()
 
     def init_gui(self):
-        box = gui.vBox(self.controlArea, "Method")
+        box = gui.vBox(self.controlArea, "方法")
         self.method_combo = gui.comboBox(box, self, "outlier_method",
                                          items=[m.name for m in self.METHODS],
                                          callback=self.__method_changed)
@@ -261,7 +261,7 @@ class OWOutliers(OWWidget, ConcurrentWidgetMixin):
         self.lof_editor = LocalOutlierFactorEditor(self)
         self.isf_editor = IsolationForestEditor(self)
 
-        box = gui.vBox(self.controlArea, "Parameters")
+        box = gui.vBox(self.controlArea, "参数")
         self.editors = (self.svm_editor, self.cov_editor,
                         self.lof_editor, self.isf_editor)
         for editor in self.editors:
@@ -338,11 +338,11 @@ class OWOutliers(OWWidget, ConcurrentWidgetMixin):
         if self.data is not None:
             if self.n_outliers is None or self.n_inliers is None:
                 return
-            self.report_items("Data",
-                              (("Input instances", len(self.data)),
-                               ("Inliers", self.n_inliers),
-                               ("Outliers", self.n_outliers)))
-        self.report_items("Detection",
+            self.report_items("数据",
+                              (("输入实例", len(self.data)),
+                               ("内层", self.n_inliers),
+                               ("异常值", self.n_outliers)))
+        self.report_items("检测",
                           self.current_editor.get_report_parameters())
 
     @classmethod

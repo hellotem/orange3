@@ -65,10 +65,10 @@ class BarPlotViewBox(pg.ViewBox):
 
 
 class ParameterSetter(CommonParameterSetter):
-    GRID_LABEL, SHOW_GRID_LABEL = "Gridlines", "Show"
+    GRID_LABEL, SHOW_GRID_LABEL = "网格线", "显示"
     DEFAULT_ALPHA_GRID, DEFAULT_SHOW_GRID = 80, True
-    BOTTOM_AXIS_LABEL, GROUP_AXIS_LABEL = "Bottom axis", "Group axis"
-    IS_VERTICAL_LABEL = "Vertical ticks"
+    BOTTOM_AXIS_LABEL, GROUP_AXIS_LABEL = "底轴", "分组轴"
+    IS_VERTICAL_LABEL = "垂直刻度"
 
     def __init__(self, master):
         self.grid_settings: Dict = None
@@ -366,18 +366,18 @@ class BarPlotGraph(PlotWidget):
 
 
 class OWBarPlot(OWWidget):
-    name = "Bar Plot"
-    description = "Visualizes comparisons among categorical variables."
+    name = "条形图 Bar Plot"
+    description = "可视化分类变量间的比较"
     icon = "icons/BarPlot.svg"
     priority = 190
     keywords = "bar plot, chart"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
-        data_subset = Input("Data Subset", Table)
+        data = Input("数据", Table, default=True)
+        data_subset = Input("数据子集", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选择的数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     buttons_area_orientation = Qt.Vertical
@@ -394,13 +394,13 @@ class OWBarPlot(OWWidget):
     graph_name = "graph.plotItem"  # QGraphicsView (pg.PlotWidget -> BarPlotGraph)
 
     class Error(OWWidget.Error):
-        no_cont_features = Msg("Plotting requires a numeric feature.")
+        no_cont_features = Msg("绘图需要数值特征")
 
     class Information(OWWidget.Information):
-        too_many_instances = Msg("Data has too many instances. Only first {}"
-                                 " are shown.".format(MAX_INSTANCES))
+        too_many_instances = Msg("数据实例过多。仅显示前 {}"
+                                 " 个".format(MAX_INSTANCES))
 
-    enumeration = "Enumeration"
+    enumeration = "枚举"
 
     def __init__(self):
         super().__init__()
@@ -445,7 +445,7 @@ class OWBarPlot(OWWidget):
         )
 
         self._group_var_model = DomainModel(
-            placeholder="None", valid_types=DiscreteVariable
+            placeholder="无", valid_types=DiscreteVariable
         )
         gui.comboBox(
             box, self, "group_var", label="Group by:",
@@ -454,7 +454,7 @@ class OWBarPlot(OWWidget):
         )
 
         self._annot_var_model = DomainModel(
-            placeholder="None",
+            placeholder="无",
             valid_types=(DiscreteVariable, StringVariable)
         )
         self._annot_var_model.order = self._annot_var_model.order[:1] + \
@@ -467,7 +467,7 @@ class OWBarPlot(OWWidget):
         )
 
         self._color_var_model = DomainModel(
-            placeholder="(Same color)", valid_types=DiscreteVariable
+            placeholder="(相同颜色)", valid_types=DiscreteVariable
         )
         gui.comboBox(
             box, self, "color_var", label="Color:",

@@ -37,7 +37,7 @@ from Orange.widgets.utils.state_summary import missing_values
 # module's namespace so that old saved settings still work
 from Orange.widgets.utils.filedialogs import RecentPath
 
-DEFAULT_READER_TEXT = "Automatically detect type"
+DEFAULT_READER_TEXT = "自动检测类型"
 
 log = logging.getLogger(__name__)
 
@@ -83,18 +83,18 @@ class LineEditSelectOnFocus(QLineEdit):
 
 
 class OWFile(widget.OWWidget, RecentPathsWComboMixin):
-    name = "File"
+    name = "文件 File"
     id = "orange.widgets.data.file"
-    description = "Read data from an input file or network " \
-                  "and send a data table to the output."
+    description = "从输入文件或网络读取数据" \
+                  "并将数据表发送到输出"
     icon = "icons/File.svg"
     priority = 10
-    category = "Data"
-    keywords = "file, load, read, open"
+    category = "数据"
+    keywords = "文件，加载，读取，打开"
 
     class Outputs:
-        data = Output("Data", Table,
-                      doc="Attribute-valued dataset read from the input file.")
+        data = Output("数据", Table,
+                      doc="从输入文件读取的具有属性值的数据集")
 
     want_main_area = False
     buttons_area_orientation = None
@@ -131,32 +131,32 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
     domain_editor = SettingProvider(DomainEditor)
 
     class Information(widget.OWWidget.Information):
-        no_file_selected = Msg("No file selected.")
+        no_file_selected = Msg("未选择文件")
 
     class Warning(widget.OWWidget.Warning):
-        file_too_big = Msg("The file is too large to load automatically."
-                           " Press Reload to load.")
-        load_warning = Msg("Read warning:\n{}")
+        file_too_big = Msg("文件太大，无法自动加载"
+                           "按重新加载可加载")
+        load_warning = Msg("读取警告:\n{}")
         performance_warning = Msg(
-            "Categorical variables with >100 values may decrease performance.")
-        renamed_vars = Msg("Some variables have been renamed "
-                           "to avoid duplicates.\n{}")
-        multiple_targets = Msg("Most widgets do not support multiple targets")
+            "类别变量值大于100可能会降低性能")
+        renamed_vars = Msg("某些变量被重命名"
+                           "以避免重复。\n{}")
+        multiple_targets = Msg("大多数小部件不支持多个目标")
 
     class Error(widget.OWWidget.Error):
-        file_not_found = Msg("File not found.")
-        missing_reader = Msg("Missing reader.")
-        sheet_error = Msg("Error listing available sheets.")
-        unknown = Msg("Read error:\n{}")
+        file_not_found = Msg("找不到文件")
+        missing_reader = Msg("缺少读取器")
+        sheet_error = Msg("列出可用工作表时出错")
+        unknown = Msg("读取错误:\n{}")
 
     UserAdviceMessages = [
         widget.Message(
-            "Use CSV File Import widget for advanced options "
-            "for comma-separated files",
-            "use-csv-file-import"),
+            "使用CSV文件导入小部件获得更多选项"
+            "用于逗号分隔文件",
+            "使用csv文件导入"),
         widget.Message(
-            "This widget loads only tabular data. Use other widgets to load "
-            "other data types like models, distance matrices and networks.",
+            "此小部件只加载表格数据。使用其他小部件加载"
+            "其他数据类型，如模型、距离矩阵和网络",
             "other-data-types"
         )
     ]
@@ -188,7 +188,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
 
         layout = QGridLayout()
         layout.setSpacing(4)
-        gui.widgetBox(self.controlArea, orientation=layout, box='Source')
+        gui.widgetBox(self.controlArea, orientation=layout, box='源')
         vbox = gui.radioButtons(None, self, "source", box=True,
                                 callback=self.load_data, addToLayout=False)
 
@@ -210,7 +210,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
         layout.addWidget(file_button, 0, 2)
 
         reload_button = gui.button(
-            None, self, "Reload", callback=self.load_data, autoDefault=False)
+            None, self, "重新加载", callback=self.load_data, autoDefault=False)
         reload_button.setIcon(self.style().standardIcon(
             QStyle.SP_BrowserReload))
         reload_button.setSizePolicy(Policy.Fixed, Policy.Fixed)
@@ -222,7 +222,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
         self.sheet_combo.setSizePolicy(Policy.Expanding, Policy.Fixed)
         self.sheet_combo.setMinimumSize(QSize(50, 1))
         self.sheet_label = QLabel()
-        self.sheet_label.setText('Sheet')
+        self.sheet_label.setText('工作表')
         self.sheet_label.setSizePolicy(
             Policy.MinimumExpanding, Policy.Fixed)
         self.sheet_box.layout().addWidget(
@@ -256,7 +256,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
 
         layout = QGridLayout()
         layout.setSpacing(4)
-        gui.widgetBox(self.controlArea, orientation=layout, box='File Type')
+        gui.widgetBox(self.controlArea, orientation=layout, box='文件类型')
 
         box = gui.hBox(None, addToLayout=False, margin=0)
         box.setSizePolicy(Policy.Expanding, Policy.Fixed)
@@ -268,22 +268,22 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
         box.layout().addWidget(self.reader_combo)
         layout.addWidget(box, 0, 1)
 
-        box = gui.vBox(self.controlArea, "Info")
-        self.infolabel = gui.widgetLabel(box, 'No data loaded.')
+        box = gui.vBox(self.controlArea, "信息")
+        self.infolabel = gui.widgetLabel(box, '未加载数据')
 
-        box = gui.widgetBox(self.controlArea, "Columns (Double click to edit)")
+        box = gui.widgetBox(self.controlArea, "列(双击编辑)")
         self.domain_editor = DomainEditor(self)
         self.editor_model = self.domain_editor.model()
         box.layout().addWidget(self.domain_editor)
 
         box = gui.hBox(box)
         gui.button(
-            box, self, "Reset", callback=self.reset_domain_edit,
+            box, self, "重置", callback=self.reset_domain_edit,
             autoDefault=False
         )
         gui.rubber(box)
         self.apply_button = gui.button(
-            box, self, "Apply", callback=self.apply_domain_edit)
+            box, self, "应用", callback=self.apply_domain_edit)
         self.apply_button.setEnabled(False)
         self.apply_button.setFixedWidth(170)
         self.editor_model.dataChanged.connect(
@@ -292,7 +292,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
         hBox = gui.hBox(self.controlArea)
         gui.rubber(hBox)
         gui.button(
-            hBox, self, "Browse documentation datasets",
+            hBox, self, "浏览文档数据集",
             callback=lambda: self.browse_file(True), autoDefault=False)
         gui.rubber(hBox)
 
@@ -367,8 +367,8 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
             start_file = get_sample_datasets_dir()
             if not os.path.exists(start_file):
                 QMessageBox.information(
-                    None, "File",
-                    "Cannot find the directory with documentation datasets")
+                    None, "文件",
+                    "找不到包含文档数据集的目录")
                 return
         else:
             start_file = self.last_path() or os.path.expanduser("~/")
@@ -399,7 +399,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
             self.data = None
             self.sheet_box.hide()
             self.Outputs.data.send(None)
-            self.infolabel.setText("No data.")
+            self.infolabel.setText("没有数据")
 
     def _try_load(self):
         self._initialize_reader_combo()
@@ -471,7 +471,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
                 try:
                     reader_class = class_from_qualified_name(qname)
                 except Exception as ex:
-                    raise MissingReaderException(f'Can not find reader "{qname}"') from ex
+                    raise MissingReaderException(f'找不到读取器"{qname}"') from ex
                 reader = reader_class(path)
             else:
                 self.reader_combo.setCurrentIndex(0)
@@ -518,7 +518,7 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
 
         attrs = getattr(table, "attributes", {})
         descs = [attrs[desc]
-                 for desc in ("Name", "Description") if desc in attrs]
+                 for desc in ("名称", "描述") if desc in attrs]
         if len(descs) == 2:
             descs[0] = f"<b>{descs[0]}</b>"
         if descs:
@@ -608,10 +608,10 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
             try:
                 return FileFormat.names[os.path.splitext(filename)[1]]
             except KeyError:
-                return "unknown"
+                return "未知"
 
         if self.data is None:
-            self.report_paragraph("File", "No file.")
+            self.report_paragraph("文件", "没有文件")
             return
 
         if self.source == self.LOCAL_FILE:
@@ -624,13 +624,13 @@ class OWFile(widget.OWWidget, RecentPathsWComboMixin):
                 name = self.loaded_file
             if self.sheet_combo.isVisible():
                 name += f" ({self.sheet_combo.currentText()})"
-            self.report_items("File", [("File name", name),
-                                       ("Format", get_ext_name(name))])
+            self.report_items("文件", [("文件名", name),
+                                       ("格式", get_ext_name(name))])
         else:
-            self.report_items("Data", [("Resource", self.url),
-                                       ("Format", get_ext_name(self.url))])
+            self.report_items("数据", [("资源", self.url),
+                                       ("格式", get_ext_name(self.url))])
 
-        self.report_data("Data", self.data)
+        self.report_data("数据", self.data)
 
     @staticmethod
     def dragEnterEvent(event):

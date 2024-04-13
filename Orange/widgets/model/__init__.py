@@ -1,8 +1,8 @@
 """Learners"""
 
-NAME = 'Model'
+NAME = '模型'
 
-DESCRIPTION = 'Prediction.'
+DESCRIPTION = '预测。'
 
 BACKGROUND = '#FAC1D9'
 

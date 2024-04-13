@@ -261,23 +261,23 @@ class GraphicsView(pg.GraphicsView):
 
 
 class OWDistanceMap(widget.OWWidget):
-    name = "Distance Map"
-    description = "Visualize a distance matrix."
+    name = "距离图 Distance Map"
+    description = "可视化距离矩阵。"
     icon = "icons/DistanceMap.svg"
     priority = 1200
     keywords = "distance map"
 
     class Inputs:
-        distances = Input("Distances", Orange.misc.DistMatrix)
+        distances = Input("距离", Orange.misc.DistMatrix)
 
     class Outputs:
-        selected_data = Output("Selected Data", Orange.data.Table, default=True)
+        selected_data = Output("选中的数据", Orange.data.Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Orange.data.Table)
-        features = Output("Features", widget.AttributeList, dynamic=False)
+        features = Output("特征", widget.AttributeList, dynamic=False)
 
     class Error(widget.OWWidget.Error):
-        empty_matrix = widget.Msg("Empty distance matrix")
-        not_symmetric = widget.Msg("Distance matrix is not symmetric.")
+        empty_matrix = widget.Msg("距离矩阵为空")
+        not_symmetric = widget.Msg("距离矩阵不对称")
 
     settingsHandler = settings.PerfectDomainContextHandler()
 
@@ -315,11 +315,11 @@ class OWDistanceMap(widget.OWWidget):
         self._selection = None
 
         self.sorting_cb = gui.comboBox(
-            self.controlArea, self, "sorting", box="Element Sorting",
-            items=["None", "Clustering", "Clustering with ordered leaves"],
+            self.controlArea, self, "sorting", box="元素排序",
+            items=["无", "聚类", "有序子叶聚类"],
             callback=self._invalidate_ordering)
 
-        box = gui.vBox(self.controlArea, "Colors")
+        box = gui.vBox(self.controlArea, "颜色")
         self.color_map_widget = cmw = ColorGradientSelection(
             thresholds=(self.color_low, self.color_high),
         )
@@ -339,12 +339,12 @@ class OWDistanceMap(widget.OWWidget):
         box.layout().addWidget(self.color_map_widget)
 
         self.annot_combo = gui.comboBox(
-            self.controlArea, self, "annotation_idx", box="Annotations",
+            self.controlArea, self, "annotation_idx", box="注释",
             contentsLength=12, searchable=True,
             callback=self._invalidate_annotations
         )
         self.annot_combo.setModel(itemmodels.VariableListModel())
-        self.annot_combo.model()[:] = ["None", "Enumeration"]
+        self.annot_combo.model()[:] = ["无", "枚举"]
         gui.rubber(self.controlArea)
 
         gui.auto_send(self.buttonsArea, self, "autocommit")
@@ -450,8 +450,8 @@ class OWDistanceMap(widget.OWWidget):
             item.setFlags(item.flags() & ~Qt.ItemIsEnabled)
             if self.sorting == OWDistanceMap.OrderedClustering:
                 self.sorting = OWDistanceMap.Clustering
-                msg = "Cluster ordering was disabled due to the input " \
-                      "matrix being to big"
+                msg = "由于输入" \
+                      "矩阵太大,所以禁用了聚类排序"
         else:
             item.setFlags(item.flags() | Qt.ItemIsEnabled)
 
@@ -460,8 +460,8 @@ class OWDistanceMap(widget.OWWidget):
             item.setFlags(item.flags() & ~Qt.ItemIsEnabled)
             if self.sorting == OWDistanceMap.Clustering:
                 self.sorting = OWDistanceMap.NoOrdering
-            msg = "Clustering was disabled due to the input " \
-                  "matrix being to big"
+            msg = "由于输入" \
+                  "矩阵太大,所以禁用了聚类排序"
         else:
             item.setFlags(item.flags() | Qt.ItemIsEnabled)
 
@@ -471,19 +471,19 @@ class OWDistanceMap(widget.OWWidget):
         self.items = items
         model = self.annot_combo.model()
         if items is None:
-            model[:] = ["None", "Enumeration"]
+            model[:] = ["无", "枚举"]
         elif not axis:
-            model[:] = ["None", "Enumeration", "Attribute names"]
+            model[:] = ["无", "枚举", "属性名"]
         elif isinstance(items, Orange.data.Table):
             annot_vars = list(filter_visible(items.domain.variables)) + list(items.domain.metas)
-            model[:] = ["None", "Enumeration"] + annot_vars
+            model[:] = ["无", "枚举"] + annot_vars
             self.annotation_idx = 0
             self.openContext(items.domain)
         elif isinstance(items, list) and \
                 all(isinstance(item, Orange.data.Variable) for item in items):
-            model[:] = ["None", "Enumeration", "Name"]
+            model[:] = ["无", "枚举", "名称"]
         else:
-            model[:] = ["None", "Enumeration"]
+            model[:] = ["无", "枚举"]
         self.annotation_idx = min(self.annotation_idx, len(model) - 1)
 
     def clear(self):
@@ -598,7 +598,7 @@ class OWDistanceMap(widget.OWWidget):
             labels = None
         elif self.annotation_idx == 1:  # Enumeration
             labels = [str(i + 1) for i in range(self.matrix.shape[0])]
-        elif self.annot_combo.model()[self.annotation_idx] == "Attribute names":
+        elif self.annot_combo.model()[self.annotation_idx] == "属性名":
             attr = self.matrix.row_items.domain.attributes
             labels = [str(attr[i]) for i in range(self.matrix.shape[0])]
         elif self.annotation_idx == 2 and \
@@ -688,8 +688,8 @@ class OWDistanceMap(widget.OWWidget):
         if self.annotation_idx <= 1:
             annot = annot.lower()
         self.report_items((
-            ("Sorting", self.sorting_cb.currentText().lower()),
-            ("Annotations", annot)
+            ("排序", self.sorting_cb.currentText().lower()),
+            ("注释", annot)
         ))
         if self.matrix is not None:
             self.report_plot()

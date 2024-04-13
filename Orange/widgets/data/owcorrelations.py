@@ -43,7 +43,7 @@ class CorrelationType(IntEnum):
         """
         Texts for correlation types. Can be used in gui controls (eg. combobox).
         """
-        return ["Pearson correlation", "Spearman correlation"]
+        return ["皮尔逊相关", "斯皮尔曼相关"]
 
 
 class Cluster(SimpleNamespace):
@@ -238,19 +238,19 @@ class CorrelationRank(VizRankDialogAttrPair):
 
 
 class OWCorrelations(OWWidget):
-    name = "Correlations"
-    description = "Compute all pairwise attribute correlations."
+    name = "相关 Correlations"
+    description = "计算所有成对属性相关性。"
     icon = "icons/Correlations.svg"
     priority = 1106
-    category = "Unsupervised"
+    category = "无监督"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data = Output("Data", Table)
-        features = Output("Features", AttributeList)
-        correlations = Output("Correlations", Table)
+        data = Output("数据", Table)
+        features = Output("特征", AttributeList)
+        correlations = Output("相关", Table)
 
     want_main_area = False
     want_control_area = True
@@ -264,11 +264,11 @@ class OWCorrelations(OWWidget):
     correlation_type = Setting(0)
 
     class Information(OWWidget.Information):
-        removed_cons_feat = Msg("Constant features have been removed.")
+        removed_cons_feat = Msg("常数特征已被移除。")
 
     class Warning(OWWidget.Warning):
-        not_enough_vars = Msg("At least two numeric features are needed.")
-        not_enough_inst = Msg("At least two instances are needed.")
+        not_enough_vars = Msg("至少需要两个数值特征。")
+        not_enough_inst = Msg("至少需要两个实例。")
 
     def __init__(self):
         super().__init__()
@@ -284,7 +284,7 @@ class OWCorrelations(OWWidget):
 
         self.feature_model = DomainModel(
             order=DomainModel.ATTRIBUTES, separators=False,
-            placeholder="(All combinations)", valid_types=ContinuousVariable)
+            placeholder="(所有组合)", valid_types=ContinuousVariable)
         gui.comboBox(
             box, self, "feature", callback=self._feature_combo_changed,
             model=self.feature_model, searchable=True
@@ -398,10 +398,10 @@ class OWCorrelations(OWWidget):
             self.Outputs.correlations.send(None)
             return
 
-        attrs = [ContinuousVariable("Correlation"),
-                 ContinuousVariable("uncorrected p"),
+        attrs = [ContinuousVariable("相关"),
+                 ContinuousVariable("未校正的 p 值"),
                  ContinuousVariable("FDR")]
-        metas = [StringVariable("Feature 1"), StringVariable("Feature 2")]
+        metas = [StringVariable("特征 1"), StringVariable("特征 2")]
         domain = Domain(attrs, metas=metas)
         model = self.vizrank.rank_model
         count = model.rowCount()
@@ -417,7 +417,7 @@ class OWCorrelations(OWWidget):
                        for a in index(row, 0).data(CorrelationRank._AttrRole)]
                       for row in range(count)], dtype=object)
         corr_table = Table(domain, x, metas=m)
-        corr_table.name = "Correlations"
+        corr_table.name = "相关"
 
         # data has been imputed; send original attributes
         self.Outputs.features.send(AttributeList(

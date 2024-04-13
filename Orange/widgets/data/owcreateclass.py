@@ -165,25 +165,25 @@ def unique_in_order_mapping(a):
 
 
 class OWCreateClass(widget.OWWidget):
-    name = "Create Class"
-    description = "Create class attribute from a string attribute"
+    name = "创建类 Create Class"
+    description = "从字符串属性创建类属性"
     icon = "icons/CreateClass.svg"
-    category = "Transform"
-    keywords = "create class"
+    category = "变换"
+    keywords = "创建类"
     priority = 2300
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数据", Table)
 
     want_main_area = False
     buttons_area_orientation = Qt.Vertical
 
     settingsHandler = DomainContextHandler()
     attribute = ContextSetting(None)
-    class_name = ContextSetting("class")
+    class_name = ContextSetting("类")
     rules = ContextSetting({})
     match_beginning = ContextSetting(False)
     case_sensitive = ContextSetting(False)
@@ -197,11 +197,11 @@ class OWCreateClass(widget.OWWidget):
     cached_variables = {}
 
     class Warning(widget.OWWidget.Warning):
-        no_nonnumeric_vars = Msg("Data contains only numeric variables.")
+        no_nonnumeric_vars = Msg("数据只包含数值变量。")
 
     class Error(widget.OWWidget.Error):
-        class_name_duplicated = Msg("Class name duplicated.")
-        class_name_empty = Msg("Class name should not be empty.")
+        class_name_duplicated = Msg("类名重复。")
+        class_name_empty = Msg("类名不应为空。")
 
     def __init__(self):
         super().__init__()
@@ -223,9 +223,9 @@ class OWCreateClass(widget.OWWidget):
 
         gui.lineEdit(
             self.controlArea, self, "class_name",
-            orientation=Qt.Horizontal, box="New Class Name")
+            orientation=Qt.Horizontal, box="新类名")
 
-        variable_select_box = gui.vBox(self.controlArea, "Match by Substring")
+        variable_select_box = gui.vBox(self.controlArea, "通过子字符串匹配")
 
         combo = gui.comboBox(
             variable_select_box, self, "attribute", label="From column:",
@@ -247,9 +247,9 @@ class OWCreateClass(widget.OWWidget):
         self.rules_box.setColumnStretch(0, 1)
         self.rules_box.setColumnStretch(1, 1)
         self.rules_box.setColumnStretch(2, 100)
-        rules_box.addWidget(QLabel("Name"), 0, 1)
-        rules_box.addWidget(QLabel("Substring"), 0, 2)
-        rules_box.addWidget(QLabel("Count"), 0, 3, 1, 2)
+        rules_box.addWidget(QLabel("名称"), 0, 1)
+        rules_box.addWidget(QLabel("子字符串"), 0, 2)
+        rules_box.addWidget(QLabel("计数"), 0, 3, 1, 2)
         self.update_rules()
 
         widget = QWidget(patternbox)
@@ -263,17 +263,17 @@ class OWCreateClass(widget.OWWidget):
                    sizePolicy=(QSizePolicy.Maximum,
                                QSizePolicy.Maximum))
 
-        optionsbox = gui.vBox(self.controlArea, "Options")
+        optionsbox = gui.vBox(self.controlArea, "选项")
         gui.checkBox(
-            optionsbox, self, "match_beginning", "Match only at the beginning",
+            optionsbox, self, "match_beginning", "仅在开头匹配",
             callback=self.options_changed)
         gui.checkBox(
-            optionsbox, self, "case_sensitive", "Case sensitive",
+            optionsbox, self, "case_sensitive", "区分大小写",
             callback=self.options_changed)
 
         gui.rubber(self.controlArea)
 
-        gui.button(self.buttonsArea, self, "Apply", callback=self.apply)
+        gui.button(self.buttonsArea, self, "应用", callback=self.apply)
 
         # TODO: Resizing upon changing the number of rules does not work
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
@@ -477,7 +477,7 @@ class OWCreateClass(widget.OWWidget):
                               f"f {n_total} matching {pl(n_total, 'instance')} " \
                               f"{pl(n_before, 'is|are')} already covered above."
                     else:
-                        tip = "All matching instances are already covered above"
+                        tip = "所有匹配的实例已在上面涵盖"
                     lab_total.setToolTip(tip)
                     lab_matched.setToolTip(tip)
 
@@ -488,7 +488,7 @@ class OWCreateClass(widget.OWWidget):
             for n_matched, (_, patt) in zip(matches, self.line_edits):
                 if not patt.text():
                     patt.setPlaceholderText(
-                        "(remaining instances)" if n_matched else "(unused)")
+                        "(剩余实例)" if n_matched else "(未使用)")
 
             labels = self.class_labels()
             for label, (lab_edit, _) in zip(labels, self.line_edits):
@@ -568,11 +568,11 @@ class OWCreateClass(widget.OWWidget):
             if patt:
                 rule += f"if <b>{self.attribute.name}</b> contains <b>{patt}</b>"
             else:
-                rule += "otherwise"
+                rule += "否则"
             return rule
 
         def _count_part():
-            aca = "already covered above"
+            aca = "已在上面涵盖"
             if not n_matched:
                 if n_total == 1:
                     return f"the single matching instance is {aca}"
@@ -591,7 +591,7 @@ class OWCreateClass(widget.OWWidget):
 
         if not self.attribute:
             return
-        self.report_items("Input", [("Source attribute", self.attribute.name)])
+        self.report_items("输入", [("源属性", self.attribute.name)])
         output = ""
         names = self.class_labels()
         for (n_matched, n_total), class_name, (lab, patt) in \
@@ -599,7 +599,7 @@ class OWCreateClass(widget.OWWidget):
             if lab or patt or n_total:
                 output += "<li>{}; {}</li>".format(_cond_part(), _count_part())
         if output:
-            self.report_items("Output", [("Class name", self.class_name)])
+            self.report_items("输出", [("类名", self.class_name)])
             self.report_raw("<ol>{}</ol>".format(output))
 
 

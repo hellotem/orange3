@@ -37,7 +37,7 @@ def run_mds(matrix: DistMatrix, max_iter: int, step_size: int, init_type: int,
 
     iterations_done = 0
     init = embedding
-    state.set_status("Running...")
+    state.set_status("运行中...")
     oldstress = np.finfo(float).max
 
     while True:
@@ -147,13 +147,13 @@ class OWMDSGraph(OWScatterPlotBase):
 
 class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
     name = "MDS"
-    description = "Two-dimensional data projection by multidimensional " \
-                  "scaling constructed from a distance matrix."
+    description = "利用多维尺度进行两维数据投影" \
+                  "构建距离矩阵"
     icon = "icons/MDS.svg"
     keywords = "mds, multidimensional scaling, multi dimensional scaling"
 
     class Inputs(OWDataProjectionWidget.Inputs):
-        distances = Input("Distances", DistMatrix)
+        distances = Input("距离", DistMatrix)
 
     settings_version = 3
 
@@ -162,11 +162,11 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
 
     #: Refresh rate
     RefreshRate = [
-        ("Every iteration", 1),
-        ("Every 5 steps", 5),
-        ("Every 10 steps", 10),
-        ("Every 25 steps", 25),
-        ("Every 50 steps", 50),
+        ("每次迭代", 1),
+        ("每 5 步", 5),
+        ("每 10 步", 10),
+        ("每 25 步", 25),
+        ("每 50 步", 50),
         ("None", -1)
     ]
 
@@ -179,14 +179,14 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
     embedding_variables_names = ("mds-x", "mds-y")
 
     class Error(OWDataProjectionWidget.Error):
-        not_enough_rows = Msg("Input data needs at least 2 rows")
-        matrix_not_symmetric = Msg("Distance matrix is not symmetric")
-        matrix_too_small = Msg("Input matrix must be at least 2x2")
-        no_attributes = Msg("Data has no attributes")
+        not_enough_rows = Msg("输入数据至少需要 2 行")
+        matrix_not_symmetric = Msg("距离矩阵不是对称的")
+        matrix_too_small = Msg("输入矩阵必须至少是 2x2 的")
+        no_attributes = Msg("数据没有属性")
         mismatching_dimensions = \
-            Msg("Data and distances dimensions do not match.")
-        out_of_memory = Msg("Out of memory")
-        optimization_error = Msg("Error during optimization\n{}")
+            Msg("数据与距离维数不匹配")
+        out_of_memory = Msg("内存不足")
+        optimization_error = Msg("优化时出错\n{}")
 
     def __init__(self):
         OWDataProjectionWidget.__init__(self)
@@ -205,7 +205,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
         self.size_model = self.gui.points_models[2]
         self.size_model.order = \
             self.gui.points_models[2].order[:1] \
-            + ("Stress", ) + \
+            + ("应力", ) + \
             self.gui.points_models[2].order[1:]
 
     def _add_controls(self):
@@ -220,15 +220,15 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
     def _add_controls_optimization(self):
         # This is a part of init
         # pylint: disable=attribute-defined-outside-init
-        box = gui.vBox(self.controlArea, box="Optimize", spacing=0)
+        box = gui.vBox(self.controlArea, box="优化", spacing=0)
         hbox = gui.hBox(box, margin=0)
         gui.button(hbox, self, "PCA", callback=self.do_PCA, autoDefault=False)
-        gui.button(hbox, self, "Randomize", callback=self.do_random, autoDefault=False)
-        gui.button(hbox, self, "Jitter", callback=self.do_jitter, autoDefault=False)
+        gui.button(hbox, self, "随机化", callback=self.do_random, autoDefault=False)
+        gui.button(hbox, self, "抖动", callback=self.do_jitter, autoDefault=False)
         gui.separator(box, height=18)
         grid = QGridLayout()
         gui.widgetBox(box, orientation=grid)
-        self.run_button = gui.button(None, self, "Start", self._toggle_run)
+        self.run_button = gui.button(None, self, "开始", self._toggle_run)
         self.step_button = QPushButton(QIcon(SvgIconEngine(_playpause_icon)), "")
         self.step_button.pressed.connect(self._step)
         self.step_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
@@ -242,7 +242,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
                 sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed),
                 callback=self.__refresh_rate_combo_changed),
             1, 1)
-        self.stress_label = QLabel("Kruskal Stress: -")
+        self.stress_label = QLabel("克鲁斯卡尔应力: -")
         grid.addWidget(self.stress_label, 2, 0, 1, 3)
 
     def __refresh_rate_combo_changed(self):
@@ -358,7 +358,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
     def _toggle_run(self):
         if self.task is not None:
             self.cancel()
-            self.run_button.setText("Resume")
+            self.run_button.setText("恢复")
             self.step_button.setEnabled(True)
             self.commit.deferred()
         else:
@@ -371,7 +371,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
         if self.effective_matrix is None \
                 or np.allclose(self.effective_matrix, 0):
             return
-        self.run_button.setText("Stop")
+        self.run_button.setText("停止")
         self.step_button.setEnabled(False)
         # false positive, pylint: disable=invalid-sequence-index
         _, step_size = OWMDS.RefreshRate[self.refresh_rate]
@@ -401,14 +401,14 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
         assert isinstance(result.embedding, np.ndarray)
         assert len(result.embedding) == len(self.effective_matrix)
         # embedding, graph and stress are already updated in on_partial_result
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
         self.step_button.setEnabled(True)
         self.commit.deferred()
 
     def update_stress(self):
         self.stress = self._compute_stress()
         stress_val = "-" if self.stress is None else f"{self.stress:.3f}"
-        self.stress_label.setText(f"Kruskal Stress: {stress_val}")
+        self.stress_label.setText(f"克鲁斯卡尔应力: {stress_val}")
 
     def _compute_stress(self):
         if self.embedding is None or self.effective_matrix is None:
@@ -422,7 +422,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
             self.Error.out_of_memory()
         else:
             self.Error.optimization_error(str(ex))
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
         self.step_button.setEnabled(True)
 
     def do_PCA(self):
@@ -435,7 +435,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
         self.do_initialization(self.Jitter)
 
     def do_initialization(self, init_type: int):
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
         self.step_button.setEnabled(True)
         self.__invalidate_embedding(init_type)
         self.graph.update_coordinates()
@@ -489,7 +489,7 @@ class OWMDS(OWDataProjectionWidget, ConcurrentWidgetMixin):
             self.graph.update_pairs()
 
     def get_size_data(self):
-        if self.attr_size == "Stress":
+        if self.attr_size == "应力":
             return self.get_stress(self.embedding, self.effective_matrix)
         else:
             return super().get_size_data()

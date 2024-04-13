@@ -123,7 +123,7 @@ class Learner(ReprableWithPreprocessors):
 
         if progress_callback is None:
             progress_callback = dummy_callback
-        progress_callback(0, "Preprocessing...")
+        progress_callback(0, "预处理...")
         try:
             cb = wrap_callback(progress_callback, end=0.1)
             data = self.preprocess(data, progress_callback=cb)
@@ -139,7 +139,7 @@ class Learner(ReprableWithPreprocessors):
             raise TypeError("%s doesn't support multiple class variables" %
                             self.__class__.__name__)
 
-        progress_callback(0.1, "Fitting...")
+        progress_callback(0.1, "拟合...")
         model = self._fit_model(data)
         model.used_vals = [np.unique(y).astype(int) for y in data.Y[:, None].T]
         if not hasattr(model, "domain") or model.domain is None:

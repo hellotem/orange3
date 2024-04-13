@@ -159,7 +159,7 @@ class TSNERunner:
     @staticmethod
     def compute_pca(task: Task, state: TaskState, **_) -> None:
         # Perform PCA preprocessing
-        state.set_status("Computing PCA...")
+        state.set_status("计算 PCA...")
         pca_projection = pca_preprocessing(task.effective_data, task.pca_components)
         # Apply t-SNE's preprocessors to the data
         task.pca_projection = task.tsne.preprocess(pca_projection)
@@ -169,7 +169,7 @@ class TSNERunner:
     @staticmethod
     def compute_initialization(task: Task, state: TaskState, **_) -> None:
         # Prepare initial positions for t-SNE
-        state.set_status("Preparing initialization...")
+        state.set_status("准备初始化...")
         if task.initialization_method == "pca":
             x = task.effective_data.X
         elif task.initialization_method == "spectral":
@@ -184,7 +184,7 @@ class TSNERunner:
 
     @staticmethod
     def compute_affinities(task: Task, state: TaskState, **_) -> None:
-        state.set_status("Finding nearest neighbors...")
+        state.set_status("寻找最近邻居...")
 
         if task.distance_metric == "precomputed":
             assert task.distance_matrix is not None
@@ -201,7 +201,7 @@ class TSNERunner:
     def compute_tsne(task: Task, state: TaskState, progress_callback=None) -> None:
         tsne = task.tsne
 
-        state.set_status("Running optimization...")
+        state.set_status("运行优化...")
 
         # If this the first time we're computing t-SNE (otherwise we may just
         # be resuming optimization), we have to assemble the tsne object
@@ -380,7 +380,7 @@ class invalidated:
 
 class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
     name = "t-SNE"
-    description = "Two-dimensional data projection with t-SNE."
+    description = "使用 t-SNE 进行二维数据投影"
     icon = "icons/TSNE.svg"
     priority = 920
     keywords = "t-sne, tsne"
@@ -409,8 +409,8 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         distances = Input("Distances", DistMatrix)
 
     class Information(OWDataProjectionWidget.Information):
-        modified = Msg("The parameter settings have been changed. Press "
-                       "\"Start\" to rerun with the new settings.")
+        modified = Msg("参数设置已更改。按"
+                       "\"开始\" 以新设置重新运行")
 
     class Warning(OWDataProjectionWidget.Warning):
         consider_using_pca_preprocessing = Msg(
@@ -419,10 +419,10 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         )
 
     class Error(OWDataProjectionWidget.Error):
-        not_enough_rows = Msg("Input data needs at least 2 rows")
-        not_enough_cols = Msg("Input data needs at least 2 attributes")
-        constant_data = Msg("Input data is constant")
-        no_valid_data = Msg("No projection due to no valid data")
+        not_enough_rows = Msg("输入数据至少需要 2 行")
+        not_enough_cols = Msg("输入数据至少需要 2 个属性")
+        constant_data = Msg("输入数据为常数")
+        no_valid_data = Msg("由于无有效数据而无法投影")
 
         distance_matrix_not_symmetric = Msg("Distance matrix is not symmetric")
         distance_matrix_too_small = Msg("Input matrix must be at least 2x2")
@@ -477,7 +477,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
     def _add_controls_start_box(self):
         self.preprocessing_box = gui.vBox(self.controlArea, box="Preprocessing")
         self.normalize_cbx = gui.checkBox(
-            self.preprocessing_box, self, "normalize", "Normalize data",
+            self.preprocessing_box, self, "normalize", "标准化数据",
             callback=self._normalize_data_changed, stateWhenDisabled=False,
         )
         self.pca_preprocessing_cbx = gui.checkBox(
@@ -519,7 +519,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         form.addRow("Perplexity:", self.perplexity_spin)
 
         form.addRow(gui.checkBox(
-            self.controlArea, self, "multiscale", label="Preserve global structure",
+            self.controlArea, self, "multiscale", label="保留全局结构",
             callback=self._multiscale_changed, addToLayout=False
         ))
 
@@ -534,7 +534,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         self.parameter_box.layout().addLayout(form)
 
         self.run_button = gui.button(
-            self.parameter_box, self, "Start", callback=self._toggle_run
+            self.parameter_box, self, "开始", callback=self._toggle_run
         )
 
     # GUI control callbacks
@@ -606,7 +606,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
 
     def _stop_running_task(self):
         self.cancel()
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
 
     def _set_modified(self, state):
         """Mark the widget (GUI) as containing modified state."""
@@ -690,7 +690,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         # Pause task
         if self.task is not None:
             self.cancel()
-            self.run_button.setText("Resume")
+            self.run_button.setText("恢复")
             self.commit.deferred()
         # Resume task
         else:
@@ -873,7 +873,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         if not has_distance_matrix and has_data and self.data.is_sparse():
             self.normalize_cbx.setDisabled(True)
             self.normalize_cbx.setToolTip(
-                "Data normalization is not supported on sparse matrices."
+                "稀疏矩阵不支持数据标准化"
             )
 
         # Disable slider parent, because we want to disable the labels too
@@ -905,7 +905,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
         # When the data is invalid, it is set to `None` and an error is set,
         # therefore it would be erroneous to clear the error here
         if self.data is not None:
-            self.run_button.setText("Stop")
+            self.run_button.setText("停止")
 
         # Cancel current running task
         self.cancel()
@@ -1050,7 +1050,7 @@ class OWtSNE(OWDataProjectionWidget, ConcurrentWidgetMixin):
 
     def on_done(self, task):
         # type: (Task) -> None
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
         # NOTE: All of these have already been set by on_partial_result,
         # we double-check that they are aliases
         if task.preprocessed_data is not None:

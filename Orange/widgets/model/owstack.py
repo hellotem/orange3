@@ -9,18 +9,18 @@ from Orange.widgets.widget import Input, MultiInput
 
 
 class OWStackedLearner(OWBaseLearner):
-    name = "Stacking"
-    description = "Stack multiple models."
+    name = "堆叠 Stacking"
+    description = "堆叠多个模型。"
     icon = "icons/Stacking.svg"
     priority = 100
 
     LEARNER = StackedFitter
 
-    learner_name = Setting("Stack")
+    learner_name = Setting("堆叠")
 
     class Inputs(OWBaseLearner.Inputs):
-        learners = MultiInput("Learners", Learner, filter_none=True)
-        aggregate = Input("Aggregate", Learner)
+        learners = MultiInput("学习器", Learner, filter_none=True)
+        aggregate = Input("聚合", Learner)
 
     def __init__(self):
         self.learners: List[Learner] = []
@@ -62,9 +62,9 @@ class OWStackedLearner(OWBaseLearner):
             preprocessors=self.preprocessors)
 
     def get_learner_parameters(self):
-        return (("Base learners", [l.name for l in self.learners]),
-                ("Aggregator",
-                 self.aggregate.name if self.aggregate else 'default'))
+        return (("基础学习器", [l.name for l in self.learners]),
+                ("聚合器",
+                 self.aggregate.name if self.aggregate else '默认'))
 
 
 if __name__ == "__main__":

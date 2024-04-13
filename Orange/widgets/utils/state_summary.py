@@ -39,10 +39,10 @@ def format_variables_string(variables):
         return '—'
 
     agg = []
-    for var_type_name, var_type in [('categorical', DiscreteVariable),
-                                    ('numeric', ContinuousVariable),
-                                    ('time', TimeVariable),
-                                    ('string', StringVariable)]:
+    for var_type_name, var_type in [('分类', DiscreteVariable),
+                                    ('数值', ContinuousVariable),
+                                    ('时间', TimeVariable),
+                                    ('字符串', StringVariable)]:
         # Disable pylint here because a `TimeVariable` is also a
         # `ContinuousVariable`, and should be labelled as such. That is why
         # it is necessary to check the type this way instead of using
@@ -89,24 +89,24 @@ def format_summary_details(data: Union[Table, Domain],
             features_missing \
                 = missing_values(data.get_nan_frequency_attribute())
         name = getattr(data, "name", None)
-        if name == "untitled":
+        if name == "未命名":
             name = None
-        basic = f'{len(data):n} {pl(len(data), "instance")}, '
+        basic = f'{len(data):n} {pl(len(data), "个实例")},'
 
     n_features = len(domain.variables) + len(domain.metas)
-    basic += f'{n_features} {pl(n_features, "variable")}'
+    basic += f'{n_features} {pl(n_features, "个变量")}'
 
     features = format_variables_string(domain.attributes)
-    features = f'Features: {features}{features_missing}'
+    features = f'特征: {features}{features_missing}'
 
     targets = format_variables_string(domain.class_vars)
-    targets = f'Target: {targets}'
+    targets = f'目标: {targets}'
 
     metas = format_variables_string(domain.metas)
     metas = f'Metas: {metas}'
 
     if format == Qt.PlainText:
-        details = f"{name}: " if name else "Table with "
+        details = f"{name}: " if name else "表格包含"
         details += f"{basic}\n{features}\n{targets}"
         if domain.metas:
             details += f"\n{metas}"
@@ -115,7 +115,7 @@ def format_summary_details(data: Union[Table, Domain],
         if name:
             descs.append(_nobr(f"<b><u>{escape(name)}</u></b>: {basic}"))
         else:
-            descs.append(_nobr(f"Table with {basic}"))
+            descs.append(_nobr(f"包含 {basic} 的表格"))
 
         if domain.variables:
             descs.append(_nobr(features))
@@ -131,14 +131,14 @@ def format_summary_details(data: Union[Table, Domain],
 
 def missing_values(value):
     if value:
-        return f' ({value*100:.1f}% missing values)'
+        return f' ({value*100:.1f}% 缺失值)'
     elif value is None:
         return ''
     else:
-        return ' (no missing values)'
+        return ' (无缺失值)'
 
 
-def format_multiple_summaries(data_list, type_io='input'):
+def format_multiple_summaries(data_list, type_io='输入'):
     """
     A function that forms the entire descriptive part of the input/output
     summary for widgets that have more than one input/output.
@@ -163,7 +163,7 @@ def format_multiple_summaries(data_list, type_io='input'):
         if data:
             details = new_line(format_summary_details(data))
         else:
-            details = f'No data on {type_io}.'
+            details = f'{type_io} 无数据'
         full_details.append(details if not name else f'{name}:<br>{details}')
     return '<hr>'.join(full_details)
 
@@ -232,7 +232,7 @@ def summarize_matrix(matrix: DistMatrix):  # pylint: disable=function-redefined
     h, w = matrix.shape
     return PartialSummary(
         f"{w}×{h}",
-        _nobr(f"{w}×{h} distance matrix"),
+        _nobr(f"{w}×{h} 距离矩阵"),
         previewer
     )
 
@@ -241,8 +241,8 @@ def summarize_matrix(matrix: DistMatrix):  # pylint: disable=function-redefined
 def summarize_results(results: Results):  # pylint: disable=function-redefined
     nmethods, ninstances = results.predicted.shape
     summary = f"{nmethods}×{ninstances}"
-    details = f"{nmethods} {pl(nmethods, 'method')} " \
-              f"on {ninstances} test {pl(ninstances, 'instance')}"
+    details = f"{nmethods} {pl(nmethods, '个方法')} " \
+              f"在 {ninstances} 个测试 {pl(ninstances, '个实例')}"
     return PartialSummary(summary, _nobr(details))
 
 
@@ -250,12 +250,12 @@ def summarize_results(results: Results):  # pylint: disable=function-redefined
 def summarize_attributes(attributes: AttributeList):  # pylint: disable=function-redefined
     n = len(attributes)
     if n == 0:
-        details = "empty list"
+        details = "空列表"
     elif n <= 3:
         details = _nobr(", ".join(var.name for var in attributes))
     else:
         details = _nobr(", ".join(var.name for var in attributes[:2]) +
-                       f" and {n - 2} others")
+                       f" 和其他 {n - 2} 个")
     return PartialSummary(n, details)
 
 
@@ -265,7 +265,7 @@ def summarize_preprocessor(preprocessor: Preprocess):  # pylint: disable=functio
         if preprocessor.preprocessors:
             details = "<br/>".join(map(_name_of, preprocessor.preprocessors))
         else:
-            details = _nobr(f"{_name_of(preprocessor)} (empty)")
+            details = _nobr(f"{_name_of(preprocessor)} (空)")
     else:
         details = _name_of(preprocessor)
     return PartialSummary("🄿", details)

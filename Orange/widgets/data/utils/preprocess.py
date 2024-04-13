@@ -466,7 +466,7 @@ class SequenceFlow(QWidget):
             self.__focusframe = None
 
             self.__deleteaction = QAction(
-                "Remove", self, shortcut=QKeySequence.Delete,
+                "删除", self, shortcut=QKeySequence.Delete,
                 enabled=False, triggered=self.closeRequested
             )
             self.addAction(self.__deleteaction)

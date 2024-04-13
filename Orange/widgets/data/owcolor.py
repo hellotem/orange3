@@ -157,7 +157,7 @@ class DiscAttrDesc(AttrDesc):
             if len(set(mapped_values)) != len(mapped_values):
                 warnings.append(
                     f"{var.name}: "
-                    "renaming of values ignored due to duplicate names")
+                    "忽略值的重命名,因为名称重复")
             else:
                 obj.new_values = mapped_values
 
@@ -377,7 +377,7 @@ class ContColorTableModel(ColorTableModel):
             if role == Qt.ForegroundRole:
                 return QBrush(Qt.blue)
             if row == self.mouse_row and role == Qt.DisplayRole:
-                return "Copy to all"
+                return "复制到所有"
             return None
 
         row, col = index.row(), index.column()
@@ -537,15 +537,15 @@ class ContinuousTable(ColorTable):
 
 
 class OWColor(widget.OWWidget):
-    name = "Color"
-    description = "Set color legend for variables."
+    name = "颜色 Color"
+    description = "设置变量的颜色图例。"
     icon = "icons/Colors.svg"
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
+        data = Input("数据", Orange.data.Table)
 
     class Outputs:
-        data = Output("Data", Orange.data.Table)
+        data = Output("数据", Orange.data.Table)
 
     settingsHandler = settings.PerfectDomainContextHandler(
         match_values=settings.PerfectDomainContextHandler.MATCH_VALUES_ALL)
@@ -563,22 +563,22 @@ class OWColor(widget.OWWidget):
         self.data = None
         self.orig_domain = self.domain = None
 
-        box = gui.hBox(self.controlArea, "Discrete Variables")
+        box = gui.hBox(self.controlArea, "离散变量")
         self.disc_model = DiscColorTableModel()
         self.disc_view = DiscreteTable(self.disc_model)
         self.disc_model.dataChanged.connect(self._on_data_changed)
         box.layout().addWidget(self.disc_view)
 
-        box = gui.hBox(self.controlArea, "Numeric Variables")
+        box = gui.hBox(self.controlArea, "数值变量")
         self.cont_model = ContColorTableModel()
         self.cont_view = ContinuousTable(self.cont_model)
         self.cont_model.dataChanged.connect(self._on_data_changed)
         box.layout().addWidget(self.cont_view)
 
         box = gui.hBox(self.buttonsArea)
-        gui.button(box, self, "Save", callback=self.save)
-        gui.button(box, self, "Load", callback=self.load)
-        gui.button(box, self, "Reset", callback=self.reset)
+        gui.button(box, self, "保存", callback=self.save)
+        gui.button(box, self, "加载", callback=self.load)
+        gui.button(box, self, "重置", callback=self.reset)
         gui.rubber(self.buttonsArea)
         gui.auto_apply(self.buttonsArea, self, "auto_apply")
 
@@ -620,8 +620,8 @@ class OWColor(widget.OWWidget):
 
     def save(self):
         fname, _ = QFileDialog.getSaveFileName(
-            self, "File name", self._start_dir(),
-            "Variable definitions (*.colors)")
+            self, "文件名", self._start_dir(),
+            "变量定义 (*.colors)")
         if not fname:
             return
         QSettings().setValue("colorwidget/last-location",
@@ -644,8 +644,8 @@ class OWColor(widget.OWWidget):
 
     def load(self):
         fname, _ = QFileDialog.getOpenFileName(
-            self, "File name", self._start_dir(),
-            "Variable definitions (*.colors)")
+            self, "文件名", self._start_dir(),
+            "变量定义 (*.colors)")
         if not fname:
             return
 
@@ -654,10 +654,10 @@ class OWColor(widget.OWWidget):
                 js = json.load(f)  #: dict
                 self._parse_var_defs(js)
         except IOError:
-            QMessageBox.critical(self, "File error", "File cannot be opened.")
+            QMessageBox.critical(self, "文件错误", "无法打开文件。")
             return
         except (json.JSONDecodeError, InvalidFileFormat):
-            QMessageBox.critical(self, "File error", "Invalid file format.")
+            QMessageBox.critical(self, "文件错误", "无效的文件格式。")
             return
 
     def _parse_var_defs(self, js):
@@ -684,8 +684,8 @@ class OWColor(widget.OWWidget):
         if len(renamed_vars) != len(self.disc_descs) + len(self.cont_descs):
             QMessageBox.warning(
                 self,
-                "Duplicated variable names",
-                "Variables will not be renamed due to duplicated names.")
+                "变量名重复",
+                "由于名称重复,变量将不会被重命名。")
             for repo in js.values():
                 for desc in repo.values():
                     desc.pop("rename", None)
@@ -712,11 +712,11 @@ class OWColor(widget.OWWidget):
         if unused_vars:
             names = [f"'{name}'" for name in unused_vars]
             if len(unused_vars) == 1:
-                warn = f'Definition for variable {names[0]}, which does not ' \
-                       f'appear in the data, was ignored.\n'
+                warn = f'对于不在数据中的变量 {names[0]} 的定义,' \
+                       f'已被忽略。\n'
             else:
                 if len(unused_vars) <= 5:
-                    warn = 'Definitions for variables ' \
+                    warn = '对于不在数据中的变量' \
                            f'{", ".join(names[:-1])} and {names[-1]}'
                 else:
                     warn = f'Definitions for {", ".join(names[:4])} ' \
@@ -730,7 +730,7 @@ class OWColor(widget.OWWidget):
                            for desc in self.cont_descs]
         if warnings:
             QMessageBox.warning(
-                self, "Invalid definitions", "\n".join(warnings))
+                self, "无效的定义", "\n".join(warnings))
 
         self.disc_model.set_data(self.disc_descs)
         self.cont_model.set_data(self.cont_descs)
@@ -804,9 +804,9 @@ class OWColor(widget.OWWidget):
         sections = (
             (name, _report_variables(variables))
             for name, variables in (
-                ("Features", dom.attributes),
-                (f'{pl(len(dom.class_vars), "Outcome")}', dom.class_vars),
-                ("Meta attributes", dom.metas)))
+                ("特征", dom.attributes),
+                (f'{pl(len(dom.class_vars), "输出")}', dom.class_vars),
+                ("元数据", dom.metas)))
         table = "".join(f"<tr><th>{name}</th></tr>{rows}"
                         for name, rows in sections if rows)
         if table:

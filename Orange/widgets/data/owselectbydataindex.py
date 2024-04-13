@@ -11,29 +11,29 @@ from Orange.widgets.utils.annotated_data import (create_annotated_table)
 
 
 class OWSelectByDataIndex(widget.OWWidget):
-    name = "Select by Data Index"
-    description = "Match instances by index from data subset."
-    category = "Transform"
+    name = "按数据索引选择 Select by Data Index"
+    description = "通过数据子集的索引匹配实例。"
+    category = "变换"
     icon = "icons/SelectByDataIndex.svg"
     priority = 1112
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
         data_subset = Input("Data Subset", Table)
 
     class Outputs:
-        matching_data = Output("Matching Data", Table, replaces=["Data"], default=True)
-        non_matching_data = Output("Unmatched Data", Table)
+        matching_data = Output("匹配数据", Table, replaces=["Data"], default=True)
+        non_matching_data = Output("不匹配数据", Table)
         # avoiding the default annotated output name (Data), as it was used
         # for Matching Data previously
-        annotated_data = Output("Annotated Data", Table)
+        annotated_data = Output("标记数据", Table)
 
     want_main_area = False
     buttons_area_orientation = None
     resizing_enabled = False
 
     class Warning(widget.OWWidget.Warning):
-        instances_not_matching = widget.Msg("Input tables do not share any instances.")
+        instances_not_matching = widget.Msg("输入表没有共享任何实例。")
 
     def __init__(self):
         super().__init__()
@@ -98,15 +98,15 @@ that appear in Data Subset, based on row identity and not actual data.
     def send_report(self):
         def data_info_text(data):
             if data is None:
-                return "No data."
+                return "无数据。"
             nvars = len(data.domain.variables) + len(data.domain.metas)
             return f"{data.name}, " \
-                   f"{len(data)} {pl(len(data), 'instance')}, " \
-                   f"{nvars} {pl(nvars, 'variable')}"
+                   f"{len(data)} {pl(len(data), '实例')}, " \
+                   f"{nvars} {pl(nvars, '变量')}"
 
         self.report_items("",
-                          [("Data", data_info_text(self.data)),
-                           ("Data Subset", data_info_text(self.data_subset))])
+                          [("数据", data_info_text(self.data)),
+                           ("数据子集", data_info_text(self.data_subset))])
 
 
 if __name__ == "__main__":  # pragma: no cover

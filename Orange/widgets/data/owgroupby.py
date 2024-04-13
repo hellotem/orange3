@@ -90,41 +90,41 @@ def span(s):
 
 
 AGGREGATIONS = {
-    "Mean": Aggregation("mean", {ContinuousVariable, TimeVariable}),
-    "Median": Aggregation("median", {ContinuousVariable, TimeVariable}),
-    "Q1": Aggregation(lambda s: s.quantile(0.25), {ContinuousVariable, TimeVariable}),
-    "Q3": Aggregation(lambda s: s.quantile(0.75), {ContinuousVariable, TimeVariable}),
-    "Min. value": Aggregation("min", {ContinuousVariable, TimeVariable}),
-    "Max. value": Aggregation("max", {ContinuousVariable, TimeVariable}),
-    "Mode": Aggregation(
+    "平均值": Aggregation("mean", {ContinuousVariable, TimeVariable}),
+    "中位数": Aggregation("median", {ContinuousVariable, TimeVariable}),
+    "第一分位数": Aggregation(lambda s: s.quantile(0.25), {ContinuousVariable, TimeVariable}),
+    "第三分位数": Aggregation(lambda s: s.quantile(0.75), {ContinuousVariable, TimeVariable}),
+    "最小值": Aggregation("min", {ContinuousVariable, TimeVariable}),
+    "最大值": Aggregation("max", {ContinuousVariable, TimeVariable}),
+    "模式": Aggregation(
         lambda x: pd.Series.mode(x).get(0, nan),
         {ContinuousVariable, DiscreteVariable, TimeVariable}
     ),
-    "Standard deviation": Aggregation(std, {ContinuousVariable, TimeVariable}),
-    "Variance": Aggregation(var, {ContinuousVariable, TimeVariable}),
-    "Sum": Aggregation("sum", {ContinuousVariable}),
-    "Concatenate": Aggregation(
+    "标准差": Aggregation(std, {ContinuousVariable, TimeVariable}),
+    "方差": Aggregation(var, {ContinuousVariable, TimeVariable}),
+    "总和": Aggregation("sum", {ContinuousVariable}),
+    "连接": Aggregation(
         concatenate,
         {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable},
     ),
-    "Span": Aggregation(span, {ContinuousVariable, TimeVariable}),
-    "First value": Aggregation(
+    "跨度": Aggregation(span, {ContinuousVariable, TimeVariable}),
+    "首个值": Aggregation(
         "first", {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable}
     ),
-    "Last value": Aggregation(
+    "最后值": Aggregation(
         "last", {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable}
     ),
-    "Random value": Aggregation(
+    "随机值": Aggregation(
         lambda x: x.sample(1, random_state=0),
         {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable},
     ),
-    "Count defined": Aggregation(
+    "计数定义": Aggregation(
         "count", {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable}
     ),
-    "Count": Aggregation(
+    "计数": Aggregation(
         "size", {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable}
     ),
-    "Proportion defined": Aggregation(
+    "比例定义": Aggregation(
         lambda x: x.count() / x.size,
         {ContinuousVariable, DiscreteVariable, StringVariable, TimeVariable},
     ),
@@ -158,7 +158,7 @@ def _run(
         if state.is_interruption_requested():
             raise Exception
 
-    state.set_status("Aggregating")
+    state.set_status("聚合中")
     # group table rows
     if result.group_by is None:
         result.group_by = data.groupby(group_by_attrs)
@@ -182,7 +182,7 @@ class TabColumn:
     aggregations = 1
 
 
-TABLE_COLUMN_NAMES = ["Attributes", "Aggregations"]
+TABLE_COLUMN_NAMES = ["属性", "聚合"]
 
 
 class VarTableModel(QAbstractTableModel):
@@ -330,18 +330,18 @@ def block_signals(widget):
 
 
 class OWGroupBy(OWWidget, ConcurrentWidgetMixin):
-    name = "Group by"
+    name = "按组汇总 Group by"
     description = ""
-    category = "Transform"
+    category = "变换"
     icon = "icons/GroupBy.svg"
-    keywords = "aggregate, group by"
+    keywords = "聚合，按组汇总"
     priority = 1210
 
     class Inputs:
-        data = Input("Data", Table, doc="Input data table")
+        data = Input("数据", Table, doc="输入数据表")
 
     class Outputs:
-        data = Output("Data", Table, doc="Aggregated data")
+        data = Output("数据", Table, doc="聚合数据")
 
     class Error(OWWidget.Error):
         unexpected_error = Msg("{}")
@@ -374,7 +374,7 @@ class OWGroupBy(OWWidget, ConcurrentWidgetMixin):
             self.controlArea,
             self,
             "gb_attrs",
-            box="Group by",
+            box="按组汇总",
             model=self.gb_attrs_model,
             viewType=AggregateListViewSearch,
             callback=self.__gb_changed,
@@ -397,7 +397,7 @@ class OWGroupBy(OWWidget, ConcurrentWidgetMixin):
 
         # aggregations checkboxes
         grid_layout = QGridLayout()
-        gui.widgetBox(self.mainArea, orientation=grid_layout, box="Aggregations")
+        gui.widgetBox(self.mainArea, orientation=grid_layout, box="聚合")
 
         col = 0
         row = 0

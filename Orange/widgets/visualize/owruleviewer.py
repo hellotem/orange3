@@ -18,18 +18,18 @@ from Orange.widgets.widget import Input, Output
 
 
 class OWRuleViewer(widget.OWWidget):
-    name = "CN2 Rule Viewer"
-    description = "Review rules induced from data."
+    name = "CN2规则查看器 CN2 Rule Viewer"
+    description = "审阅从数据中导出的规则。"
     icon = "icons/CN2RuleViewer.svg"
     priority = 1140
-    keywords = "cn2 rule viewer"
+    keywords = "cn2规则查看器"
 
     class Inputs:
-        data = Input("Data", Table)
-        classifier = Input("Classifier", _RuleClassifier)
+        data = Input("数据", Table)
+        classifier = Input("分类器", _RuleClassifier)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     compact_view = settings.Setting(False)
@@ -47,8 +47,8 @@ class OWRuleViewer(widget.OWWidget):
 
         self.model = CustomRuleViewerTableModel(parent=self)
         self.model.set_horizontal_header_labels(
-            ["IF conditions", "", "THEN class", "Distribution",
-             "Probabilities [%]", "Quality", "Length"])
+            ["IF条件", "", "THEN类", "分布",
+             "概率 [%]", "质量", "长度"])
 
         self.proxy_model = QSortFilterProxyModel(parent=self)
         self.proxy_model.setSourceModel(self.model)
@@ -66,12 +66,12 @@ class OWRuleViewer(widget.OWWidget):
         self.controlArea.layout().addWidget(self.view)
 
         gui.checkBox(widget=self.buttonsArea, master=self, value="compact_view",
-                     label="Compact view", callback=self.on_update)
+                     label="紧凑视图", callback=self.on_update)
         gui.rubber(self.buttonsArea)
 
         original_order_button = gui.button(
             self.buttonsArea, self,
-            "Restore original order",
+            "恢复原始顺序",
             autoDefault=False,
             callback=self.restore_original_order,
             attribute=Qt.WA_LayoutUsesWidgetRect,
@@ -173,7 +173,7 @@ class OWRuleViewer(widget.OWWidget):
 
     def send_report(self):
         if self.classifier is not None:
-            self.report_table("Induced rules", self.view)
+            self.report_table("导出规则", self.view)
 
     def sizeHint(self):
         return QSize(800, 450)
@@ -240,7 +240,7 @@ class CustomRuleViewerTableModel(QAbstractTableModel):
         def _display_role():
             if column == 0:
                 delim = " AND " if self._compact_view else " AND\n"
-                return "TRUE" if not rule.selectors else delim.join(
+                return "真" if not rule.selectors else delim.join(
                     [attributes[s.column].name + self.OPERATORS[s.op] +
                      (attributes[s.column].values[int(s.value)]
                       if attributes[s.column].is_discrete

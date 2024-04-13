@@ -191,7 +191,7 @@ class SelectEncodingsWidget(QWidget):
         buttons = QDialogButtonBox(
             standardButtons=QDialogButtonBox.RestoreDefaults
         )
-        b = buttons.addButton("Select all", QDialogButtonBox.ActionRole)
+        b = buttons.addButton("全选", QDialogButtonBox.ActionRole)
         b.clicked.connect(self.selectAll)
         b = buttons.button(QDialogButtonBox.RestoreDefaults)
         b.clicked.connect(self.reset)
@@ -363,7 +363,7 @@ def main(args=sys.argv):
     from AnyQt.QtWidgets import QApplication
     app = QApplication(args)
     w = SelectEncodingsWidget(
-        headingText="Select encodings visible in text encoding menus"
+        headingText="选择在文本编码菜单中可见的编码"
     )
     w.show()
     w.activateWindow()

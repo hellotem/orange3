@@ -234,7 +234,7 @@ class Euclidean(FittedDistance):
             if cat is RuntimeWarning and msg in (
                     "Mean of empty slice", "Degrees of freedom <= 0 for slice"):
                 if self.normalize:
-                    raise ValueError("some columns have no defined values")
+                    raise ValueError("某些列没有定义值")
             else:
                 orig_warn(msg, cat, *args, **kwargs)
 
@@ -246,7 +246,7 @@ class Euclidean(FittedDistance):
             means = np.nanmean(x, axis=0)
             stdvars = np.nanvar(x, axis=0)
         if self.normalize and not stdvars.all():
-            raise ValueError("some columns are constant")
+            raise ValueError("某些列是常数")
         return EuclideanColumnsModel(
             attributes, self.impute, self.normalize, means, stdvars,
             self.callback)
@@ -383,8 +383,8 @@ class Manhattan(FittedDistance):
             mads = np.nanmedian(np.abs(x - medians), axis=0)
         if self.normalize and (np.isnan(mads).any() or not mads.all()):
             raise ValueError(
-                "some columns have zero absolute distance from median, "
-                "or no values")
+                "某些列与中值的绝对距离为零,"
+                "或没有值")
         return ManhattanColumnsModel(
             attributes, self.impute, self.normalize, medians, mads,
             self.callback)
@@ -805,11 +805,11 @@ class Mahalanobis(Distance):
         try:
             c = np.cov(x.T)
         except:
-            raise MemoryError("Covariance matrix is too large.")
+            raise MemoryError("协方差矩阵太大。")
         try:
             vi = np.linalg.inv(c)
         except:
-            raise ValueError("Computation of inverse covariance matrix failed.")
+            raise ValueError("计算逆协方差矩阵失败。")
         return MahalanobisModel(self.axis, self.impute, vi)
 
 

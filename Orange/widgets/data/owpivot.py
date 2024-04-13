@@ -85,7 +85,7 @@ class Pivot:
         self._row_var_groups = nanunique(self._row_var_col)
         self._col_var_groups = nanunique(self._col_var_col)
 
-        self._total_var = DiscreteVariable("Total", values=("total", ))
+        self._total_var = DiscreteVariable("总计", values=("total", ))
         self._current_agg_functions = sorted(agg_funs)
         self._indepen_agg_done = {}  # type: Dict[Functions, int]
         self._depen_agg_done = {}  # type: Dict[Functions, Dict[Variable, int]]
@@ -300,19 +300,19 @@ class Pivot:
             kwargs = {"have_date": val_var.have_date,
                       "have_time": val_var.have_time}
             attrs = [[TimeVariable(f"{v}", **kwargs) for v in vals]] * 2
-            attrs.extend([[TimeVariable("Total", **kwargs)]] * 2)
+            attrs.extend([[TimeVariable("总计", **kwargs)]] * 2)
         elif create_cont_var:
             attrs = [[ContinuousVariable(f"{v}", 1) for v in vals]] * 2
-            attrs.extend([[ContinuousVariable("Total", 1)]] * 2)
+            attrs.extend([[ContinuousVariable("总计", 1)]] * 2)
         else:
             attrs = []
             for x in (X, X_h):
                 attrs.append([DiscreteVariable(f"{v}", map_values(i, x))
                               for i, v in enumerate(vals, 2)])
             for x in (X_v, X_t):
-                attrs.append([DiscreteVariable("Total", map_values(0, x))])
-        row_var_h = DiscreteVariable(self._row_var.name, values=["Total"])
-        aggr_attr = DiscreteVariable('Aggregate', [str(f) for f in agg_funs])
+                attrs.append([DiscreteVariable("总计", map_values(0, x))])
+        row_var_h = DiscreteVariable(self._row_var.name, values=["总计"])
+        aggr_attr = DiscreteVariable('聚合', [str(f) for f in agg_funs])
 
         same_row_col = self._col_var is self._row_var
 
@@ -439,16 +439,16 @@ class Pivot:
     Count, Count_defined, Sum, Mean, Min, Max, Mode, Median, Var, Majority = \
     Functions = [
         Function(i, *fdef) for i, fdef in enumerate((
-            ("Count", len),
-            ("Count defined", count_defined),
-            ("Sum", lambda x: nansum(x, axis=0) if x.shape[0] > 0 else 0),
-            ("Mean", wrapstat(nanmean)),
-            ("Min", wrapstat(nanmin)),
-            ("Max", wrapstat(nanmax)),
-            ("Mode", mode),
-            ("Median", wrapstat(nanmedian)),
-            ("Var", wrapstat(nanvar)),
-            ("Majority", majority)
+            ("计数", len),
+            ("计数已定义", count_defined),
+            ("求和", lambda x: nansum(x, axis=0) if x.shape[0] > 0 else 0),
+            ("平均值", wrapstat(nanmean)),
+            ("最小值", wrapstat(nanmin)),
+            ("最大值", wrapstat(nanmax)),
+            ("众数", mode),
+            ("中位数", wrapstat(nanmedian)),
+            ("方差", wrapstat(nanvar)),
+            ("多数", majority)
     ))]
 
     AutonomousFunctions = (Count,)
@@ -476,7 +476,7 @@ class BorderedItemDelegate(QStyledItemDelegate):
 class PivotTableView(QTableView):
     selection_changed = pyqtSignal()
 
-    TOTAL_STRING = "Total"
+    TOTAL_STRING = "总计"
 
     def __init__(self):
         super().__init__(editTriggers=QTableView.NoEditTriggers)
@@ -720,29 +720,29 @@ class PivotTableView(QTableView):
 
 
 class OWPivot(OWWidget):
-    name = "Pivot Table"
-    description = "Reshape data table based on column values."
-    category = "Transform"
+    name = "数据透视表 Pivot Table"
+    description = "根据列值重塑数据表。"
+    category = "变换"
     icon = "icons/Pivot.svg"
     priority = 1220
-    keywords = "pivot table, pivot, group, aggregate"
+    keywords = "数据透视表,数据透视,分组,聚合"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
+        data = Input("数据", Table, default=True)
 
     class Outputs:
-        pivot_table = Output("Pivot Table", Table, default=True)
-        filtered_data = Output("Filtered Data", Table)
-        grouped_data = Output("Grouped Data", Table)
+        pivot_table = Output("数据透视表", Table, default=True)
+        filtered_data = Output("过滤后的数据", Table)
+        grouped_data = Output("分组数据", Table)
 
     class Warning(OWWidget.Warning):
         # TODO - inconsistent for different variable types
-        no_col_feature = Msg("Column feature should be selected.")
-        cannot_aggregate = Msg("Some aggregations ({}) cannot be computed.")
-        renamed_vars = Msg("Some variables have been renamed in some tables"
-                           "to avoid duplicates.\n{}")
-        too_many_values = Msg("Selected variable has too many values.")
-        no_variables = Msg("At least 1 primitive variable is required.")
+        no_col_feature = Msg("应选择列特征。")
+        cannot_aggregate = Msg("无法计算某些聚合({})。")
+        renamed_vars = Msg("某些变量在某些表中已被重命名"
+                           "以避免重复。\n{}")
+        too_many_values = Msg("选定的变量值太多。")
+        no_variables = Msg("至少需要1个基本变量。")
 
     settingsHandler = DomainContextHandler()
     settings_version = 2
@@ -778,26 +778,26 @@ class OWPivot(OWWidget):
         self._add_main_area_controls()
 
     def _add_control_area_controls(self):
-        gui.comboBox(gui.vBox(self.controlArea, box="Rows"),
+        gui.comboBox(gui.vBox(self.controlArea, box="行"),
                      self, "row_feature",
                      contentsLength=14,
                      searchable=True,
                      model=DomainModel(valid_types=DomainModel.PRIMITIVE),
                      callback=self.__feature_changed,
                      orientation=Qt.Horizontal)
-        gui.comboBox(gui.vBox(self.controlArea, box="Columns"),
+        gui.comboBox(gui.vBox(self.controlArea, box="列"),
                      self, "col_feature",
                      contentsLength=14,
                      searchable=True,
-                     model=DomainModel(placeholder="(Same as rows)",
+                     model=DomainModel(placeholder="(与行相同)",
                                        valid_types=DiscreteVariable),
                      callback=self.__feature_changed,
                      orientation=Qt.Horizontal)
-        gui.comboBox(gui.vBox(self.controlArea, box="Values"),
+        gui.comboBox(gui.vBox(self.controlArea, box="值"),
                      self, "val_feature",
                      contentsLength=14,
                      searchable=True,
-                     model=DomainModel(placeholder="(None)"),
+                     model=DomainModel(placeholder="(无)"),
                      callback=self.__val_feature_changed,
                      orientation=Qt.Horizontal)
         self.__add_aggregation_controls()
@@ -814,7 +814,7 @@ class OWPivot(OWWidget):
             box.layout().addWidget(inbox)
             row = col = 0
 
-        box = gui.vBox(self.controlArea, "Aggregations")
+        box = gui.vBox(self.controlArea, "聚合")
         row = col = 0
         inbox = None
         new_inbox()
@@ -1018,13 +1018,13 @@ class OWPivot(OWWidget):
 
     def send_report(self):
         self.report_items((
-            ("Row feature", self.row_feature),
-            ("Column feature", self.col_feature),
-            ("Value feature", self.val_feature)))
+            ("行特征", self.row_feature),
+            ("列特征", self.col_feature),
+            ("值特征", self.val_feature)))
         if self.data and self.val_feature is not None:
             self.report_table("", self.table_view)
         if not self.data:
-            self.report_items((("Group by", self.row_feature),))
+            self.report_items((("按...分组", self.row_feature),))
             self.report_table(self.table_view)
 
     @classmethod

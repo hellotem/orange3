@@ -59,7 +59,7 @@ def split_domain(domain: Domain, split_label: str):
         groups[val].append(var)
     if None in groups:
         na = groups.pop(None)
-        return [*groups.items(), ("N/A", na)]
+        return [*groups.items(), ("无", na)]
     else:
         return list(groups.items())
 
@@ -91,17 +91,17 @@ ClusteringRole = Qt.UserRole + 13
 #: Item data for clustering method selection models
 ClusteringModelData = [
     {
-        Qt.DisplayRole: "None",
-        Qt.ToolTipRole: "No clustering",
+        Qt.DisplayRole: "无",
+        Qt.ToolTipRole: "无聚类",
         ClusteringRole: Clustering.None_,
     }, {
-        Qt.DisplayRole: "Clustering",
-        Qt.ToolTipRole: "Apply hierarchical clustering",
+        Qt.DisplayRole: "聚类",
+        Qt.ToolTipRole: "应用层次聚类",
         ClusteringRole: Clustering.Clustering,
     }, {
-        Qt.DisplayRole: "Clustering (opt. ordering)",
-        Qt.ToolTipRole: "Apply hierarchical clustering with optimal leaf "
-                        "ordering.",
+        Qt.DisplayRole: "聚类(优化排序)",
+        Qt.ToolTipRole: "应用具有最优叶子顺序的层次聚类"
+                        "方法",
         ClusteringRole: Clustering.OrderedClustering,
     }
 ]
@@ -109,10 +109,10 @@ ClusteringModelData = [
 ColumnLabelsPosData = [
     {Qt.DisplayRole: name, Qt.UserRole: value}
     for name, value in [
-        ("None", HeatmapGridWidget.NoPosition),
-        ("Top", HeatmapGridWidget.PositionTop),
-        ("Bottom", HeatmapGridWidget.PositionBottom),
-        ("Top and Bottom", (HeatmapGridWidget.PositionTop |
+        ("无", HeatmapGridWidget.NoPosition),
+        ("顶部", HeatmapGridWidget.PositionTop),
+        ("底部", HeatmapGridWidget.PositionBottom),
+        ("顶部和底部", (HeatmapGridWidget.PositionTop |
                             HeatmapGridWidget.PositionBottom)),
     ]
 ]
@@ -133,17 +133,17 @@ def create_list_model(
 
 
 class OWHeatMap(widget.OWWidget):
-    name = "Heat Map"
-    description = "Plot a data matrix heatmap."
+    name = "热力图 Heat Map"
+    description = "绘制数据矩阵热图"
     icon = "icons/Heatmap.svg"
     priority = 260
     keywords = "heat map"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选择的数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     settings_version = 3
@@ -190,27 +190,27 @@ class OWHeatMap(widget.OWWidget):
     graph_name = "scene"  # QGraphicsScene (HeatmapScene)
 
     class Information(widget.OWWidget.Information):
-        sampled = Msg("Data has been sampled")
-        discrete_ignored = Msg("Categorical features are ignored.")
+        sampled = Msg("数据已被采样")
+        discrete_ignored = Msg("忽略分类特征")
         row_clust = Msg("{}")
         col_clust = Msg("{}")
-        sparse_densified = Msg("Showing this data may require a lot of memory")
+        sparse_densified = Msg("显示该数据可能需要大量内存")
 
     class Error(widget.OWWidget.Error):
-        no_continuous = Msg("No numeric features")
-        not_enough_features = Msg("Not enough features for column clustering")
-        not_enough_instances = Msg("Not enough instances for clustering")
+        no_continuous = Msg("无数值特征")
+        not_enough_features = Msg("列聚类的特征数不足")
+        not_enough_instances = Msg("实例数不足以进行聚类")
         not_enough_instances_k_means = Msg(
-            "Not enough instances for k-means merging")
-        not_enough_memory = Msg("Not enough memory to show this data")
+            "实例数不足以进行 k-means 合并")
+        not_enough_memory = Msg("内存不足以显示该数据")
 
     class Warning(widget.OWWidget.Warning):
-        empty_clusters = Msg("Empty clusters were removed")
+        empty_clusters = Msg("已移除空簇")
 
     UserAdviceMessages = [
         widget.Message(
-            "For data with a meaningful mid-point, "
-            "choose one of diverging palettes.",
+            "对于有有意义的中点的数据,"
+            "选择发散调色板之一",
             "diverging_palette")]
 
     def __init__(self):
@@ -246,7 +246,7 @@ class OWHeatMap(widget.OWWidget):
         self.__columns_cache = {}
 
         # GUI definition
-        colorbox = gui.vBox(self.controlArea, "Color")
+        colorbox = gui.vBox(self.controlArea, "颜色")
 
         self.color_map_widget = cmw = ColorGradientSelection(
             thresholds=(self.threshold_low, self.threshold_high),
@@ -272,15 +272,15 @@ class OWHeatMap(widget.OWWidget):
 
         colorbox.layout().addWidget(self.color_map_widget)
 
-        mergebox = gui.vBox(self.controlArea, "Merge",)
-        gui.checkBox(mergebox, self, "merge_kmeans", "Merge by k-means",
+        mergebox = gui.vBox(self.controlArea, "合并",)
+        gui.checkBox(mergebox, self, "merge_kmeans", "通过 k-means 合并",
                      callback=self.__update_row_clustering)
         ibox = gui.indentedBox(mergebox)
         gui.spin(ibox, self, "merge_kmeans_k", minv=5, maxv=500,
                  label="Clusters:", keyboardTracking=False,
                  callbackOnReturn=True, callback=self.update_merge)
 
-        cluster_box = gui.vBox(self.controlArea, "Clustering")
+        cluster_box = gui.vBox(self.controlArea, "聚类")
         # Row clustering
         self.row_cluster_cb = cb = ComboBox()
         cb.setModel(create_list_model(ClusteringModelData, self))
@@ -312,7 +312,7 @@ class OWHeatMap(widget.OWWidget):
         form.addRow("Rows:", self.row_cluster_cb)
         form.addRow("Columns:", self.col_cluster_cb)
         cluster_box.layout().addLayout(form)
-        box = gui.vBox(self.controlArea, "Split By")
+        box = gui.vBox(self.controlArea, "拆分依据")
         form = QFormLayout(
             formAlignment=Qt.AlignLeft, labelAlignment=Qt.AlignLeft,
             fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow,
@@ -320,7 +320,7 @@ class OWHeatMap(widget.OWWidget):
         box.layout().addLayout(form)
 
         self.row_split_model = DomainModel(
-            placeholder="(None)",
+            placeholder="(无)",
             valid_types=(Orange.data.DiscreteVariable,),
             parent=self,
         )
@@ -328,7 +328,7 @@ class OWHeatMap(widget.OWWidget):
             enabled=not self.merge_kmeans,
             sizeAdjustPolicy=ComboBox.AdjustToMinimumContentsLengthWithIcon,
             minimumContentsLength=14,
-            toolTip="Split the heatmap vertically by a categorical column"
+            toolTip="按分类列垂直拆分热图"
         )
         self.row_split_cb.setModel(self.row_split_model)
         self.connect_control(
@@ -343,7 +343,7 @@ class OWHeatMap(widget.OWWidget):
             self.__on_split_rows_activated
         )
         self.col_split_model = DomainModel(
-            placeholder="(None)",
+            placeholder="(无)",
             order=DomainModel.MIXED,
             valid_types=(Orange.data.DiscreteVariable,),
             parent=self,
@@ -351,7 +351,7 @@ class OWHeatMap(widget.OWWidget):
         self.col_split_cb = cb = ComboBoxSearch(
             sizeAdjustPolicy=ComboBox.AdjustToMinimumContentsLengthWithIcon,
             minimumContentsLength=14,
-            toolTip="Split the heatmap horizontally by column annotation"
+            toolTip="按列注释水平拆分热图"
         )
         self.col_split_cb.setModel(self.col_split_model)
         self.connect_control(
@@ -362,22 +362,22 @@ class OWHeatMap(widget.OWWidget):
         form.addRow("Rows:", self.row_split_cb)
         form.addRow("Columns:", self.col_split_cb)
 
-        box = gui.vBox(self.controlArea, 'Annotation && Legends')
+        box = gui.vBox(self.controlArea, '注释和图例')
 
-        gui.checkBox(box, self, 'legend', 'Show legend',
+        gui.checkBox(box, self, 'legend', '显示图例',
                      callback=self.update_legend)
 
-        gui.checkBox(box, self, 'averages', 'Stripes with averages',
+        gui.checkBox(box, self, 'averages', '带有平均值的条纹',
                      callback=self.update_averages_stripe)
         gui.separator(box)
-        annotbox = QGroupBox("Row Annotations")
+        annotbox = QGroupBox("行注释")
         form = QFormLayout(
             annotbox,
             formAlignment=Qt.AlignLeft,
             labelAlignment=Qt.AlignLeft,
             fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow
         )
-        self.annotation_model = DomainModel(placeholder="(None)")
+        self.annotation_model = DomainModel(placeholder="(无)")
         self.annotation_text_cb = ComboBoxSearch(
             minimumContentsLength=12,
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon
@@ -389,7 +389,7 @@ class OWHeatMap(widget.OWWidget):
         self.row_side_color_model = DomainModel(
             order=(DomainModel.CLASSES, DomainModel.Separator,
                    DomainModel.METAS),
-            placeholder="(None)", valid_types=DomainModel.PRIMITIVE,
+            placeholder="(无)", valid_types=DomainModel.PRIMITIVE,
             flags=Qt.ItemIsSelectable | Qt.ItemIsEnabled,
             parent=self,
         )
@@ -400,10 +400,10 @@ class OWHeatMap(widget.OWWidget):
         self.row_side_color_cb.setModel(self.row_side_color_model)
         self.row_side_color_cb.activated.connect(self.set_annotation_color_var)
         self.connect_control("annotation_color_var", self.annotation_color_var_changed)
-        form.addRow("Text", self.annotation_text_cb)
-        form.addRow("Color", self.row_side_color_cb)
+        form.addRow("文本", self.annotation_text_cb)
+        form.addRow("颜色", self.row_side_color_cb)
         box.layout().addWidget(annotbox)
-        annotbox = QGroupBox("Column annotations")
+        annotbox = QGroupBox("列注释")
         form = QFormLayout(
             annotbox,
             formAlignment=Qt.AlignLeft,
@@ -411,7 +411,7 @@ class OWHeatMap(widget.OWWidget):
             fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow
         )
         self.col_side_color_model = DomainModel(
-            placeholder="(None)",
+            placeholder="(无)",
             valid_types=(DiscreteVariable, ContinuousVariable),
             parent=self
         )
@@ -432,12 +432,12 @@ class OWHeatMap(widget.OWWidget):
             callback=self.update_column_annotations)
         cb.setModel(create_list_model(ColumnLabelsPosData, parent=self))
         cb.setCurrentIndex(self.column_label_pos)
-        form.addRow("Position", cb)
-        form.addRow("Color", self.col_side_color_cb)
+        form.addRow("位置", cb)
+        form.addRow("颜色", self.col_side_color_cb)
         box.layout().addWidget(annotbox)
 
         gui.checkBox(self.controlArea, self, "keep_aspect",
-                     "Keep aspect ratio", box="Resize",
+                     "保持纵横比", box="调整大小",
                      callback=self.__aspect_mode_changed)
 
         gui.rubber(self.controlArea)
@@ -463,9 +463,9 @@ class OWHeatMap(widget.OWWidget):
         self.mainArea.layout().addWidget(self.view)
         self.selected_rows = []
         self.__font_inc = QAction(
-            "Increase Font", self, shortcut=QKeySequence("ctrl+>"))
+            "增大字体", self, shortcut=QKeySequence("ctrl+>"))
         self.__font_dec = QAction(
-            "Decrease Font", self, shortcut=QKeySequence("ctrl+<"))
+            "减小字体", self, shortcut=QKeySequence("ctrl+<"))
         self.__font_inc.triggered.connect(lambda: self.__adjust_font_size(1))
         self.__font_dec.triggered.connect(lambda: self.__adjust_font_size(-1))
         if hasattr(QAction, "setShortcutVisibleInContextMenu"):
@@ -734,7 +734,7 @@ class OWHeatMap(widget.OWWidget):
                           for name, ind in zip(group_var.values, row_indices)]
             if np.any(_col_data.mask):
                 row_groups.append(RowPart(
-                    title="N/A", indices=np.flatnonzero(_col_data.mask),
+                    title="无", indices=np.flatnonzero(_col_data.mask),
                     cluster=None, cluster_ordered=None
                 ))
         else:
@@ -1011,21 +1011,21 @@ class OWHeatMap(widget.OWWidget):
 
         if not rco_enabled and row_clust == Clustering.OrderedClustering:
             row_clust = Clustering.Clustering
-            row_clust_msg = "Row cluster ordering was disabled due to the " \
-                            "estimated runtime cost"
+            row_clust_msg = "已禁用行簇排序,因为" \
+                            "估计的运行时成本"
         if not rc_enabled and row_clust == Clustering.Clustering:
             row_clust = Clustering.None_
-            row_clust_msg = "Row clustering was was disabled due to the " \
-                            "estimated runtime cost"
+            row_clust_msg = "已禁用行聚类,因为" \
+                            "估计的运行时成本"
 
         if not cco_enabled and col_clust == Clustering.OrderedClustering:
             col_clust = Clustering.Clustering
-            col_clust_msg = "Column cluster ordering was disabled due to " \
-                            "estimated runtime cost"
+            col_clust_msg = "已禁用列簇排序,因为" \
+                            "估计的运行时成本"
         if not cc_enabled and col_clust == Clustering.Clustering:
             col_clust = Clustering.None_
-            col_clust_msg = "Column clustering was disabled due to the " \
-                            "estimated runtime cost"
+            col_clust_msg = "已禁用列聚类,因为" \
+                            "估计的运行时成本"
 
         self.col_clustering = col_clust
         self.row_clustering = row_clust
@@ -1101,7 +1101,7 @@ class OWHeatMap(widget.OWWidget):
             annot_col = self.row_annotation_data()
             merge_indices = self._merge_row_indices()
             if merge_indices is not None and annot_col is not None:
-                join = lambda _1: join_elided(", ", 42, _1, " ({} more)")
+                join = lambda _1: join_elided(", ", 42, _1, " (另有 {} 个)")
                 annot_col = aggregate_apply(join, annot_col, merge_indices)
             if annot_col is not None:
                 widget.setRowLabels(annot_col)
@@ -1242,11 +1242,11 @@ class OWHeatMap(widget.OWWidget):
 
     def send_report(self):
         self.report_items((
-            ("Columns:", "Clustering" if self.col_clustering else "No sorting"),
-            ("Rows:", "Clustering" if self.row_clustering else "No sorting"),
+            ("Columns:", "聚类" if self.col_clustering else "无排序"),
+            ("Rows:", "聚类" if self.row_clustering else "无排序"),
             ("Split:",
              self.split_by_var is not None and self.split_by_var.name),
-            ("Row annotation",
+            ("行注释",
              self.annotation_var is not None and self.annotation_var.name),
         ))
         self.report_plot()
@@ -1383,7 +1383,7 @@ def colorize(var: Variable, data: np.ndarray) -> Tuple[np.ndarray, ColorMap]:
         data = data.astype(int)
         data[mask] = -1
         if mask.any():
-            values = (*var.values, "N/A")
+            values = (*var.values, "无")
         else:
             values = var.values
             colors = colors[: -1]
@@ -1401,7 +1401,7 @@ def aggregate(
         var: Variable, data: np.ndarray, groupindices: Sequence[Sequence[int]],
 ) -> np.ndarray:
     if var.is_string:
-        join = lambda values: (join_elided(", ", 42, values, " ({} more)"))
+        join = lambda values: (join_elided(", ", 42, values, " (另有 {} 个)"))
         # collect all original labels for every merged row
         values = [data[indices] for indices in groupindices]
         data = [join(list(map(var.str_val, vals))) for vals in values]
@@ -1419,7 +1419,7 @@ def aggregate(
         raise TypeError(type(var))
 
 
-def agg_join_str(var, data, groupindices, maxlen=50, elidetemplate=" ({} more)"):
+def agg_join_str(var, data, groupindices, maxlen=50, elidetemplate=" (另有 {} 个)"):
     join_s = lambda values: (
         join_elided(", ", maxlen, values, elidetemplate=elidetemplate)
     )

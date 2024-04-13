@@ -67,11 +67,11 @@ class DiscretizeEditor(BaseEditor):
         EntropyMDL: (preprocess.discretize.EntropyMDL, {"force": False})
     }
     Names = {
-        NoDisc: "None",
-        EqualWidth: "Equal width discretization",
-        EqualFreq: "Equal frequency discretization",
-        Drop: "Remove numeric features",
-        EntropyMDL: "Entropy-MDL discretization"
+        NoDisc: "无",
+        EqualWidth: "等宽离散化",
+        EqualFreq: "等频离散化",
+        Drop: "移除数值特征",
+        EntropyMDL: "熵MDL离散化"
     }
 
     def __init__(self, parent=None, **kwargs):
@@ -95,7 +95,7 @@ class DiscretizeEditor(BaseEditor):
         group.buttonClicked.connect(self.__on_buttonClicked)
 
         self.__slbox = slbox = QGroupBox(
-            title="Number of intervals (for equal width/frequency)",
+            title="区间数(对于等宽/等频)",
             flat=True
         )
         slbox.setLayout(QHBoxLayout())
@@ -187,7 +187,7 @@ class DiscretizeEditor(BaseEditor):
         return preprocess.Discretize(method(**params), remove_const=False)
 
     def __repr__(self):
-        n_int = ", Number of intervals: {}".format(self.__nintervals) \
+        n_int = ", 区间数: {}".format(self.__nintervals) \
             if self.__method in [self.EqualFreq, self.EqualWidth] else ""
         return "{}{}".format(self.Names[self.__method], n_int)
 
@@ -196,12 +196,12 @@ class ContinuizeEditor(BaseEditor):
     _Type = type(Continuize.FirstAsBase)
 
     Continuizers = OrderedDict([
-        (Continuize.FrequentAsBase, "Most frequent is base"),
-        (Continuize.Indicators, "One feature per value"),
-        (Continuize.RemoveMultinomial, "Remove non-binary features"),
-        (Continuize.Remove, "Remove categorical features"),
-        (Continuize.AsOrdinal, "Treat as ordinal"),
-        (Continuize.AsNormalizedOrdinal, "Divide by number of values")
+        (Continuize.FrequentAsBase, "以最频繁为基准"),
+        (Continuize.Indicators, "每个值一个特征"),
+        (Continuize.RemoveMultinomial, "移除非二值特征"),
+        (Continuize.Remove, "移除分类特征"),
+        (Continuize.AsOrdinal, "视为有序"),
+        (Continuize.AsNormalizedOrdinal, "除以值的数量")
     ])
 
     def __init__(self, parent=None, **kwargs):
@@ -256,7 +256,7 @@ class ContinuizeEditor(BaseEditor):
 
 
 class RemoveSparseEditor(BaseEditor):
-    options = ["missing values", "zeros"]
+    options = ["缺失值", "零值"]
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, **kwargs)
@@ -266,7 +266,7 @@ class RemoveSparseEditor(BaseEditor):
         self.filter0 = True
         self.setLayout(QVBoxLayout())
 
-        self.layout().addWidget(QLabel("Remove features with too many"))
+        self.layout().addWidget(QLabel("移除具有太多...的特征"))
         self.filter_buttons = QButtonGroup(exclusive=True)
         self.filter_buttons.buttonClicked.connect(self.filterByClicked)
         for idx, option, in enumerate(self.options):
@@ -281,14 +281,14 @@ class RemoveSparseEditor(BaseEditor):
         self.settings_buttons = QButtonGroup(exclusive=True)
         self.settings_buttons.buttonClicked.connect(self.filterSettingsClicked)
 
-        btn_perc = QRadioButton(self, text='Percentage', checked=not self.useFixedThreshold)
+        btn_perc = QRadioButton(self, text='百分比', checked=not self.useFixedThreshold)
         self.settings_buttons.addButton(btn_perc, id=0)
         self.percSpin = QSpinBox(minimum=0, maximum=100, value=self.percThresh,
                                  enabled=not self.useFixedThreshold)
         self.percSpin.valueChanged[int].connect(self.setPercThresh)
         self.percSpin.editingFinished.connect(self.edited)
 
-        btn_fix = QRadioButton(self, text='Fixed', checked=self.useFixedThreshold)
+        btn_fix = QRadioButton(self, text='固定值', checked=self.useFixedThreshold)
         self.settings_buttons.addButton(btn_fix, id=1)
         self.fixedSpin = QSpinBox(minimum=0, maximum=1000000, value=self.fixedThresh,
                                   enabled=self.useFixedThreshold)
@@ -376,12 +376,12 @@ class ImputeEditor(BaseEditor):
         DropRows: (None, {})
     }
     Names = {
-        NoImputation: "Don't impute.",
-        Constant: "Replace with constant",
-        Average: "Average/Most frequent",
-        Model: "Model based imputer",
-        Random: "Replace with random value",
-        DropRows: "Remove rows with missing values.",
+        NoImputation: "不填补。",
+        Constant: "用常量替换",
+        Average: "平均值/最频繁值",
+        Model: "基于模型的填补",
+        Random: "用随机值替换",
+        DropRows: "移除缺失值的行。",
     }
 
     def __init__(self, parent=None, **kwargs):
@@ -457,7 +457,7 @@ class UnivariateFeatureSelect(QWidget):
         self.__k = 10
         self.__p = 75.0
 
-        box = QGroupBox(title="Score", flat=True)
+        box = QGroupBox(title="评分", flat=True)
         box.setLayout(QVBoxLayout())
         self.__cb = cb = QComboBox(self, )
         self.__cb.currentIndexChanged.connect(self.setScoreIndex)
@@ -466,7 +466,7 @@ class UnivariateFeatureSelect(QWidget):
 
         self.layout().addWidget(box)
 
-        box = QGroupBox(title="Number of features", flat=True)
+        box = QGroupBox(title="特征数量", flat=True)
         self.__group = group = QButtonGroup(self, exclusive=True)
         self.__spins = {}
 
@@ -568,15 +568,15 @@ class UnivariateFeatureSelect(QWidget):
 class FeatureSelectEditor(BaseEditor):
 
     MEASURES = [
-        ("Information Gain", preprocess.score.InfoGain),
-        ("Gain ratio", preprocess.score.GainRatio),
-        ("Gini index", preprocess.score.Gini),
+        ("信息增益", preprocess.score.InfoGain),
+        ("增益比", preprocess.score.GainRatio),
+        ("基尼指数", preprocess.score.Gini),
         ("ReliefF", preprocess.score.ReliefF),
-        ("Fast Correlation Based Filter", preprocess.score.FCBF),
+        ("基于快速相关的过滤器", preprocess.score.FCBF),
         ("ANOVA", preprocess.score.ANOVA),
-        ("Chi2", preprocess.score.Chi2),
+        ("卡方", preprocess.score.Chi2),
         ("RReliefF", preprocess.score.RReliefF),
-        ("Univariate Linear Regression", preprocess.score.UnivariateLinearRegression)
+        ("单变量线性回归", preprocess.score.UnivariateLinearRegression)
     ]
 
     def __init__(self, parent=None):
@@ -589,15 +589,15 @@ class FeatureSelectEditor(BaseEditor):
 
         self.__uni_fs = UnivariateFeatureSelect()
         self.__uni_fs.setItems(
-            [{"text": "Information Gain", "tooltip": ""},
-             {"text": "Gain Ratio"},
-             {"text": "Gini Index"},
+            [{"text": "信息增益", "tooltip": ""},
+             {"text": "增益比"},
+             {"text": "基尼指数"},
              {"text": "ReliefF"},
-             {"text": "Fast Correlation Based Filter"},
+             {"text": "基于快速相关的过滤器"},
              {"text": "ANOVA"},
-             {"text": "Chi2"},
+             {"text": "卡方"},
              {"text": "RReliefF"},
-             {"text": "Univariate Linear Regression"}
+             {"text": "单变量线性回归"}
             ]
         )
         self.layout().addWidget(self.__uni_fs)
@@ -627,7 +627,7 @@ class FeatureSelectEditor(BaseEditor):
 
     def __repr__(self):
         params = self.__uni_fs.parameters()
-        return "Score: {}, Strategy (Fixed): {}".format(
+        return "评分: {},策略(固定): {}".format(
             self.MEASURES[params["score"]][0], params["k"])
 
 # TODO: Model based FS (random forest variable importance, ...), RFE
@@ -645,12 +645,12 @@ class RandomFeatureSelectEditor(BaseEditor):
         self.__k = 10
         self.__p = 75.0
 
-        box = QGroupBox(title="Number of features", flat=True)
+        box = QGroupBox(title="特征数量", flat=True)
         self.__group = group = QButtonGroup(self, exclusive=True)
         self.__spins = {}
 
         form = QFormLayout()
-        fixedrb = QRadioButton("Fixed", checked=True)
+        fixedrb = QRadioButton("固定值", checked=True)
         group.addButton(fixedrb, RandomFeatureSelectEditor.Fixed)
         kspin = QSpinBox(
             minimum=1, maximum=1000000, value=self.__k,
@@ -661,7 +661,7 @@ class RandomFeatureSelectEditor(BaseEditor):
         self.__spins[RandomFeatureSelectEditor.Fixed] = kspin
         form.addRow(fixedrb, kspin)
 
-        percrb = QRadioButton("Percentage")
+        percrb = QRadioButton("百分比")
         group.addButton(percrb, RandomFeatureSelectEditor.Percentage)
         pspin = QDoubleSpinBox(
             minimum=0.0, maximum=100.0, singleStep=0.5,
@@ -759,11 +759,11 @@ class Scale(BaseEditor):
         NormalizeSpan_NonZeroBased = 0, 1, 2, 3, 4
 
     Names = {
-        NormalizeBySD: "Standardize to μ=0, σ²=1",
-        CenterByMean: "Center to μ=0",
-        ScaleBySD: "Scale to σ²=1",
-        NormalizeSpan_NonZeroBased: "Normalize to interval [-1, 1]",
-        NormalizeBySpan_ZeroBased: "Normalize to interval [0, 1]",
+        NormalizeBySD: "标准化为μ=0,σ²=1",
+        CenterByMean: "中心化为μ=0",
+        ScaleBySD: "缩放为σ²=1",
+        NormalizeSpan_NonZeroBased: "归一化为区间[-1,1]",
+        NormalizeBySpan_ZeroBased: "归一化为区间[0,1]",
     }
 
     def __init__(self, parent=None, **kwargs):
@@ -831,9 +831,9 @@ class Randomize(BaseEditor):
 
         form = QFormLayout()
         self.__rand_type_cb = QComboBox()
-        self.__rand_type_cb.addItems(["Classes",
-                                      "Features",
-                                      "Meta data"])
+        self.__rand_type_cb.addItems(["类",
+                                      "特征",
+                                      "元数据"])
 
         self.__rand_type_cb.currentIndexChanged.connect(self.changed)
         self.__rand_type_cb.activated.connect(self.edited)
@@ -864,8 +864,8 @@ class Randomize(BaseEditor):
 
     def __repr__(self):
         return "{}, {}".format(self.__rand_type_cb.currentText(),
-                               "Replicable" if self.__rand_seed_ch.isChecked()
-                               else "Not replicable")
+                               "可复制" if self.__rand_seed_ch.isChecked()
+                               else "不可复制")
 
 
 class PCA(BaseEditor):
@@ -902,7 +902,7 @@ class PCA(BaseEditor):
         return ProjectPCA(n_components=n_components)
 
     def __repr__(self):
-        return "Components: {}".format(self.cspin.value())
+        return "主成分: {}".format(self.cspin.value())
 
 
 class CUR(BaseEditor):
@@ -954,7 +954,7 @@ class CUR(BaseEditor):
         return ProjectCUR(rank=rank, max_error=max_error)
 
     def __repr__(self):
-        return "Rank: {}, Relative error: {}".format(self.rspin.value(),
+        return "秩: {},相对误差: {}".format(self.rspin.value(),
                                                      self.espin.value())
 
 
@@ -999,63 +999,63 @@ def icon_path(basename):
 
 PREPROCESS_ACTIONS = [
     PreprocessAction(
-        "Discretize", "orange.preprocess.discretize", "Discretization",
-        Description("Discretize Continuous Variables",
+        "离散化", "orange.preprocess.discretize", "离散化",
+        Description("离散连续变量",
                     icon_path("Discretize.svg")),
         DiscretizeEditor
     ),
     PreprocessAction(
-        "Continuize", "orange.preprocess.continuize", "Continuization",
-        Description("Continuize Discrete Variables",
+        "连续化", "orange.preprocess.continuize", "连续化",
+        Description("连续离散变量",
                     icon_path("Continuize.svg")),
         ContinuizeEditor
     ),
     PreprocessAction(
-        "Impute", "orange.preprocess.impute", "Impute",
-        Description("Impute Missing Values",
+        "填补", "orange.preprocess.impute", "填补",
+        Description("填补缺失值",
                     icon_path("Impute.svg")),
         ImputeEditor
     ),
     PreprocessAction(
-        "Feature Selection", "orange.preprocess.fss", "Feature Selection",
-        Description("Select Relevant Features",
+        "特征选择", "orange.preprocess.fss", "特征选择",
+        Description("选择相关特征",
                     icon_path("SelectColumns.svg")),
         FeatureSelectEditor
     ),
     PreprocessAction(
-        "Random Feature Selection", "orange.preprocess.randomfss",
-        "Random Feature Selection",
-        Description("Select Random Features",
+        "随机特征选择", "orange.preprocess.randomfss",
+        "随机特征选择",
+        Description("选择随机特征",
                     icon_path("SelectColumnsRandom.svg")),
         RandomFeatureSelectEditor
     ),
     PreprocessAction(
-        "Normalize", "orange.preprocess.scale", "Scale",
-        Description("Normalize Features",
+        "归一化", "orange.preprocess.scale", "缩放",
+        Description("归一化特征",
                     icon_path("Normalize.svg")),
         Scale
     ),
     PreprocessAction(
-        "Randomize", "orange.preprocess.randomize", "Randomization",
-        Description("Randomize",
+        "随机化", "orange.preprocess.randomize", "随即化",
+        Description("随机化",
                     icon_path("Random.svg")),
         Randomize
     ),
     PreprocessAction(
-        "Remove Sparse", "orange.preprocess.remove_sparse", "Feature Selection",
-        Description("Remove Sparse Features",
+        "移除稀疏", "orange.preprocess.remove_sparse", "特征选择",
+        Description("移除稀疏特征",
                     icon_path("PurgeDomain.svg")),
         RemoveSparseEditor
     ),
     PreprocessAction(
         "PCA", "orange.preprocess.pca", "PCA",
-        Description("Principal Component Analysis",
+        Description("主成分分析",
                     icon_path("PCA.svg")),
         PCA
     ),
     PreprocessAction(
         "CUR", "orange.preprocess.cur", "CUR",
-        Description("CUR Matrix Decomposition",
+        Description("CUR矩阵分解",
                     icon_path("SelectColumns.svg")),
         CUR
     )
@@ -1082,21 +1082,21 @@ PREPROCESS_ACTIONS = [
 
 
 class OWPreprocess(widget.OWWidget, openclass=True):
-    name = "Preprocess"
-    description = "Construct a data preprocessing pipeline."
-    category = "Transform"
+    name = "预处理 Preprocess"
+    description = "创建一个数据预处理流程"
+    category = "变换"
     icon = "icons/Preprocess.svg"
     priority = 2100
-    keywords = "preprocess, process"
+    keywords = "预处理，处理"
 
     settings_version = 2
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
+        data = Input("数据", Orange.data.Table)
 
     class Outputs:
-        preprocessor = Output("Preprocessor", preprocess.preprocess.Preprocess, dynamic=False)
-        preprocessed_data = Output("Preprocessed Data", Orange.data.Table)
+        preprocessor = Output("预处理器", preprocess.preprocess.Preprocess, dynamic=False)
+        preprocessed_data = Output("预处理后的数据", Orange.data.Table)
 
     storedsettings = Setting({})
     autocommit = Setting(True)
@@ -1123,7 +1123,7 @@ class OWPreprocess(widget.OWWidget, openclass=True):
         # for mimeData delegate)
         self.preprocessors.mimeData = mimeData
 
-        box = gui.vBox(self.controlArea, "Preprocessors")
+        box = gui.vBox(self.controlArea, "预处理器")
         gui.rubber(self.controlArea)
 
         # we define a class that lets us set the vertical sizeHint
@@ -1166,7 +1166,7 @@ class OWPreprocess(widget.OWWidget, openclass=True):
         self.overlay.setWidget(self.flow_view)
         self.overlay.setLayout(QVBoxLayout())
         self.overlay.layout().addWidget(
-            QLabel("Drag items from the list on the left", wordWrap=True))
+            QLabel("从左侧列表拖拽项目", wordWrap=True))
 
         self.scroll_area = QScrollArea(
             verticalScrollBarPolicy=Qt.ScrollBarAlwaysOn
@@ -1424,7 +1424,7 @@ class OWPreprocess(widget.OWWidget, openclass=True):
         pp = [(self.controler.model().index(i, 0).data(Qt.DisplayRole), w)
               for i, w in enumerate(self.controler.view.widgets())]
         if pp:
-            self.report_items("Settings", pp)
+            self.report_items("设置", pp)
 
 if __name__ == "__main__":  # pragma: no cover
     WidgetPreview(OWPreprocess).run(Orange.data.Table("brown-selected"))

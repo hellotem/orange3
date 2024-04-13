@@ -14,19 +14,19 @@ _userhome = os.path.expanduser(f"~{os.sep}")
 
 
 class OWSave(OWSaveBase):
-    name = "Save Data"
-    description = "Save data to an output file."
+    name = "保存数据 Save Data"
+    description = "将数据保存到输出文件。"
     icon = "icons/Save.svg"
-    category = "Data"
-    keywords = "save data, export"
+    category = "数据"
+    keywords = "保存数据,导出"
 
     settings_version = 3
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Error(OWSaveBase.Error):
-        unsupported_sparse = widget.Msg("Use Pickle format for sparse data.")
+        unsupported_sparse = widget.Msg("对于稀疏数据,请使用Pickle格式。")
 
     add_type_annotations = Setting(True)
 
@@ -37,10 +37,10 @@ class OWSave(OWSaveBase):
         self.grid.addWidget(
             gui.checkBox(
                 None, self, "add_type_annotations",
-                "Add type annotations to header",
+                "在标头添加类型注释",
                 tooltip=
-                "Some formats (Tab-delimited, Comma-separated) can include \n"
-                "additional information about variables types in header rows.",
+                "一些格式(制表符分隔,逗号分隔)可以包含 \n"
+                "在标题行中有关于变量类型的其他信息。",
                 callback=self.update_messages),
             0, 0, 1, 2)
         self.grid.setRowMinimumHeight(1, 8)
@@ -57,7 +57,7 @@ class OWSave(OWSaveBase):
         return {
             **{f"{w.DESCRIPTION} (*{w.EXTENSIONS[0]})": w
                for w in writers},
-            **{f"Compressed {w.DESCRIPTION} (*{w.EXTENSIONS[0]}.gz)": w
+            **{f"压缩的 {w.DESCRIPTION} (*{w.EXTENSIONS[0]}.gz)": w
                for w in writers if w.SUPPORT_COMPRESSED}
         }
 
@@ -84,11 +84,11 @@ class OWSave(OWSaveBase):
     def send_report(self):
         self.report_data_brief(self.data)
         writer = self.writer
-        noyes = ["No", "Yes"]
+        noyes = ["否", "是"]
         self.report_items((
-            ("File name", self.filename or "not set"),
-            ("Format", writer and writer.DESCRIPTION),
-            ("Type annotations",
+            ("文件名", self.filename or "未设置"),
+            ("格式", writer and writer.DESCRIPTION),
+            ("类型注释",
              writer and writer.OPTIONAL_TYPE_ANNOTATIONS
              and noyes[self.add_type_annotations])
         ))

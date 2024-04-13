@@ -41,9 +41,9 @@ class Scorer(Reprable):
     @staticmethod
     def _friendly_vartype_name(vartype):
         if vartype == DiscreteVariable:
-            return "categorical"
+            return "分类型"
         if vartype == ContinuousVariable:
-            return "numeric"
+            return "数值型"
         # Fallbacks
         name = vartype.__name__
         if name.endswith("Variable"):
@@ -53,11 +53,11 @@ class Scorer(Reprable):
     def __call__(self, data, feature=None):
         if not data.domain.class_var:
             raise ValueError(
-                "{} requires data with a target variable."
+                "{} 需要带有目标变量的数据。"
                 .format(self.friendly_name))
         if not isinstance(data.domain.class_var, self.class_type):
             raise ValueError(
-                "{} requires a {} target variable."
+                "{} 需要 {} 目标变量。"
                 .format(self.friendly_name,
                         self._friendly_vartype_name(self.class_type)))
 
@@ -72,7 +72,7 @@ class Scorer(Reprable):
         for var in data.domain.attributes:
             if not isinstance(var, self.feature_type):
                 raise ValueError(
-                    "{} cannot score {} variables."
+                    "{} 无法评分 {} 变量。"
                     .format(self.friendly_name,
                             self._friendly_vartype_name(type(var))))
 

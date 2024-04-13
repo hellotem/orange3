@@ -520,12 +520,12 @@ if TYPE_CHECKING:
 
 
 class OWPythonScript(OWWidget):
-    name = "Python Script"
-    description = "Write a Python script and run it on input data or models."
-    category = "Transform"
+    name = "Python 脚本 Python Script"
+    description = "在输入数据或模型上编写并运行 Python 脚本。"
+    category = "变换"
     icon = "icons/PythonScript.svg"
     priority = 3150
-    keywords = "program, function"
+    keywords = "程序,函数"
 
     class Inputs:
         data = MultiInput(
@@ -682,7 +682,7 @@ class OWPythonScript(OWWidget):
 
         self.libraryList.wrap(self.libraryListSource)
 
-        self.controlBox = gui.vBox(self.controlArea, 'Library')
+        self.controlBox = gui.vBox(self.controlArea, '库')
         self.controlBox.layout().setSpacing(1)
 
         self.libraryView = QListView(
@@ -701,26 +701,26 @@ class OWPythonScript(OWWidget):
         w = itemmodels.ModelActionsWidget()
 
         self.addNewScriptAction = action = QAction("+", self)
-        action.setToolTip("Add a new script to the library")
+        action.setToolTip("向库中添加新脚本")
         action.triggered.connect(self.onAddScript)
         w.addAction(action)
 
         action = QAction(unicodedata.lookup("MINUS SIGN"), self)
-        action.setToolTip("Remove script from library")
+        action.setToolTip("从库中删除脚本")
         action.triggered.connect(self.onRemoveScript)
         w.addAction(action)
 
-        action = QAction("Update", self)
-        action.setToolTip("Save changes in the editor to library")
+        action = QAction("更新", self)
+        action.setToolTip("将编辑器中的更改保存到库")
         action.setShortcut(QKeySequence(QKeySequence.Save))
         action.triggered.connect(self.commitChangesToLibrary)
         w.addAction(action)
 
-        action = QAction("More", self, toolTip="More actions")
+        action = QAction("更多", self, toolTip="更多操作")
 
-        new_from_file = QAction("Import Script from File", self)
-        save_to_file = QAction("Save Selected Script to File", self)
-        restore_saved = QAction("Undo Changes to Selected Script", self)
+        new_from_file = QAction("从文件导入脚本", self)
+        save_to_file = QAction("将选定的脚本保存到文件", self)
+        restore_saved = QAction("撤消对选定脚本的更改", self)
         save_to_file.setShortcut(QKeySequence(QKeySequence.SaveAs))
 
         new_from_file.triggered.connect(self.onAddScriptFromFile)
@@ -739,19 +739,19 @@ class OWPythonScript(OWWidget):
 
         self.controlBox.layout().addWidget(w)
 
-        self.execute_button = gui.button(self.buttonsArea, self, 'Run', callback=self.commit)
+        self.execute_button = gui.button(self.buttonsArea, self, '运行', callback=self.commit)
 
-        self.run_action = QAction("Run script", self, triggered=self.commit,
+        self.run_action = QAction("运行脚本", self, triggered=self.commit,
                                   shortcut=QKeySequence(Qt.ControlModifier | Qt.Key_R))
         self.addAction(self.run_action)
 
-        self.saveAction = action = QAction("&Save", self.text)
-        action.setToolTip("Save script to file")
+        self.saveAction = action = QAction("保存(&S)", self.text)
+        action.setToolTip("将脚本保存到文件")
         action.setShortcut(QKeySequence(QKeySequence.Save))
         action.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         action.triggered.connect(self.saveScript)
 
-        self.consoleBox = gui.vBox(self.splitCanvas, 'Console')
+        self.consoleBox = gui.vBox(self.splitCanvas, '控制台')
         self.console = PythonConsole({}, self)
         self.consoleBox.layout().addWidget(self.console)
         self.console.document().setDefaultFont(QFont(defaultFont))
@@ -863,14 +863,14 @@ class OWPythonScript(OWWidget):
         select_row(self.libraryView, index)
 
     def onAddScript(self, *_):
-        self.libraryList.append(Script("New script", self.text.toPlainText(), 0))
+        self.libraryList.append(Script("新脚本", self.text.toPlainText(), 0))
         self.setSelectedScript(len(self.libraryList) - 1)
 
     def onAddScriptFromFile(self, *_):
         filename, _ = QFileDialog.getOpenFileName(
-            self, 'Open Python Script',
+            self, '打开 Python 脚本',
             os.path.expanduser("~/"),
-            'Python files (*.py)\nAll files(*.*)'
+            'Python 文件 (*.py)\n所有文件(*.*) '
         )
         if filename:
             name = os.path.basename(filename)
@@ -945,9 +945,9 @@ class OWPythonScript(OWWidget):
             filename = os.path.expanduser("~/")
 
         filename, _ = QFileDialog.getSaveFileName(
-            self, 'Save Python Script',
+            self, '保存 Python 脚本',
             filename,
-            'Python files (*.py)\nAll files(*.*)'
+            'Python 文件 (*.py)\n所有文件(*.*)'
         )
 
         if filename:
@@ -977,7 +977,7 @@ class OWPythonScript(OWWidget):
         lcls = self.initial_locals_state()
         lcls["_script"] = str(self.text.toPlainText())
         self.console.updateLocals(lcls)
-        self.console.write("\nRunning script:\n")
+        self.console.write("\n运行脚本:\n")
         self.console.push("exec(_script)")
         self.console.new_prompt(sys.ps1)
         for signal in self.signal_names:
@@ -985,7 +985,7 @@ class OWPythonScript(OWWidget):
             signal_type = getattr(self.Outputs, signal).type
             if not isinstance(out_var, signal_type) and out_var is not None:
                 self.Error.add_message(signal,
-                                       "'{}' has to be an instance of '{}'.".
+                                       "'{}' 必须是 '{}' 的实例。".
                                        format(signal, signal_type.__name__))
                 getattr(self.Error, signal)()
                 out_var = None

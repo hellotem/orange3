@@ -39,19 +39,19 @@ class OWSaveBase(widget.OWWidget, openclass=True):
     """
 
     class Information(widget.OWWidget.Information):
-        empty_input = widget.Msg("Empty input; nothing was saved.")
+        empty_input = widget.Msg("输入为空;没有保存任何内容")
 
     class Warning(widget.OWWidget.Warning):
         auto_save_disabled = widget.Msg(
-            "Auto save disabled.\n"
-            "Due to security reasons auto save is only restored for paths "
-            "that are in the same directory as the workflow file or in a "
-            "subtree of that directory."
+            "自动保存已禁用。\n"
+            "出于安全原因,只能还原与工作流文件"
+            "位于同一目录或子目录中的自动保存路径"
+            "内容"
         )
 
     class Error(widget.OWWidget.Error):
-        no_file_name = widget.Msg("File name is not set.")
-        unsupported_format = widget.Msg("File format is unsupported.\n{}")
+        no_file_name = widget.Msg("文件名未设置")
+        unsupported_format = widget.Msg("不支持的文件格式。\n{}")
         general_error = widget.Msg("{}")
 
     want_main_area = False
@@ -96,14 +96,14 @@ class OWSaveBase(widget.OWWidget, openclass=True):
         gui.widgetBox(self.controlArea, orientation=grid, box=True)
         grid.addWidget(
             gui.checkBox(
-                None, self, "auto_save", "Autosave when receiving new data",
+                None, self, "auto_save", "收到新数据时自动保存",
                 callback=self._on_auto_save_toggled),
             start_row, 0, 1, 2)
         self.bt_save = gui.button(
             self.buttonsArea, self,
-            label=f"Save as {self.stored_name}" if self.stored_name else "Save",
+            label=f"另存为 {self.stored_name}" if self.stored_name else "保存",
             callback=self.save_file)
-        gui.button(self.buttonsArea, self, "Save as ...", callback=self.save_file_as)
+        gui.button(self.buttonsArea, self, "另存为...", callback=self.save_file_as)
 
         self.adjustSize()
         self.update_messages()
@@ -225,7 +225,7 @@ class OWSaveBase(widget.OWWidget, openclass=True):
         self.filename = filename
         self.filter = selected_filter
         self.Error.unsupported_format.clear()
-        self.bt_save.setText(f"Save as {self.stored_name}")
+        self.bt_save.setText(f"另存为 {self.stored_name}")
         self.update_messages()
         self._try_save()
 
@@ -368,7 +368,7 @@ class OWSaveBase(widget.OWWidget, openclass=True):
             filename = self.initial_start_dir()
             while True:
                 dlg = QFileDialog(
-                    None, "Save File", filename, ";;".join(no_ext_filters))
+                    None, "保存文件", filename, ";;".join(no_ext_filters))
                 dlg.setAcceptMode(dlg.AcceptSave)
                 dlg.selectNameFilter(remove_star(self.default_valid_filter()))
                 dlg.setOption(QFileDialog.DontConfirmOverwrite)
@@ -419,7 +419,7 @@ class OWSaveBase(widget.OWWidget, openclass=True):
         def get_save_filename(self):
             dlg = self.SaveFileDialog(
                 type(self),
-                None, "Save File", self.initial_start_dir(),
+                None, "保存文件", self.initial_start_dir(),
                 ";;".join(self.valid_filters()))
             dlg.selectNameFilter(self.default_valid_filter())
             if dlg.exec() == QFileDialog.Rejected:

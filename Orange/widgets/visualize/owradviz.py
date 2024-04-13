@@ -38,7 +38,7 @@ class RadvizVizRank(VizRankDialogNAttrs):
 
     def __init__(self, parent, data, attributes, color, n_attrs):
         super().__init__(parent, data, attributes, color, n_attrs,
-                         spin_label="Maximum number of variables: ")
+                         spin_label="最大变量数量: ")
 
     def score_attributes(self):
         attrs = [v for v in self.attrs if v is not self.attr_color]
@@ -180,11 +180,11 @@ class OWRadvizGraph(OWGraphWithAnchors):
 
 
 class OWRadviz(OWAnchorProjectionWidget, VizRankMixin(RadvizVizRank)):
-    name = "Radviz"
-    description = "Display Radviz projection"
+    name = "径向维恩图"
+    description = "显示径向维恩投影"
     icon = "icons/Radviz.svg"
     priority = 241
-    keywords = "radviz, viz"
+    keywords = "径向维恩,维"
 
     settings_version = 3
 
@@ -195,22 +195,22 @@ class OWRadviz(OWAnchorProjectionWidget, VizRankMixin(RadvizVizRank)):
 
     class Warning(OWAnchorProjectionWidget.Warning):
         removed_vars = widget.Msg(
-            "Categorical variables with more than two values are not shown.")
+            "不显示具有两个以上值的分类变量。")
         max_vars_selected = widget.Msg(
-            "Maximum number of selected variables reached.")
+            "已达到选定变量的最大数量。")
 
     def __init__(self):
         VizRankMixin.__init__(self)  # pylint: disable=non-parent-init-called
         OWAnchorProjectionWidget.__init__(self)
 
     def _add_controls(self):
-        box = gui.vBox(self.controlArea, box="Features")
+        box = gui.vBox(self.controlArea, box="特征")
         self.model_selected = VariableSelectionModel(self.selected_vars,
                                                      max_vars=20)
         variables_selection(box, self, self.model_selected)
         self.model_selected.selection_changed.connect(
             self.__model_selected_changed)
-        box.layout().addWidget(self.vizrank_button("Suggest features"))
+        box.layout().addWidget(self.vizrank_button("建议特征"))
         self.vizrankSelectionChanged.connect(self.vizrank_set_attrs)
         self.vizrankRunStateChanged.connect(self.store_vizrank_n_attrs)
         super()._add_controls()

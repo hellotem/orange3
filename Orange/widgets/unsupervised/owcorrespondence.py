@@ -30,16 +30,16 @@ class ScatterPlotItem(pg.ScatterPlotItem):
 
 
 class OWCorrespondenceAnalysis(widget.OWWidget):
-    name = "Correspondence Analysis"
-    description = "Correspondence analysis for categorical multivariate data."
+    name = "对应分析 Correspondence Analysis"
+    description = "用于分类多变量数据的对应分析。"
     icon = "icons/CorrespondenceAnalysis.svg"
     keywords = "correspondence analysis"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        coordinates = Output("Coordinates", Table)
+        coordinates = Output("坐标", Table)
 
     Invalidate = QEvent.registerEventType()
 
@@ -51,8 +51,8 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
     graph_name = "plot.plotItem"  # QGraphicsView (pg.PlotWidget)
 
     class Error(widget.OWWidget.Error):
-        empty_data = widget.Msg("Empty dataset")
-        no_disc_vars = widget.Msg("No categorical data")
+        empty_data = widget.Msg("空数据集")
+        no_disc_vars = widget.Msg("无分类数据")
 
     def __init__(self):
         super().__init__()
@@ -61,7 +61,7 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
         self.component_x = 0
         self.component_y = 1
 
-        box = gui.vBox(self.controlArea, "Variables")
+        box = gui.vBox(self.controlArea, "变量")
         self.varlist = itemmodels.VariableListModel()
         self.varview = view = ListViewSearch(
             selectionMode=QListView.MultiSelection,
@@ -72,7 +72,7 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
 
         box.layout().addWidget(view)
 
-        axes_box = gui.vBox(self.controlArea, "Axes")
+        axes_box = gui.vBox(self.controlArea, "坐标轴")
         self.axis_x_cb = gui.comboBox(
             axes_box, self, "component_x", label="X:",
             callback=self._component_changed, orientation=Qt.Horizontal,
@@ -88,7 +88,7 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
         )
 
         self.infotext = gui.widgetLabel(
-            gui.vBox(self.controlArea, "Contribution to Inertia"), "\n"
+            gui.vBox(self.controlArea, "惰性贡献"), "\n"
         )
 
         gui.auto_send(self.buttonsArea, self, "auto_commit")
@@ -143,10 +143,10 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
                 rf = self.ca.row_factors
             vars_data = [(val.name, var) for val in sel_vars for var in val.values]
             output_table = Table(
-                Domain([ContinuousVariable(f"Component {i + 1}")
+                Domain([ContinuousVariable(f"分量 {i + 1}")
                         for i in range(rf.shape[1])],
-                       metas=[StringVariable("Variable"),
-                              StringVariable("Value")]),
+                       metas=[StringVariable("变量"),
+                              StringVariable("值")]),
                 rf, metas=vars_data
             )
         self.Outputs.coordinates.send(output_table)
@@ -302,18 +302,18 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
             inertia = 100 * inertia / np.sum(inertia)
 
         ax = self.plot.getAxis("bottom")
-        ax.setLabel("Component {} ({:.1f}%)"
+        ax.setLabel("分量 {} ({:.1f}%)"
                     .format(p_axes[0] + 1, inertia[p_axes[0]]))
         ax = self.plot.getAxis("left")
-        ax.setLabel("Component {} ({:.1f}%)"
+        ax.setLabel("分量 {} ({:.1f}%)"
                     .format(p_axes[1] + 1, inertia[p_axes[1]]))
 
     def _update_info(self):
         if self.ca is None:
             self.infotext.setText("\n\n")
         else:
-            fmt = ("Axis 1: {:.2f}\n"
-                   "Axis 2: {:.2f}")
+            fmt = ("轴 1: {:.2f}\n"
+                   "轴 2: {:.2f}")
             inertia = self.ca.inertia_of_axis()
             if np.sum(inertia) == 0:
                 inertia = 100 * inertia
@@ -332,11 +332,11 @@ class OWCorrespondenceAnalysis(widget.OWWidget):
             return
 
         items = OrderedDict()
-        items["Data instances"] = len(self.data)
+        items["数据实例"] = len(self.data)
         if len(vars) == 1:
-            items["Selected variable"] = vars[0]
+            items["选择的变量"] = vars[0]
         else:
-            items["Selected variables"] = "{} and {}".format(
+            items["选择的变量"] = "{} 和 {}".format(
                 ", ".join(var.name for var in vars[:-1]), vars[-1].name)
         self.report_items(items)
 

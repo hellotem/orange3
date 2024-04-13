@@ -25,22 +25,22 @@ class TransformRunner:
 
 
 class OWTransform(OWWidget, ConcurrentWidgetMixin):
-    name = "Apply Domain"
-    description = "Applies template domain on data table."
-    category = "Transform"
+    name = "应用域 Apply Domain"
+    description = "在数据表上应用模板域。"
+    category = "变换"
     icon = "icons/Transform.svg"
     priority = 1230
-    keywords = "apply domain, transform"
+    keywords = "应用域,转换"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
-        template_data = Input("Template Data", Table)
+        data = Input("数据", Table, default=True)
+        template_data = Input("模板数据", Table)
 
     class Outputs:
-        transformed_data = Output("Transformed Data", Table)
+        transformed_data = Output("变换后数据", Table)
 
     class Error(OWWidget.Error):
-        error = Msg("An error occurred while transforming data.\n{}")
+        error = Msg("转换数据时发生错误。\n{}")
 
     resizing_enabled = False
     want_main_area = False
@@ -84,11 +84,11 @@ like, for instance, discretization, feature construction, PCA etc.
 
     def send_report(self):
         if self.data:
-            self.report_data("Data", self.data)
+            self.report_data("数据", self.data)
         if self.template_data:
-            self.report_domain("Template data", self.template_data.domain)
+            self.report_domain("模板数据", self.template_data.domain)
         if self.transformed_info:
-            self.report_items("Transformed data", self.transformed_info)
+            self.report_items("转换后的数据", self.transformed_info)
 
     def on_partial_result(self, _):
         pass

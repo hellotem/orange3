@@ -93,8 +93,8 @@ class ManifoldParametersEditor(QWidget, gui.OWComponent):
 class TSNEParametersEditor(ManifoldParametersEditor):
     _metrics = ("euclidean", "manhattan", "chebyshev", "jaccard")
     metric_index = Setting(0)
-    metric_values = [("euclidean", "Euclidean"), ("manhattan", "Manhattan"),
-                     ("chebyshev", "Chebyshev"), ("jaccard", "Jaccard")]
+    metric_values = [("euclidean", "欧氏"), ("manhattan", "曼哈顿"),
+                     ("chebyshev", "切比雄夫"), ("jaccard", "杰卡德")]
 
     perplexity = Setting(30)
     early_exaggeration = Setting(12)
@@ -102,7 +102,7 @@ class TSNEParametersEditor(ManifoldParametersEditor):
     n_iter = Setting(1000)
 
     initialization_index = Setting(0)
-    initialization_values = [("pca", "PCA"), ("random", "Random")]
+    initialization_values = [("pca", "PCA"), ("random", "随机")]
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -115,18 +115,18 @@ class TSNEParametersEditor(ManifoldParametersEditor):
         self._create_radio_parameter("initialization", "Initialization:")
 
     def get_report_parameters(self):
-        return {"Metric": self.parameters_name["metric"],
-                "Perplexity": self.parameters["perplexity"],
-                "Early exaggeration": self.parameters["early_exaggeration"],
-                "Learning rate": self.parameters["learning_rate"],
-                "Max iterations": self.parameters["n_iter"],
-                "Initialization": self.parameters_name["initialization"]}
+        return {"度量": self.parameters_name["metric"],
+                "困惑度": self.parameters["perplexity"],
+                "早期夸张": self.parameters["early_exaggeration"],
+                "学习率": self.parameters["learning_rate"],
+                "最大迭代次数": self.parameters["n_iter"],
+                "初始化": self.parameters_name["initialization"]}
 
 class MDSParametersEditor(ManifoldParametersEditor):
     max_iter = Setting(300)
     init_type_index = Setting(0)
     init_type_values = (("PCA", "PCA (Torgerson)"),
-                        ("random", "Random"))
+                        ("random", "随机"))
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -140,8 +140,8 @@ class MDSParametersEditor(ManifoldParametersEditor):
         return par
 
     def get_report_parameters(self):
-        return {"Max iterations": self.parameters["max_iter"],
-                "Initialization": self.parameters_name["init_type"]}
+        return {"最大迭代次数  ": self.parameters["max_iter"],
+                "初始化": self.parameters_name["init_type"]}
 
 class IsomapParametersEditor(ManifoldParametersEditor):
     n_neighbors = Setting(5)
@@ -151,16 +151,16 @@ class IsomapParametersEditor(ManifoldParametersEditor):
         self._create_spin_parameter("n_neighbors", 1, 10 ** 2, "Neighbors:")
 
     def get_report_parameters(self):
-        return {"Neighbors": self.parameters["n_neighbors"]}
+        return {"邻居数": self.parameters["n_neighbors"]}
 
 class LocallyLinearEmbeddingParametersEditor(ManifoldParametersEditor):
     n_neighbors = Setting(5)
     max_iter = Setting(100)
     method_index = Setting(0)
-    method_values = (("standard", "Standard"),
-                     ("modified", "Modified"),
-                     ("hessian", "Hessian eigenmap"),
-                     ("ltsa", "Local"))
+    method_values = (("standard", "标准"),
+                     ("modified", "修正"),
+                     ("hessian", "Hessian 特征映射"),
+                     ("ltsa", "局部"))
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -169,36 +169,36 @@ class LocallyLinearEmbeddingParametersEditor(ManifoldParametersEditor):
         self._create_spin_parameter("max_iter", 10, 10 ** 4, "Max iterations:")
 
     def get_report_parameters(self):
-        return {"Method": self.parameters_name["method"],
-                "Neighbors": self.parameters["n_neighbors"],
-                "Max iterations": self.parameters["max_iter"]}
+        return {"方法": self.parameters_name["method"],
+                "邻居数": self.parameters["n_neighbors"],
+                "最大迭代次数": self.parameters["max_iter"]}
 
 class SpectralEmbeddingParametersEditor(ManifoldParametersEditor):
     affinity_index = Setting(0)
-    affinity_values = (("nearest_neighbors", "Nearest neighbors"),
-                       ("rbf", "RBF kernel"))
+    affinity_values = (("nearest_neighbors", "最近邻"),
+                       ("rbf", "RBF 核"))
 
     def __init__(self, parent):
         super().__init__(parent)
         self._create_combo_parameter("affinity", "Affinity:")
 
     def get_report_parameters(self):
-        return {"Affinity": self.parameters_name["affinity"]}
+        return {"亲和性": self.parameters_name["affinity"]}
 
 class OWManifoldLearning(OWWidget):
-    name = "Manifold Learning"
-    description = "Nonlinear dimensionality reduction."
+    name = "流形学习 Manifold Learning"
+    description = "非线性降维。"
     icon = "icons/Manifold.svg"
     priority = 2200
     keywords = "manifold learning"
     settings_version = 2
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        transformed_data = Output("Transformed Data", Table, dynamic=False,
-                                  replaces=["Transformed data"])
+        transformed_data = Output("转换后的数据", Table, dynamic=False,
+                                  replaces=["转换后的数据"])
 
     MANIFOLD_METHODS = (TSNE, MDS, Isomap, LocallyLinearEmbedding,
                         SpectralEmbedding)
@@ -217,14 +217,14 @@ class OWManifoldLearning(OWWidget):
     auto_apply = Setting(True)
 
     class Error(OWWidget.Error):
-        n_neighbors_too_small = Msg("For chosen method and components, "
-                                    "neighbors must be greater than {}")
+        n_neighbors_too_small = Msg("对于选择的方法和分量,"
+                                    "邻居数必须大于 {}")
         manifold_error = Msg("{}")
-        sparse_not_supported = Msg("Sparse data is not supported.")
-        out_of_memory = Msg("Out of memory")
+        sparse_not_supported = Msg("不支持稀疏数据。")
+        out_of_memory = Msg("内存不足")
 
     class Warning(OWWidget.Warning):
-        graph_not_connected = Msg("Disconnected graph, embedding may not work")
+        graph_not_connected = Msg("图不连通,嵌入可能无效")
 
     @classmethod
     def migrate_settings(cls, settings, version):
@@ -245,7 +245,7 @@ class OWManifoldLearning(OWWidget):
         self.data = None
 
         # GUI
-        method_box = gui.vBox(self.controlArea, "Method")
+        method_box = gui.vBox(self.controlArea, "方法")
         self.manifold_methods_combo = gui.comboBox(
             method_box, self, "manifold_method_index",
             items=[m.name for m in self.MANIFOLD_METHODS],
@@ -268,7 +268,7 @@ class OWManifoldLearning(OWWidget):
         self.params_widget = self.parameter_editors[self.manifold_method_index]
         self.params_widget.show()
 
-        output_box = gui.vBox(self.controlArea, "Output")
+        output_box = gui.vBox(self.controlArea, "输出")
         self.n_components_spin = gui.spin(
             output_box, self, "n_components", 1, 10, label="Components:",
             controlWidth=QFontMetrics(self.font()).horizontalAdvance("0" * 10),
@@ -298,7 +298,7 @@ class OWManifoldLearning(OWWidget):
         builtin_warn = warnings.warn
 
         def _handle_disconnected_graph_warning(msg, *args, **kwargs):
-            if msg.startswith("Graph is not fully connected"):
+            if msg.startswith("图不完全连通"):
                 self.Warning.graph_not_connected()
             else:
                 builtin_warn(msg, *args, **kwargs)
@@ -353,12 +353,12 @@ class OWManifoldLearning(OWWidget):
 
     def send_report(self):
         method = self.MANIFOLD_METHODS[self.manifold_method_index]
-        self.report_items((("Method", method.name),))
-        parameters = {"Number of components": self.n_components}
+        self.report_items((("方法", method.name),))
+        parameters = {"分量数 ": self.n_components}
         parameters.update(self.params_widget.get_report_parameters())
-        self.report_items("Method parameters", parameters)
+        self.report_items("方法参数", parameters)
         if self.data:
-            self.report_data("Data", self.data)
+            self.report_data("数据  ", self.data)
 
 
 if __name__ == "__main__":  # pragma: no cover

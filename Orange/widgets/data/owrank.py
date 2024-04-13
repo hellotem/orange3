@@ -53,11 +53,11 @@ ScoreMeta = namedtuple("score_meta", ["name", "shortname", "scorer", 'problem_ty
 
 # Default scores.
 CLS_SCORES = [
-    ScoreMeta("Information Gain", "Info. gain",
+    ScoreMeta("信息增益", "信息增益",
               score.InfoGain, ProblemType.CLASSIFICATION, False),
-    ScoreMeta("Information Gain Ratio", "Gain ratio",
+    ScoreMeta("信息增益比", "增益比",
               score.GainRatio, ProblemType.CLASSIFICATION, True),
-    ScoreMeta("Gini Decrease", "Gini",
+    ScoreMeta("基尼系数减少", "基尼系数",
               score.Gini, ProblemType.CLASSIFICATION, True),
     ScoreMeta("ANOVA", "ANOVA",
               score.ANOVA, ProblemType.CLASSIFICATION, False),
@@ -69,7 +69,7 @@ CLS_SCORES = [
               score.FCBF, ProblemType.CLASSIFICATION, False)
 ]
 REG_SCORES = [
-    ScoreMeta("Univariate Regression", "Univar. reg.",
+    ScoreMeta("单变量回归", "单变量回归",
               score.UnivariateLinearRegression, ProblemType.REGRESSION, True),
     ScoreMeta("RReliefF", "RReliefF",
               score.RReliefF, ProblemType.REGRESSION, True)
@@ -205,20 +205,20 @@ def run(
 
 
 class OWRank(OWWidget, ConcurrentWidgetMixin):
-    name = "Rank"
-    description = "Rank and filter data features by their relevance."
+    name = "排名 Rank"
+    description = "按相关性对数据特征进行排名和过滤。"
     icon = "icons/Rank.svg"
     priority = 1102
-    keywords = "rank, filter"
+    keywords = "排名,过滤"
 
     buttons_area_orientation = Qt.Vertical
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
         scorer = MultiInput("Scorer", score.Scorer, filter_none=True)
 
     class Outputs:
-        reduced_data = Output("Reduced Data", Table, default=True)
+        reduced_data = Output("减少后数据", Table, default=True)
         scores = Output("Scores", Table)
         features = Output("Features", AttributeList, dynamic=False)
 
@@ -236,17 +236,17 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
     selectionMethod = ContextSetting(SelectNBest)
 
     class Information(OWWidget.Information):
-        no_target_var = Msg("Data does not have a (single) target variable.")
-        missings_imputed = Msg('Missing values will be imputed as needed.')
+        no_target_var = Msg("数据没有(单一)目标变量。")
+        missings_imputed = Msg('缺失值将根据需要被impute。')
 
     class Error(OWWidget.Error):
-        invalid_type = Msg("Cannot handle target variable type {}")
-        inadequate_learner = Msg("Scorer {} inadequate: {}")
-        no_attributes = Msg("Data does not have a single attribute.")
+        invalid_type = Msg("无法处理目标变量类型 {}")
+        inadequate_learner = Msg("评分器 {} 不合适: {}")
+        no_attributes = Msg("数据没有单个属性。")
 
     class Warning(OWWidget.Warning):
         renamed_variables = Msg(
-            "Variables with duplicated names have been renamed.")
+            "重复名称的变量已被重命名。")
 
     def __init__(self):
         OWWidget.__init__(self)
@@ -286,7 +286,7 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
         for scoring_methods in (CLS_SCORES,
                                 REG_SCORES,
                                 []):
-            box = gui.vBox(None, "Scoring Methods" if scoring_methods else None)
+            box = gui.vBox(None, "评分方法" if scoring_methods else None)
             stacked.addWidget(box)
             for method in scoring_methods:
                 box.layout().addWidget(QCheckBox(
@@ -300,7 +300,7 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
 
         self.switchProblemType(ProblemType.CLASSIFICATION)
 
-        selMethBox = gui.vBox(self.buttonsArea, "Select Attributes")
+        selMethBox = gui.vBox(self.buttonsArea, "选择属性")
 
         grid = QGridLayout()
         grid.setContentsMargins(0, 0, 0, 0)
@@ -315,9 +315,9 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
                 b.setToolTip(toolTip)
             return b
 
-        b1 = button(self.tr("None"), OWRank.SelectNone)
-        b2 = button(self.tr("All"), OWRank.SelectAll)
-        b3 = button(self.tr("Manual"), OWRank.SelectManual)
+        b1 = button(self.tr("无"), OWRank.SelectNone)
+        b2 = button(self.tr("全部"), OWRank.SelectAll)
+        b3 = button(self.tr("手动"), OWRank.SelectManual)
         b4 = button(self.tr("Best ranked:"), OWRank.SelectNBest)
 
         s = gui.spin(selMethBox, self, "nSelected", 1, 999,
@@ -390,7 +390,7 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
         self.selectButtons.button(self.selectionMethod).setChecked(True)
 
     def handleNewSignals(self):
-        self.setStatusMessage('Running')
+        self.setStatusMessage('运行中')
         self.update_scores()
         self.setStatusMessage('')
         self.on_select()
@@ -580,10 +580,10 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
     def send_report(self):
         if not self.data:
             return
-        self.report_domain("Input", self.data.domain)
-        self.report_table("Ranks", self.ranksView, num_format="{:.3f}")
+        self.report_domain("输入", self.data.domain)
+        self.report_table("排名", self.ranksView, num_format="{:.3f}")
         if self.out_domain_desc is not None:
-            self.report_items("Output", self.out_domain_desc)
+            self.report_items("输出", self.out_domain_desc)
 
     @gui.deferred
     def commit(self):
@@ -605,7 +605,7 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
         model_list = self.ranksModel.tolist()
         if not model_list or len(model_list[0]) == 2:  # Empty or just first two columns
             return None
-        unique, renamed = get_unique_names_duplicates(labels + ('Feature',),
+        unique, renamed = get_unique_names_duplicates(labels + ('特征',),
                                                       return_duplicated=True)
         if renamed:
             self.Warning.renamed_variables(', '.join(renamed))
@@ -622,7 +622,7 @@ class OWRank(OWWidget, ConcurrentWidgetMixin):
         feature_names = feature_names[:, None]
 
         new_table = Table(domain, scores, metas=feature_names)
-        new_table.name = "Feature Scores"
+        new_table.name = "特征评分"
         return new_table
 
     @classmethod

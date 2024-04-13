@@ -42,12 +42,12 @@ _MAX_K_NEIGBOURS = 200
 _DEFAULT_K_NEIGHBORS = 30
 
 
-METRICS = [("Euclidean", "l2"), ("Manhattan", "l1"), ("Cosine", "cosine")]
+METRICS = [("欧氏", "l2"), ("曼哈顿", "l1"), ("余弦", "cosine")]
 
 
 class OWLouvainClustering(widget.OWWidget):
-    name = "Louvain Clustering"
-    description = "Detects communities in a network of nearest neighbors."
+    name = "Louvain 聚类  Louvain Clustering"
+    description = "检测最近邻网络中的社区。"
     icon = "icons/LouvainClustering.svg"
     priority = 2110
 
@@ -57,12 +57,12 @@ class OWLouvainClustering(widget.OWWidget):
     resizing_enabled = False
 
     class Inputs:
-        data = Input("Data", Table, default=True)
+        data = Input("数据", Table, default=True)
 
     class Outputs:
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table, default=True)
         if Network is not None:
-            graph = Output("Network", Network)
+            graph = Output("网络", Network)
 
     apply_pca = Setting(True)
     pca_components = Setting(_DEFAULT_PCA_COMPONENTS)
@@ -73,10 +73,10 @@ class OWLouvainClustering(widget.OWWidget):
     auto_commit = Setting(False)
 
     class Information(widget.OWWidget.Information):
-        modified = Msg("Press commit to recompute clusters and send new data")
+        modified = Msg("按提交重新计算簇并发送新数据")
 
     class Error(widget.OWWidget.Error):
-        empty_dataset = Msg("No features in data")
+        empty_dataset = Msg("数据中无特征")
 
     def __init__(self):
         super().__init__()
@@ -99,44 +99,44 @@ class OWLouvainClustering(widget.OWWidget):
         self.__commit_timer.timeout.connect(self.commit)
 
         # Set up UI
-        info_box = gui.vBox(self.controlArea, "Info")
-        self.info_label = gui.widgetLabel(info_box, "No data on input.")  # type: QLabel
+        info_box = gui.vBox(self.controlArea, "信息")
+        self.info_label = gui.widgetLabel(info_box, "输入无数据。")  # type: QLabel
 
-        preprocessing_box = gui.vBox(self.controlArea, "Preprocessing")
+        preprocessing_box = gui.vBox(self.controlArea, "预处理")
         self.normalize_cbx = gui.checkBox(
-            preprocessing_box, self, "normalize", label="Normalize data",
+            preprocessing_box, self, "normalize", label="归一化数据",
             callback=self._invalidate_preprocessed_data, attribute=Qt.WA_LayoutUsesWidgetRect
         )  # type: QCheckBox
         self.apply_pca_cbx = gui.checkBox(
-            preprocessing_box, self, "apply_pca", label="Apply PCA preprocessing",
+            preprocessing_box, self, "apply_pca", label="应用 PCA 预处理",
             callback=self._apply_pca_changed, attribute=Qt.WA_LayoutUsesWidgetRect
         )  # type: QCheckBox
         self.pca_components_slider = gui.hSlider(
-            preprocessing_box, self, "pca_components", label="PCA Components: ", minValue=2,
+            preprocessing_box, self, "pca_components", label="PCA 分量:", minValue=2,
             maxValue=_MAX_PCA_COMPONENTS,
             callback=self._invalidate_pca_projection, tracking=False
         )  # type: QSlider
 
-        graph_box = gui.vBox(self.controlArea, "Graph parameters")
+        graph_box = gui.vBox(self.controlArea, "图参数")
         self.metric_combo = gui.comboBox(
-            graph_box, self, "metric_idx", label="Distance metric",
+            graph_box, self, "metric_idx", label="距离度量",
             items=[m[0] for m in METRICS], callback=self._invalidate_graph,
             orientation=Qt.Horizontal,
         )
         self.k_neighbors_spin = gui.spin(
             graph_box, self, "k_neighbors", minv=1, maxv=_MAX_K_NEIGBOURS,
-            label="k neighbors", controlWidth=80, alignment=Qt.AlignRight,
+            label="k 邻居", controlWidth=80, alignment=Qt.AlignRight,
             callback=self._invalidate_graph,
         )
         self.resolution_spin = gui.hSlider(
             graph_box, self, "resolution", minValue=0, maxValue=5., step=1e-1,
-            label="Resolution", intOnly=False, labelFormat="%.1f",
+            label="分辨率", intOnly=False, labelFormat="%.1f",
             callback=self._invalidate_partition, tracking=False,
         )  # type: QSlider
         self.resolution_spin.parent().setToolTip(
-            "The resolution parameter affects the number of clusters to find. "
-            "Smaller values tend to produce more clusters and larger values "
-            "retrieve less clusters."
+            "分辨率参数会影响要找到的簇数。"
+            "较小值往往会产生更多簇,较大值"
+            "则会检索到更少簇。"
         )
         self.apply_button = gui.auto_apply(
             self.buttonsArea, self, "auto_commit",
@@ -268,7 +268,7 @@ class OWLouvainClustering(widget.OWWidget):
                 run_on_graph, graph, resolution=self.resolution, state=state
             )
 
-        self.info_label.setText("Running...")
+        self.info_label.setText("运行中...")
         self.__set_state_busy()
         self.__start_task(task, state)
 
@@ -368,7 +368,7 @@ class OWLouvainClustering(widget.OWWidget):
         # Display the number of found clusters in the UI
         num_clusters = len(np.unique(self.partition))
         self.info_label.setText(
-            f"{num_clusters} {pl(num_clusters, 'cluster')} found.")
+            f"找到 {num_clusters} 个{pl(num_clusters, '簇')}。")
 
         self._send_data()
 
@@ -383,7 +383,7 @@ class OWLouvainClustering(widget.OWWidget):
         new_partition = list(map(index_map.get, self.partition))
 
         cluster_var = DiscreteVariable(
-            get_unique_names(domain, "Cluster"),
+            get_unique_names(domain, "簇"),
             values=["C%d" % (i + 1) for i, _ in enumerate(np.unique(new_partition))]
         )
 
@@ -439,7 +439,7 @@ class OWLouvainClustering(widget.OWWidget):
         # Can't have more k neighbors than there are data points
         self.k_neighbors_spin.setMaximum(min(_MAX_K_NEIGBOURS, len(data) - 1))
 
-        self.info_label.setText("Clustering not yet run.")
+        self.info_label.setText("尚未运行聚类。")
 
         self.commit()
 
@@ -451,7 +451,7 @@ class OWLouvainClustering(widget.OWWidget):
         self.partition = None
         self.Error.clear()
         self.Information.modified.clear()
-        self.info_label.setText("No data on input.")
+        self.info_label.setText("输入无数据。")
 
     def onDeleteWidget(self):
         self.__cancel_task(wait=True)
@@ -463,14 +463,14 @@ class OWLouvainClustering(widget.OWWidget):
     def send_report(self):
         pca = report.bool_str(self.apply_pca)
         if self.apply_pca:
-            pca += f", {self.pca_components} {pl(self.pca_components, 'component')}"
+            pca += f", {self.pca_components} 个{pl(self.pca_components, '分量')}"
 
         self.report_items((
-            ("Normalize data", report.bool_str(self.normalize)),
-            ("PCA preprocessing", pca),
-            ("Metric", METRICS[self.metric_idx][0]),
-            ("k neighbors", self.k_neighbors),
-            ("Resolution", self.resolution),
+            ("归一化数据", report.bool_str(self.normalize)),
+            ("PCA 预处理", pca),
+            ("度量", METRICS[self.metric_idx][0]),
+            ("k 邻居", self.k_neighbors),
+            ("分辨率", self.resolution),
         ))
 
     @classmethod
@@ -610,7 +610,7 @@ def run_on_data(data, normalize, pca_components, k_neighbors, metric, resolution
 
     if pca_components is not None:
         steps = 3
-        state.set_status("Computing PCA...")
+        state.set_status("计算 PCA 中...")
         pca = PCA(n_components=pca_components, random_state=0)
 
         data = res.pca_projection = pca(data)(data)
@@ -624,7 +624,7 @@ def run_on_data(data, normalize, pca_components, k_neighbors, metric, resolution
         return res
 
     state.set_progress_value(100. * step / steps)
-    state.set_status("Building graph...")
+    state.set_status("构建图...")
 
     # Apply Louvain preprocessing before converting the table into a graph
     louvain = Louvain(resolution=resolution, random_state=0)
@@ -649,7 +649,7 @@ def run_on_data(data, normalize, pca_components, k_neighbors, metric, resolution
 
     step += 1
     state.set_progress_value(100 * step / steps)
-    state.set_status("Detecting communities...")
+    state.set_status("检测社区中...")
     if state.is_interuption_requested():
         return res
 
@@ -666,7 +666,7 @@ def run_on_graph(graph, resolution, state):
     state = state  # type: TaskState
     res = Results(resolution=resolution)
     louvain = Louvain(resolution=resolution, random_state=0)
-    state.set_status("Detecting communities...")
+    state.set_status("检测社区中...")
     if state.is_interuption_requested():
         return res
     partition = louvain(graph)

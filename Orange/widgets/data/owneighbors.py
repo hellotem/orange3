@@ -13,43 +13,43 @@ from Orange.widgets.widget import OWWidget, Msg
 from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 METRICS = [
-    ("Euclidean", distance.Euclidean),
-    ("Manhattan", distance.Manhattan),
-    ("Mahalanobis", distance.Mahalanobis),
-    ("Cosine", distance.Cosine),
-    ("Jaccard", distance.Jaccard),
-    ("Spearman", distance.SpearmanR),
-    ("Absolute Spearman", distance.SpearmanRAbsolute),
-    ("Pearson", distance.PearsonR),
-    ("Absolute Pearson", distance.PearsonRAbsolute),
+    ("欧几里得", distance.Euclidean),
+    ("曼哈顿", distance.Manhattan),
+    ("马哈拉诺比斯", distance.Mahalanobis),
+    ("余弦", distance.Cosine),
+    ("杰卡德", distance.Jaccard),
+    ("斯皮尔曼", distance.SpearmanR),
+    ("绝对斯皮尔曼", distance.SpearmanRAbsolute),
+    ("皮尔逊", distance.PearsonR),
+    ("绝对皮尔逊", distance.PearsonRAbsolute),
 ]
 
 
 class OWNeighbors(OWWidget):
-    name = "Neighbors"
-    description = "Compute nearest neighbors in data according to reference."
+    name = "近邻 Neighbors"
+    description = "根据参考计算数据中最近邻"
     icon = "icons/Neighbors.svg"
-    category = "Unsupervised"
+    category = "无监督"
     replaces = ["orangecontrib.prototypes.widgets.owneighbours.OWNeighbours"]
 
     class Inputs:
-        data = Input("Data", Table)
-        reference = Input("Reference", Table)
+        data = Input("数据", Table)
+        reference = Input("参考", Table)
 
     class Outputs:
-        data = Output("Neighbors", Table)
+        data = Output("邻居", Table)
 
     class Info(OWWidget.Warning):
         removed_references = \
-            Msg("Input data includes reference instance(s).\n"
-                "Reference instances are excluded from the output.")
+            Msg("输入数据包括参考实例。\n"
+                "参考实例被排除在输出之外。")
 
     class Warning(OWWidget.Warning):
         all_data_as_reference = \
-            Msg("Every data instance is same as some reference")
+            Msg("每个数据实例与某些参考相同")
 
     class Error(OWWidget.Error):
-        diff_domains = Msg("Data and reference have different features")
+        diff_domains = Msg("数据和参考具有不同的特征")
 
     n_neighbors: int
     distance_index: int
@@ -72,7 +72,7 @@ class OWNeighbors(OWWidget):
         box = gui.vBox(self.controlArea, box=True)
         gui.comboBox(
             box, self, "distance_index", orientation=Qt.Horizontal,
-            label="Distance metric: ", items=[d[0] for d in METRICS],
+            label="距离度量: ", items=[d[0] for d in METRICS],
             callback=self.recompute)
         gui.spin(
             box, self, "n_neighbors", label="Limit number of neighbors to:",

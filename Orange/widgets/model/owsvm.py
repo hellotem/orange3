@@ -15,9 +15,9 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 
 class OWSVM(OWBaseLearner):
-    name = 'SVM'
-    description = "Support Vector Machines map inputs to higher-dimensional " \
-                  "feature spaces."
+    name = '支持向量机 SVM'
+    description = "支持向量机将输入映射到更高维度的" \
+                  "特征空间。"
     icon = "icons/SVM.svg"
     replaces = [
         "Orange.widgets.classify.owsvmclassification.OWSVMClassification",
@@ -30,10 +30,10 @@ class OWSVM(OWBaseLearner):
 
     class Outputs(OWBaseLearner.Outputs):
         support_vectors = Output("Support Vectors", Table, explicit=True,
-                                 replaces=["Support vectors"])
+                                 replaces=["支持向量"])
 
     class Warning(OWBaseLearner.Warning):
-        sparse_data = Msg('Input data is sparse, default preprocessing is to scale it.')
+        sparse_data = Msg('输入数据是稀疏的,默认预处理是对其进行缩放')
 
     #: Different types of SVMs
     SVM, Nu_SVM = range(2)
@@ -64,9 +64,9 @@ class OWSVM(OWBaseLearner):
     max_iter = Setting(100)
 
     _default_gamma = "auto"
-    kernels = (("Linear", "x⋅y"),
-               ("Polynomial", "(g x⋅y + c)<sup>d</sup>"),
-               ("RBF", "exp(-g|x-y|²)"),
+    kernels = (("线性", "x⋅y"),
+               ("多项式", "(g x⋅y + c)<sup>d</sup>"),
+               ("高斯径向基", "exp(-g|x-y|²)"),
                ("Sigmoid", "tanh(g x⋅y + c)"))
 
     def add_main_layout(self):
@@ -79,11 +79,11 @@ class OWSVM(OWBaseLearner):
         # this is part of init, pylint: disable=attribute-defined-outside-init
         form = QGridLayout()
         self.type_box = box = gui.radioButtonsInBox(
-            self.controlArea, self, "svm_type", [], box="SVM Type",
+            self.controlArea, self, "svm_type", [], box="SVM 类型",
             orientation=form, callback=self._update_type)
 
         self.epsilon_radio = gui.appendRadioButton(
-            box, "SVM", addToLayout=False)
+            box, "支持向量机", addToLayout=False)
         self.c_spin = gui.doubleSpin(
             box, self, "C", 0.1, 512.0, 0.1, decimals=2,
             alignment=Qt.AlignRight, addToLayout=False,
@@ -136,7 +136,7 @@ class OWSVM(OWBaseLearner):
         # Initialize with the widest label to measure max width
         self.kernel_eq = self.kernels[-1][1]
 
-        box = gui.hBox(self.controlArea, "Kernel")
+        box = gui.hBox(self.controlArea, "核")
 
         self.kernel_box = buttonbox = gui.radioButtonsInBox(
             box, self, "kernel_type", btnLabels=[k[0] for k in self.kernels],
@@ -145,19 +145,19 @@ class OWSVM(OWBaseLearner):
         gui.rubber(buttonbox)
 
         parambox = gui.vBox(box)
-        gui.label(parambox, self, "Kernel: %(kernel_eq)s")
+        gui.label(parambox, self, "核: %(kernel_eq)s")
         common = dict(orientation=Qt.Horizontal, callback=self.settings_changed,
                       alignment=Qt.AlignRight, controlWidth=80)
         spbox = gui.hBox(parambox)
         gui.rubber(spbox)
         inbox = gui.vBox(spbox)
         gamma = gui.doubleSpin(
-            inbox, self, "gamma", 0.0, 10.0, 0.01, label=" g: ", **common)
+            inbox, self, "gamma", 0.0, 10.0, 0.01, label="g:", **common)
         gamma.setSpecialValueText(self._default_gamma)
         coef0 = gui.doubleSpin(
-            inbox, self, "coef0", 0.0, 10.0, 0.01, label=" c: ", **common)
+            inbox, self, "coef0", 0.0, 10.0, 0.01, label="c:", **common)
         degree = gui.doubleSpin(
-            inbox, self, "degree", 0.0, 10.0, 0.5, label=" d: ", **common)
+            inbox, self, "degree", 0.0, 10.0, 0.5, label="d:", **common)
         self._kernel_params = [gamma, coef0, degree]
         gui.rubber(parambox)
 
@@ -170,15 +170,15 @@ class OWSVM(OWBaseLearner):
     def _add_optimization_box(self):
         # this is part of init, pylint: disable=attribute-defined-outside-init
         self.optimization_box = gui.vBox(
-            self.controlArea, "Optimization Parameters")
+            self.controlArea, "优化参数")
         self.tol_spin = gui.doubleSpin(
             self.optimization_box, self, "tol", 1e-4, 1.0, 1e-4,
-            label="Numerical tolerance: ",
+            label="数值容差:",
             alignment=Qt.AlignRight, controlWidth=100,
             callback=self.settings_changed)
         self.max_iter_spin = gui.spin(
             self.optimization_box, self, "max_iter", 5, 1000000, 50,
-            label="Iteration limit: ", checked="limit_iter",
+            label="迭代限制:", checked="limit_iter",
             alignment=Qt.AlignRight, controlWidth=100,
             callback=self.settings_changed,
             checkCallback=self.settings_changed)
@@ -233,26 +233,26 @@ class OWSVM(OWBaseLearner):
     def get_learner_parameters(self):
         items = OrderedDict()
         if self.svm_type == self.SVM:
-            items["SVM type"] = "SVM, C={}, ε={}".format(self.C, self.epsilon)
+            items["SVM 类型"] = "支持向量机, C={}, ε={}".format(self.C, self.epsilon)
         else:
-            items["SVM type"] = "ν-SVM, ν={}, C={}".format(self.nu, self.nu_C)
+            items["SVM 类型"] = "ν-SVM, ν={}, C={}".format(self.nu, self.nu_C)
         self._report_kernel_parameters(items)
-        items["Numerical tolerance"] = "{:.6}".format(self.tol)
-        items["Iteration limt"] = self.max_iter if self.limit_iter else "unlimited"
+        items["数值容差"] = "{:.6}".format(self.tol)
+        items["迭代限制"] = self.max_iter if self.limit_iter else "无限制"
         return items
 
     def _report_kernel_parameters(self, items):
         gamma = self.gamma or self._default_gamma
         if self.kernel_type == 0:
-            items["Kernel"] = "Linear"
+            items["核"] = "线性"
         elif self.kernel_type == 1:
-            items["Kernel"] = \
-                "Polynomial, ({g:.4} x⋅y + {c:.4})<sup>{d}</sup>".format(
+            items["核"] = \
+                "多项式, ({g:.4} x⋅y + {c:.4})<sup>{d}</sup>".format(
                     g=gamma, c=self.coef0, d=self.degree)
         elif self.kernel_type == 2:
-            items["Kernel"] = "RBF, exp(-{:.4}|x-y|²)".format(gamma)
+            items["核"] = "高斯径向基, exp(-{:.4}|x-y|²)".format(gamma)
         else:
-            items["Kernel"] = "Sigmoid, tanh({g:.4} x⋅y + {c:.4})".format(
+            items["核"] = "Sigmoid, tanh({g:.4} x⋅y + {c:.4})".format(
                 g=gamma, c=self.coef0)
 
 

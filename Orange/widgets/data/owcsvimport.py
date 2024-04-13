@@ -461,7 +461,7 @@ class VarPathItem(QStandardItem):
                 text = f"${{{vpath.name}}}/{vpath.relpath}"
                 p = self.resolve(vpath)
                 if p is None or not os.path.exists(p):
-                    text += " (missing)"
+                    text += " (缺失)"
                 return text
         elif role == Qt.ForegroundRole:
             vpath = self.data(VarPathItem.VarPathRole)
@@ -551,9 +551,9 @@ class FileFormat(NamedTuple):
 
 
 FileFormats = [
-    FileFormat("text/csv", "Text - comma separated", ("*.csv", "*")),
-    FileFormat("text/tab-separated-values", "Text - tab separated", ("*.tsv", "*")),
-    FileFormat("text/plain", "Text - all files", ("*.txt", "*")),
+    FileFormat("text/csv", "文本 - 逗号分隔", ("*.csv", "*")),
+    FileFormat("text/tab-separated-values", "文本 - 制表符分隔", ("*.tsv", "*")),
+    FileFormat("text/plain", "文本 - 所有文件", ("*.txt", "*")),
 ]
 
 
@@ -611,20 +611,20 @@ def default_options_for_mime_type(
 
 
 class OWCSVFileImport(widget.OWWidget):
-    name = "CSV File Import"
-    description = "Import a data table from a CSV formatted file."
+    name = "CSV文件导入 CSV File Import"
+    description = "从 CSV 格式的文件中导入数据表。"
     icon = "icons/CSVFile.svg"
     priority = 11
-    category = "Data"
-    keywords = "csv file import, file, load, read, open, csv"
+    category = "数据"
+    keywords = "csv 文件导入，文件，加载，读取，打开，csv"
 
     class Outputs:
         data = widget.Output(
-            name="Data",
+            name="数据",
             type=Orange.data.Table,
-            doc="Loaded data set.")
+            doc="已加载的数据集。")
         data_frame = widget.Output(
-            name="Data Frame",
+            name="数据框",
             type=pd.DataFrame,
             doc="",
             auto_summary=False
@@ -632,12 +632,12 @@ class OWCSVFileImport(widget.OWWidget):
 
     class Error(widget.OWWidget.Error):
         error = widget.Msg(
-            "Unexpected error"
+            "意外错误"
         )
         encoding_error = widget.Msg(
-            "Encoding error\n"
-            "The file might be encoded in an unsupported encoding or it "
-            "might be binary"
+            "编码错误\n"
+            "该文件可能使用了不受支持的编码或者"
+            "可能是二进制文件"
         )
 
     #: Paths and options of files accessed in a 'session'
@@ -681,9 +681,9 @@ class OWCSVFileImport(widget.OWWidget):
         self.import_items_model = VarPathItemModel(self)
         self.import_items_model.setReplacementEnv(self._replacements())
         self.recent_combo = ItemStyledComboBox(
-            self, objectName="recent-combo", toolTip="Recent files.",
+            self, objectName="最近使用", toolTip="最近的文件。",
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon,
-            minimumContentsLength=16, placeholderText="Recent files…"
+            minimumContentsLength=16, placeholderText="最近的文件..."
         )
         self.recent_combo.setModel(self.import_items_model)
         self.recent_combo.activated.connect(self.activate_recent)
@@ -691,17 +691,17 @@ class OWCSVFileImport(widget.OWWidget):
             QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         self.browse_button = QPushButton(
             "…", icon=self.style().standardIcon(QStyle.SP_DirOpenIcon),
-            toolTip="Browse filesystem", autoDefault=False,
+            toolTip="浏览文件系统", autoDefault=False,
         )
         # A button drop down menu with selection of explicit workflow dir
         # relative import. This is only enabled when 'basedir' workflow env
         # is set. XXX: Always use menu, disable Import relative... action?
         self.browse_menu = menu = QMenu(self.browse_button)
-        ac = menu.addAction("Import any file…")
+        ac = menu.addAction("导入任何文件...")
         ac.triggered.connect(self.browse)
 
-        ac = menu.addAction("Import relative to workflow file…")
-        ac.setToolTip("Import a file within the workflow file directory")
+        ac = menu.addAction("相对于工作流文件导入...")
+        ac.setToolTip("在工作流文件目录内导入文件")
         ac.triggered.connect(lambda: self.browse_relative("basedir"))
 
         if "basedir" in self._replacements():
@@ -716,7 +716,7 @@ class OWCSVFileImport(widget.OWWidget):
         ###########
         # Info text
         ###########
-        box = gui.widgetBox(self.controlArea, "Info")
+        box = gui.widgetBox(self.controlArea, "信息")
         self.summary_text = QTextBrowser(
             verticalScrollBarPolicy=Qt.ScrollBarAsNeeded,
             readOnly=True,
@@ -732,7 +732,7 @@ class OWCSVFileImport(widget.OWWidget):
             standardButtons=QDialogButtonBox.Cancel | QDialogButtonBox.Retry
         )
         self.load_button = b = button_box.button(QDialogButtonBox.Retry)
-        b.setText("Load")
+        b.setText("加载")
         b.clicked.connect(self.__committimer.start)
         b.setEnabled(False)
         b.setDefault(True)
@@ -743,7 +743,7 @@ class OWCSVFileImport(widget.OWWidget):
         b.setAutoDefault(False)
 
         self.import_options_button = QPushButton(
-            "Import Options…", enabled=False, autoDefault=False,
+            "导入选项...", enabled=False, autoDefault=False,
             clicked=self._activate_import_dialog
         )
 
@@ -845,7 +845,7 @@ class OWCSVFileImport(widget.OWWidget):
 
     def _browse_dialog(self):
         dlg = FileDialog(
-            self, windowTitle=self.tr("Open Data File"),
+            self, windowTitle=self.tr("打开数据文件"),
             acceptMode=QFileDialog.AcceptOpen,
             fileMode=QFileDialog.ExistingFile
         )
@@ -870,8 +870,8 @@ class OWCSVFileImport(widget.OWWidget):
             parent=self,
             windowTitle=self.tr(""),
             icon=QMessageBox.Question,
-            text=self.tr("The '{basename}' may be a binary file.\n"
-                         "Are you sure you want to continue?").format(
+            text=self.tr("文件 '{basename}' 可能是二进制。\n"
+                         "您确定要继续吗?").format(
                              basename=os.path.basename(path)),
             standardButtons=QMessageBox.Cancel | QMessageBox.Yes
         )
@@ -880,9 +880,9 @@ class OWCSVFileImport(widget.OWWidget):
 
     def _path_must_be_relative_mb(self, prefix: str) -> QMessageBox:
         mb = QMessageBox(
-            parent=self, windowTitle=self.tr("Invalid path"),
+            parent=self, windowTitle=self.tr("无效路径"),
             icon=QMessageBox.Warning,
-            text=self.tr("Selected path is not within '{prefix}'").format(
+            text=self.tr("所选路径不在 '{prefix}' 内").format(
                 prefix=prefix
             ),
         )
@@ -937,7 +937,7 @@ class OWCSVFileImport(widget.OWWidget):
                 if options_ is not None:
                     options = options_
             dlg = CSVImportDialog(
-                self, windowTitle="Import Options", sizeGripEnabled=True)
+                self, windowTitle="导入选项", sizeGripEnabled=True)
             dlg.setWindowModality(Qt.WindowModal)
             dlg.setPath(path)
             dlg.setOptions(options)
@@ -968,7 +968,7 @@ class OWCSVFileImport(widget.OWWidget):
         item = self.current_item()
         assert item is not None
         dlg = CSVImportDialog(
-            self, windowTitle="Import Options", sizeGripEnabled=True,
+            self, windowTitle="导入选项", sizeGripEnabled=True,
         )
         dlg.setWindowModality(Qt.WindowModal)
         dlg.setAttribute(Qt.WA_DeleteOnClose)
@@ -1130,7 +1130,7 @@ class OWCSVFileImport(widget.OWWidget):
         if self.__watcher is not None:
             self.__cancel_task()
             self.__clear_running_state()
-            self.setStatusMessage("Cancelled")
+            self.setStatusMessage("已取消")
             self.summary_text.setText(
                 "<div>Cancelled<br/><small>Press 'Reload' to try again</small></div>"
             )
@@ -1138,9 +1138,9 @@ class OWCSVFileImport(widget.OWWidget):
     def __set_running_state(self):
         self.progressBarInit()
         self.setBlocking(True)
-        self.setStatusMessage("Running")
+        self.setStatusMessage("正在运行")
         self.cancel_button.setEnabled(True)
-        self.load_button.setText("Restart")
+        self.load_button.setText("重新启动")
         path = self.current_item().path()
         self.Error.clear()
         self.summary_text.setText(
@@ -1152,7 +1152,7 @@ class OWCSVFileImport(widget.OWWidget):
         self.setStatusMessage("")
         self.setBlocking(False)
         self.cancel_button.setEnabled(False)
-        self.load_button.setText("Reload")
+        self.load_button.setText("重新加载")
 
     def __set_error_state(self, err):
         self.Error.clear()
@@ -1404,7 +1404,7 @@ def _open(path, mode, encoding=None):
                 f = io.TextIOWrapper(f, encoding=encoding)
             return f
         else:
-            raise ValueError("Expected a single file in the archive.")
+            raise ValueError("预期归档文件中只有一个文件。")
     else:
         return open(path, mode, encoding=encoding)
 

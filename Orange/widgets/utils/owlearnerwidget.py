@@ -72,29 +72,29 @@ class OWBaseLearner(OWWidget, metaclass=OWBaseLearnerMeta, openclass=True):
 
     class Error(OWWidget.Error):
         data_error = Msg("{}")
-        fitting_failed = Msg("Fitting failed.\n{}")
-        sparse_not_supported = Msg("Sparse data is not supported.")
-        out_of_memory = Msg("Out of memory.")
+        fitting_failed = Msg("拟合失败。\n{}")
+        sparse_not_supported = Msg("不支持稀疏数据")
+        out_of_memory = Msg("内存不足")
 
     class Warning(OWWidget.Warning):
-        outdated_learner = Msg("Press Apply to submit changes.")
+        outdated_learner = Msg("按应用提交更改")
 
     class Information(OWWidget.Information):
         ignored_preprocessors = Msg(
-            "Ignoring default preprocessing.\n"
-            "Default preprocessing, such as scaling, one-hot encoding and "
-            "treatment of missing data, has been replaced with user-specified "
-            "preprocessors. Problems may occur if these are inadequate "
-            "for the given data.")
+            "忽略默认预处理。\n"
+            "默认预处理,如缩放、一次性编码和"
+            "缺失值处理已被用户指定的"
+            "预处理器替换。如果不足以处理"
+            "给定数据,可能会出现问题")
 
     class Inputs:
-        data = Input("Data", Table)
-        preprocessor = Input("Preprocessor", Preprocess)
+        data = Input("数据", Table)
+        preprocessor = Input("预处理器", Preprocess)
 
     class Outputs:
-        learner = Output("Learner", Learner, dynamic=False)
-        model = Output("Model", Model, dynamic=False,
-                       replaces=["Classifier", "Predictor"])
+        learner = Output("学习器", Learner, dynamic=False)
+        model = Output("模型", Model, dynamic=False,
+                       replaces=["分类器", "预测器"])
 
     OUTPUT_MODEL_NAME = Outputs.model.name  # Attr for backcompat w/ self.send() code
 
@@ -168,12 +168,12 @@ class OWBaseLearner(OWWidget, metaclass=OWBaseLearnerMeta, openclass=True):
         if data is not None and data.domain.class_var is None:
             if data.domain.class_vars:
                 self.Error.data_error(
-                    "Data contains multiple target variables.\n"
-                    "Select a single one with the Select Columns widget.")
+                    "数据包含多个目标变量。\n"
+                    "请用选择列小部件选择单个目标变量")
             else:
                 self.Error.data_error(
-                    "Data has no target variable.\n"
-                    "Select one with the Select Columns widget.")
+                    "数据没有目标变量。\n"
+                    "请用选择列小部件选择一个")
             self.data = None
 
         # invalidate the model so that handleNewSignals will update it
@@ -251,11 +251,11 @@ class OWBaseLearner(OWWidget, metaclass=OWBaseLearnerMeta, openclass=True):
             if reason is not None:
                 self.Error.data_error(reason)
             elif not len(self.data):
-                self.Error.data_error("Dataset is empty.")
+                self.Error.data_error("数据集为空")
             elif len(ut.unique(self.data.Y)) < 2:
-                self.Error.data_error("Data contains a single target value.")
+                self.Error.data_error("数据只包含单个目标值")
             elif self.data.X.size == 0:
-                self.Error.data_error("Data has no features to learn from.")
+                self.Error.data_error("数据没有可学习的特征")
             elif self.data.is_sparse() and not self.supports_sparse:
                 self.Error.sparse_not_supported()
             else:
@@ -280,14 +280,14 @@ class OWBaseLearner(OWWidget, metaclass=OWBaseLearnerMeta, openclass=True):
         return self.learner_name or self.name_line_edit.placeholderText()
 
     def send_report(self):
-        self.report_items((("Name", self.effective_learner_name()),))
+        self.report_items((("名称", self.effective_learner_name()),))
 
         model_parameters = self.get_learner_parameters()
         if model_parameters:
-            self.report_items("Model parameters", model_parameters)
+            self.report_items("模型参数", model_parameters)
 
         if self.data:
-            self.report_data("Data", self.data)
+            self.report_data("数据", self.data)
 
     # GUI
     def setup_layout(self):
@@ -299,12 +299,12 @@ class OWBaseLearner(OWWidget, metaclass=OWBaseLearnerMeta, openclass=True):
             if type(self).add_classification_layout is not \
                     OWBaseLearner.add_classification_layout:
                 classification_box = gui.widgetBox(
-                    self.controlArea, 'Classification')
+                    self.controlArea, '分类')
                 self.add_classification_layout(classification_box)
             # Only add a regression section if the method is overridden
             if type(self).add_regression_layout is not \
                     OWBaseLearner.add_regression_layout:
-                regression_box = gui.widgetBox(self.controlArea, 'Regression')
+                regression_box = gui.widgetBox(self.controlArea, '回归')
                 self.add_regression_layout(regression_box)
         self.add_bottom_buttons()
 
@@ -333,9 +333,9 @@ class OWBaseLearner(OWWidget, metaclass=OWBaseLearnerMeta, openclass=True):
 
     def add_learner_name_widget(self):
         self.name_line_edit = gui.lineEdit(
-            self.controlArea, self, 'learner_name', box='Name',
+            self.controlArea, self, 'learner_name', box='名称',
             placeholderText=self.captionTitle,
-            tooltip='The name will identify this model in other widgets',
+            tooltip='该名称将在其他小部件中标识此模型',
             orientation=Qt.Horizontal, callback=self.learner_name_changed)
 
     def setCaption(self, caption):

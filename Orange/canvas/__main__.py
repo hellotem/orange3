@@ -106,11 +106,11 @@ def check_for_updates():
                     latest == skipped:
                 return
 
-            notif = Notification(title='Orange Update Available',
-                                 text='Current version: <b>{}</b><br>'
-                                      'Latest version: <b>{}</b>'.format(current, latest),
-                                 accept_button_label="Download",
-                                 reject_button_label="Skip this Version",
+            notif = Notification(title='Orange有可用更新',
+                                 text='当前版本: <b>{}</b><br>'
+                                      '最新版本: <b>{}</b>'.format(current, latest),
+                                 accept_button_label="下载",
+                                 reject_button_label="跳过这个版本",
                                  icon=QIcon(resource_filename("canvas/icons/update.png")))
 
             def handle_click(role):

@@ -656,10 +656,10 @@ class DiscreteTreeNode(TreeNode):
 
         return '<p>' \
             + text \
-            + '{}/{} samples ({:2.3f}%)'.format(
+            + '{}/{} 个样本 ({:2.3f}%)'.format(
                 int(samples), total, ratio * 100) \
             + '<hr>' \
-            + ('Split by ' + splitting_attr.name
+            + ('分割依据 ' + splitting_attr.name
                if not self.tree.is_leaf(self.label) else '') \
             + ('<br><br>' if rules_str and not self.tree.is_leaf(self.label) else '') \
             + rules_str \
@@ -680,9 +680,9 @@ class ContinuousTreeNode(TreeNode):
 
     COLOR_NONE, COLOR_MEAN, COLOR_STD = range(3)
     COLOR_METHODS = {
-        'None': COLOR_NONE,
-        'Mean': COLOR_MEAN,
-        'Standard deviation': COLOR_STD,
+        '无': COLOR_NONE,
+        '均值': COLOR_MEAN,
+        '标准差': COLOR_STD,
     }
 
     @property
@@ -722,11 +722,11 @@ class ContinuousTreeNode(TreeNode):
         rules_str = self._rules_str()
         splitting_attr = self.tree.attribute(self.label)
 
-        return '<p>Mean: {:2.3f}'.format(mean) \
-            + '<br>Standard deviation: {:2.3f}'.format(std) \
-            + '<br>{} samples'.format(num_samples) \
+        return '<p>均值: {:2.3f}'.format(mean) \
+            + '<br>标准差: {:2.3f}'.format(std) \
+            + '<br>{} 个样本'.format(num_samples) \
             + '<hr>' \
-            + ('Split by ' + splitting_attr.name
+            + ('分割依据 ' + splitting_attr.name
                if not self.tree.is_leaf(self.label) else '') \
             + ('<br><br>' if rules_str and not self.tree.is_leaf(self.label) else '') \
             + rules_str \

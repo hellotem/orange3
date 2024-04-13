@@ -161,8 +161,8 @@ class SortFilterProxyWithLanguage(QSortFilterProxyModel):
 
 
 class OWDataSets(OWWidget):
-    name = "Datasets"
-    description = "Load a dataset from an online repository"
+    name = "数据集 Datasets"
+    description = "从在线库加载数据集"
     icon = "icons/DataSets.svg"
     priority = 20
     replaces = ["orangecontrib.prototypes.widgets.owdatasets.OWDataSets"]
@@ -176,32 +176,32 @@ class OWDataSets(OWWidget):
     INDEX_URL = "https://datasets.biolab.si/"
     DATASET_DIR = "datasets"
     DEFAULT_LANG = "English"
-    ALL_LANGUAGES = "All Languages"
+    ALL_LANGUAGES = "所有语言"
 
     # override HEADER_SCHEMA to define new columns
     # if schema is changed override methods: self.assign_delegates and
     # self.create_model
     HEADER_SCHEMA = [
         ['islocal', {'label': ''}],
-        ['title', {'label': 'Title'}],
-        ['size', {'label': 'Size'}],
-        ['instances', {'label': 'Instances'}],
-        ['variables', {'label': 'Variables'}],
-        ['target', {'label': 'Target'}],
-        ['tags', {'label': 'Tags'}]
+        ['title', {'label': '标题'}],
+        ['size', {'label': '大小'}],
+        ['instances', {'label': '实例'}],
+        ['variables', {'label': '变量'}],
+        ['target', {'label': '目标'}],
+        ['tags', {'label': '标签'}]
     ]  # type: List[str, dict]
 
     IndicatorBrushes = (QBrush(Qt.darkGray), QBrush(QColor(0, 192, 0)))
 
     class Error(OWWidget.Error):
-        no_remote_datasets = Msg("Could not fetch dataset list")
+        no_remote_datasets = Msg("无法获取数据集列表")
 
     class Warning(OWWidget.Warning):
-        only_local_datasets = Msg("Could not fetch datasets list, only local "
-                                  "cached datasets are shown")
+        only_local_datasets = Msg("无法获取数据集列表,仅显示本地"
+                                  "缓存的数据集")
 
     class Outputs:
-        data = Output("Data", Orange.data.Table)
+        data = Output("数据", Orange.data.Table)
 
     #: Selected dataset id
     selected_id = Setting(None)   # type: Optional[str]
@@ -232,11 +232,11 @@ class OWDataSets(OWWidget):
 
         layout = QHBoxLayout()
         self.filterLineEdit = QLineEdit(
-            textChanged=self.filter, placeholderText="Search for data set ..."
+            textChanged=self.filter, placeholderText="搜索数据集..."
         )
         layout.addWidget(self.filterLineEdit)
         layout.addSpacing(20)
-        layout.addWidget(QLabel("Show data sets in "))
+        layout.addWidget(QLabel("显示数据集"))
         lang_combo = self.language_combo = QComboBox()
         languages = [self.DEFAULT_LANG, self.ALL_LANGUAGES]
         if self.language is not None and self.language not in languages:
@@ -256,12 +256,12 @@ class OWDataSets(OWWidget):
             rootIsDecorated=False,
             editTriggers=QTreeView.NoEditTriggers,
             uniformRowHeights=True,
-            toolTip="Press Return or double-click to send"
+            toolTip="按回车或双击以发送"
         )
         # the method doesn't exists yet, pylint: disable=unnecessary-lambda
         self.view.doubleClicked.connect(self.commit)
         self.view.returnPressed.connect(self.commit)
-        box = gui.widgetBox(self.splitter, "Description", addToLayout=False)
+        box = gui.widgetBox(self.splitter, "描述", addToLayout=False)
         self.descriptionlabel = QLabel(
             wordWrap=True,
             textFormat=Qt.RichText,
@@ -297,7 +297,7 @@ class OWDataSets(OWWidget):
         self.assign_delegates()
 
         self.setBlocking(True)
-        self.setStatusMessage("Initializing")
+        self.setStatusMessage("初始化")
 
         self._executor = ThreadPoolExecutor(max_workers=1)
         f = self._executor.submit(list_remote, self.INDEX_URL)
@@ -456,7 +456,7 @@ class OWDataSets(OWWidget):
         width = self.view.fontMetrics().horizontalAdvance
         self.view.resizeColumnToContents(0)
         scw(self.Header.title, width("X" * 37))
-        scw(self.Header.size, 20 + max(width("888 bytes "), width("9999.9 MB ")))
+        scw(self.Header.size, 20 + max(width("888字节"), width("9999.9 MB ")))
         scw(self.Header.instances, 20 + width("100000000"))
         scw(self.Header.variables, 20 + width("1000000"))
 
@@ -563,7 +563,7 @@ class OWDataSets(OWWidget):
                 pr.advance.connect(self.__progress_advance, Qt.QueuedConnection)
 
                 self.progressBarInit()
-                self.setStatusMessage("Fetching...")
+                self.setStatusMessage("获取中...")
                 self.setBlocking(True)
 
                 f = self._executor.submit(
@@ -703,8 +703,8 @@ def description_html(datainfo):
     Summarize a data info as a html fragment.
     """
     html = []
-    year = " ({})".format(str(datainfo.year)) if datainfo.year else ""
-    source = ", from {}".format(datainfo.source) if datainfo.source else ""
+    year = "({})".format(str(datainfo.year)) if datainfo.year else ""
+    source = ",来自{}".format(datainfo.source) if datainfo.source else ""
 
     html.append("<b>{}</b>{}{}".format(escape(datainfo.title), year, source))
     html.append("<p>{}</p>".format(datainfo.description))

@@ -121,7 +121,7 @@ class CSVReader(FileFormat, DataTableMixin):
     """Reader for comma separated files"""
 
     EXTENSIONS = ('.csv',)
-    DESCRIPTION = 'Comma-separated values'
+    DESCRIPTION = '逗号分隔值'
     DELIMITERS = ',;:\t$ '
     SUPPORT_COMPRESSED = True
     SUPPORT_SPARSE_DATA = False
@@ -191,7 +191,7 @@ class CSVReader(FileFormat, DataTableMixin):
 class TabReader(CSVReader):
     """Reader for tab separated files"""
     EXTENSIONS = ('.tab', '.tsv')
-    DESCRIPTION = 'Tab-separated values'
+    DESCRIPTION = '制表符分隔值'
     DELIMITERS = '\t'
     PRIORITY = 10
 
@@ -199,7 +199,7 @@ class TabReader(CSVReader):
 class PickleReader(FileFormat):
     """Reader for pickled Table objects"""
     EXTENSIONS = ('.pkl', '.pickle')
-    DESCRIPTION = 'Pickled Orange data'
+    DESCRIPTION = 'Pickled Orange数据'
     SUPPORT_COMPRESSED = True
     SUPPORT_SPARSE_DATA = True
 
@@ -207,7 +207,7 @@ class PickleReader(FileFormat):
         with self.open(self.filename, 'rb') as f:
             table = pickle.load(f)
             if not isinstance(table, Table):
-                raise TypeError("file does not contain a data table")
+                raise TypeError("文件不包含数据表")
             else:
                 update_origin(table, self.filename)
                 return table
@@ -221,7 +221,7 @@ class PickleReader(FileFormat):
 class BasketReader(FileFormat):
     """Reader for basket (sparse) files"""
     EXTENSIONS = ('.basket', '.bsk')
-    DESCRIPTION = 'Basket file'
+    DESCRIPTION = '篮子文件'
     SUPPORT_SPARSE_DATA = True
 
     def read(self):
@@ -264,14 +264,14 @@ class _BaseExcelReader(FileFormat, DataTableMixin):
             if self.sheet and len(self.sheets) > 1:
                 table.name = '-'.join((table.name, self.sheet))
         except Exception:
-            raise IOError("Couldn't load spreadsheet from " + self.filename)
+            raise IOError("无法从中加载电子表格" + self.filename)
         return table
 
 
 class ExcelReader(_BaseExcelReader):
     """Reader for .xlsx files"""
     EXTENSIONS = ('.xlsx',)
-    DESCRIPTION = 'Microsoft Excel spreadsheet'
+    DESCRIPTION = 'Microsoft Excel电子表格'
     ERRORS = ("#VALUE!", "#DIV/0!", "#REF!", "#NUM!", "#NULL!", "#NAME?")
     OPTIONAL_TYPE_ANNOTATIONS = True
 
@@ -348,7 +348,7 @@ class ExcelReader(_BaseExcelReader):
 class XlsReader(_BaseExcelReader):
     """Reader for .xls files"""
     EXTENSIONS = ('.xls',)
-    DESCRIPTION = 'Microsoft Excel 97-2004 spreadsheet'
+    DESCRIPTION = 'Microsoft Excel 97-2004电子表格'
 
     def __init__(self, filename):
         super().__init__(filename)

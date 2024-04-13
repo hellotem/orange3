@@ -282,18 +282,18 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
     """Scatterplot visualization with explorative analysis and intelligent
     data visualization enhancements."""
 
-    name = "Scatter Plot"
-    description = "Interactive scatter plot visualization with " \
-                  "intelligent data visualization enhancements."
+    name = "散点图 Scatter Plot"
+    description = "具有智能数据可视化增强功能的 " \
+                  "交互式散点图可视化。"
     icon = "icons/ScatterPlot.svg"
     priority = 140
-    keywords = "scatter plot"
+    keywords = "散点图"
 
     class Inputs(OWDataProjectionWidget.Inputs):
-        features = Input("Features", AttributeList)
+        features = Input("特征", AttributeList)
 
     class Outputs(OWDataProjectionWidget.Outputs):
-        features = Output("Features", AttributeList, dynamic=False)
+        features = Output("特征", AttributeList, dynamic=False)
 
     settings_version = 5
     auto_sample = Setting(True)
@@ -307,13 +307,13 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
 
     class Warning(OWDataProjectionWidget.Warning):
         missing_coords = Msg(
-            "Plot cannot be displayed because '{}' or '{}' "
-            "is missing for all data points.")
+            "无法显示图表,因为 '{}' 或 '{}' "
+            "对所有数据点缺失。")
 
     class Information(OWDataProjectionWidget.Information):
-        sampled_sql = Msg("Large SQL table; showing a sample.")
+        sampled_sql = Msg("大型SQL表;显示示例。")
         missing_coords = Msg(
-            "Points with missing '{}' or '{}' are not displayed")
+            "缺失 '{}' 或 '{}' 的点未显示")
 
     def __init__(self):
         self.attr_box: QGroupBox = None
@@ -347,11 +347,11 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
         gui.checkBox(
             self._plot_box, self,
             value="graph.orthonormal_regression",
-            label="Treat variables as independent",
+            label="将变量视为独立",
             callback=self.graph.update_regression_line,
             tooltip=
-            "If checked, fit line to group (minimize distance from points);\n"
-            "otherwise fit y as a function of x (minimize vertical distances)",
+            "如果选中,则拟合组的线(最小化点距离);\n"
+            "否则将y拟合为x的函数(最小化垂直距离)",
             disabledBy=self.cb_reg_line)
 
     def _add_controls_axis(self):
@@ -359,7 +359,7 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
             labelWidth=50, orientation=Qt.Horizontal, sendSelectedValue=True,
             contentsLength=12, searchable=True
         )
-        self.attr_box = gui.vBox(self.controlArea, 'Axes',
+        self.attr_box = gui.vBox(self.controlArea, '轴',
                                  spacing=2 if gui.is_macstyle() else 8)
         dmod = DomainModel
         self.xy_model = DomainModel(dmod.MIXED, valid_types=dmod.PRIMITIVE)
@@ -374,13 +374,13 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
             model=self.xy_model, **common_options,
         )
         vizrank_box = gui.hBox(self.attr_box)
-        button = self.vizrank_button("Find Informative Projections")
+        button = self.vizrank_button("查找信息丰富的投影")
         vizrank_box.layout().addWidget(button)
         self.vizrankSelectionChanged.connect(self.set_attr)
 
     def _add_controls_sampling(self):
         self.sampling = gui.auto_commit(
-            self.controlArea, self, "auto_sample", "Sample", box="Sampling",
+            self.controlArea, self, "auto_sample", "样本", box="采样",
             callback=self.switch_sampling, commit=lambda: self.add_data(1))
         self.sampling.setVisible(False)
 
@@ -532,7 +532,7 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
             if subset_data.approx_len() < AUTO_DL_LIMIT:
                 subset_data = Table(subset_data)
             else:
-                self.warning("Data subset does not support large Sql tables")
+                self.warning("数据子集不支持大型Sql表")
                 subset_data = None
         super().set_subset_data(subset_data)
 
@@ -600,16 +600,16 @@ class OWScatterPlot(OWDataProjectionWidget, VizRankMixin(ScatterPlotVizRank)):
 
     def get_widget_name_extension(self):
         if self.data is not None:
-            return "{} vs {}".format(self.attr_x.name, self.attr_y.name)
+            return "{} 对 {}".format(self.attr_x.name, self.attr_y.name)
         return None
 
     def _get_send_report_caption(self):
         return report.render_items_vert((
-            ("Color", self._get_caption_var_name(self.attr_color)),
-            ("Label", self._get_caption_var_name(self.attr_label)),
-            ("Shape", self._get_caption_var_name(self.attr_shape)),
-            ("Size", self._get_caption_var_name(self.attr_size)),
-            ("Jittering", (self.attr_x.is_discrete or
+            ("颜色", self._get_caption_var_name(self.attr_color)),
+            ("标签", self._get_caption_var_name(self.attr_label)),
+            ("形状", self._get_caption_var_name(self.attr_shape)),
+            ("大小", self._get_caption_var_name(self.attr_size)),
+            ("抖动", (self.attr_x.is_discrete or
                            self.attr_y.is_discrete or
                            self.graph.jitter_continuous) and
              self.graph.jitter_size)))

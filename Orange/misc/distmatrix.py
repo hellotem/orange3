@@ -176,10 +176,10 @@ class DistMatrix(np.ndarray):
         with open(filename, encoding=detect_encoding(filename)) as fle:
             line = fle.readline()
             if not line:
-                raise ValueError("empty file")
+                raise ValueError("空文件")
             data = line.strip().split()
             if not data[0].strip().isdigit():
-                raise ValueError("distance file must begin with dimension")
+                raise ValueError("距离文件必须以维数开头")
             n = int(data.pop(0))
             symmetric = True
             axis = 1
@@ -207,7 +207,7 @@ class DistMatrix(np.ndarray):
                 col_labels = [x.strip()
                               for x in fle.readline().strip().split("\t")]
                 if len(col_labels) != n:
-                    raise ValueError("mismatching number of column labels, "
+                    raise ValueError("列标签数量不匹配,"
                                      f"{len(col_labels)} != {n}")
 
             def num_or_lab(n, labels):
@@ -216,20 +216,20 @@ class DistMatrix(np.ndarray):
             matrix = np.zeros((n, n))
             for i, line in enumerate(fle):
                 if i >= n:
-                    raise ValueError("too many rows")
+                    raise ValueError("行数过多")
                 line = line.strip().split("\t")
                 if row_labels is not None:
                     row_labels.append(line.pop(0).strip())
                 if len(line) > n:
                     raise ValueError(
-                        f"too many columns in matrix row "
+                        f"矩阵行中列数过多"
                         f"{num_or_lab(i, row_labels)}")
                 for j, e in enumerate(line[:i + 1 if symmetric else n]):
                     try:
                         matrix[i, j] = float(e)
                     except ValueError as exc:
                         raise ValueError(
-                            "invalid element at "
+                            "无效元素位于"
                             f"row {num_or_lab(i, row_labels)}, "
                             f"column {num_or_lab(j, col_labels)}") from exc
                     if symmetric:

@@ -26,7 +26,7 @@ def widget_discovery(discovery):
     # manually described category (without 'package' definition)
     discovery.handle_category(
         CategoryDescription(
-            name="Transform",
+            name="变换",
             priority=1,
             background="#FF9D5E",
             icon="data/icons/Transform.svg",
@@ -35,7 +35,7 @@ def widget_discovery(discovery):
     )
     discovery.handle_category(
         CategoryDescription(
-            name="Orange Obsolete",
+            name="已过时的Orange",
             package=__package__,
             hidden=True,
         )

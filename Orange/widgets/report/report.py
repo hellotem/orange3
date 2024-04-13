@@ -90,15 +90,15 @@ def describe_domain(domain):
         s = clipped_list([a.name for a in items], 1000)
         nitems = len(items)
         if nitems >= 10:
-            s += f" (total: {nitems} {desc})"
+            s += f"(总计: {nitems} {desc})"
         return s
 
     return OrderedDict(
-        [("Features", clip_attrs(domain.attributes, "features")),
-         ("Meta attributes", bool(domain.metas) and
-          clip_attrs(domain.metas, "meta attributes")),
-         ("Target", bool(domain.class_vars) and
-          clip_attrs(domain.class_vars, "target variables"))])
+        [("特征", clip_attrs(domain.attributes, "特征")),
+         ("元属性", bool(domain.metas) and
+          clip_attrs(domain.metas, "元属性")),
+         ("目标", bool(domain.class_vars) and
+          clip_attrs(domain.class_vars, "目标变量"))])
 
 
 def describe_data(data):
@@ -118,9 +118,9 @@ def describe_data(data):
     if data is None:
         return items
     if isinstance(data, SqlTable):
-        items["Data instances"] = data.approx_len()
+        items["数据实例"] = data.approx_len()
     else:
-        items["Data instances"] = len(data)
+        items["数据实例"] = len(data)
     items.update(describe_domain(data.domain))
     return items
 
@@ -140,17 +140,17 @@ def describe_domain_brief(domain):
     items = OrderedDict()
     if domain is None:
         return items
-    items["Features"] = len(domain.attributes) or "None"
-    items["Meta attributes"] = len(domain.metas) or "None"
+    items["特征"] = len(domain.attributes) or "无"
+    items["元属性"] = len(domain.metas) or "无"
     if domain.has_discrete_class:
-        items["Target"] = "Class '{}'".format(domain.class_var.name)
+        items["目标"] = "类别 '{}'".format(domain.class_var.name)
     elif domain.has_continuous_class:
-        items["Target"] = "Numeric variable '{}'". \
+        items["目标"] = "数值变量 '{}'". \
             format(domain.class_var.name)
     elif domain.class_vars:
-        items["Targets"] = len(domain.class_vars)
+        items["目标"] = len(domain.class_vars)
     else:
-        items["Targets"] = False
+        items["目标"] = False
     return items
 
 
@@ -171,8 +171,8 @@ def describe_data_brief(data):
     if data is None:
         return items
     if isinstance(data, SqlTable):
-        items["Data instances"] = data.approx_len()
+        items["数据实例"] = data.approx_len()
     else:
-        items["Data instances"] = len(data)
+        items["数据实例"] = len(data)
     items.update(describe_domain_brief(data.domain))
     return items

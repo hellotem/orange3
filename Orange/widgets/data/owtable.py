@@ -174,28 +174,28 @@ _Sorting = List[Tuple[str, int]]
 
 
 class OWTable(OWWidget):
-    name = "Data Table"
-    description = "View the dataset in a spreadsheet."
+    name = "数据表 Data Table"
+    description = "在电子表格中查看数据集。"
     icon = "icons/Table.svg"
     priority = 50
-    keywords = "data table, view"
+    keywords = "数据表,查看"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
+        data = Input("数据", Table, default=True)
         data_subset = Input("Data Subset", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选中的数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     class Warning(OWWidget.Warning):
         missing_sort_columns = Msg(
-            "Cannot restore sorting.\n"
-            "Missing columns in input table: {}"
+            "无法恢复排序。\n"
+            "输入表缺少列: {}"
         )
         non_sortable_input = Msg(
-            "Cannot restore sorting.\n"
-            "Input table cannot be sorted due to implementation constraints."
+            "无法恢复排序。\n"
+            "由于实现限制,无法对输入表进行排序。"
         )
     buttons_area_orientation = Qt.Vertical
 
@@ -223,31 +223,31 @@ class OWTable(OWWidget):
         self.__have_new_subset = False
         self.dist_color = QColor(220, 220, 220, 255)
 
-        info_box = gui.vBox(self.controlArea, "Info")
+        info_box = gui.vBox(self.controlArea, "信息")
         self.info_text = gui.widgetLabel(info_box)
 
-        box = gui.vBox(self.controlArea, "Variables")
+        box = gui.vBox(self.controlArea, "变量")
         self.c_show_attribute_labels = gui.checkBox(
             box, self, "show_attribute_labels",
-            "Show variable labels (if present)",
+            "显示变量标签(如果存在)",
             callback=self._update_variable_labels)
 
         gui.checkBox(box, self, "show_distributions",
-                     'Visualize numeric values',
+                     '可视化数值',
                      callback=self._on_distribution_color_changed)
-        gui.checkBox(box, self, "color_by_class", 'Color by instance classes',
+        gui.checkBox(box, self, "color_by_class", '按实例类着色',
                      callback=self._on_distribution_color_changed)
 
-        box = gui.vBox(self.controlArea, "Selection")
+        box = gui.vBox(self.controlArea, "选择")
 
-        gui.checkBox(box, self, "select_rows", "Select full rows",
+        gui.checkBox(box, self, "select_rows", "选择完整行",
                      callback=self._on_select_rows_changed)
 
         gui.rubber(self.controlArea)
 
-        gui.button(self.buttonsArea, self, "Restore Original Order",
+        gui.button(self.buttonsArea, self, "恢复原始顺序",
                    callback=self.restore_order,
-                   tooltip="Show rows in the original order",
+                   tooltip="按原始顺序显示行",
                    autoDefault=False,
                    attribute=Qt.WA_LayoutUsesWidgetRect)
         gui.auto_send(self.buttonsArea, self, "auto_commit")
@@ -397,7 +397,7 @@ class OWTable(OWWidget):
         self.info.set_input_summary(summary, details)
 
         if self.input is None:
-            summary = ["No data."]
+            summary = ["无数据。"]
         else:
             summary = tsummary.format_summary(self.input.summary)
         self.info_text.setText("\n".join(summary))

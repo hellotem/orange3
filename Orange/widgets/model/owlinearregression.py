@@ -15,9 +15,9 @@ from Orange.widgets.widget import Output
 
 
 class OWLinearRegression(OWBaseLearner):
-    name = "Linear Regression"
-    description = "A linear regression algorithm with optional L1 (LASSO), " \
-                  "L2 (ridge) or L1L2 (elastic net) regularization."
+    name = "线性回归 Linear Regression"
+    description = "一种可选线性回归算法，具有 L1 (LASSO)、" \
+                  "L2 (ridge) 或 L1L2 (elastic net) 正则化"
     icon = "icons/LinearRegression.svg"
     replaces = [
         "Orange.widgets.regression.owlinearregression.OWLinearRegression",
@@ -28,11 +28,11 @@ class OWLinearRegression(OWBaseLearner):
     LEARNER = LinearRegressionLearner
 
     class Outputs(OWBaseLearner.Outputs):
-        coefficients = Output("Coefficients", Table, explicit=True)
+        coefficients = Output("系数", Table, explicit=True)
 
     #: Types
-    REGULARIZATION_TYPES = ["No regularization", "Ridge regression (L2)",
-                            "Lasso regression (L1)", "Elastic net regression"]
+    REGULARIZATION_TYPES = ["无正则化", "岭回归 (L2)",
+                            "Lasso 回归 (L1)", "弹性网络回归"]
     OLS, Ridge, Lasso, Elastic = 0, 1, 2, 3
 
     ridge = settings.Setting(False)
@@ -52,12 +52,12 @@ class OWLinearRegression(OWBaseLearner):
 
     def add_main_layout(self):
         # this is part of init, pylint: disable=attribute-defined-outside-init
-        box = gui.hBox(self.controlArea, "Parameters")
+        box = gui.hBox(self.controlArea, "参数")
         gui.checkBox(box, self, "fit_intercept",
-                     "Fit intercept (unchecking it fixes it to zero)",
+                     "拟合截距 (取消选中将其固定为零)",
                      callback=self._intercept_changed)
 
-        box = gui.hBox(self.controlArea, "Regularization")
+        box = gui.hBox(self.controlArea, "正则化")
         gui.radioButtons(box, self, "reg_type",
                          btnLabels=self.REGULARIZATION_TYPES,
                          callback=self._reg_type_changed)
@@ -145,26 +145,26 @@ class OWLinearRegression(OWBaseLearner):
                 coefs.insert(0, self.model.intercept)
                 names.insert(0, "intercept")
             coef_table = Table.from_list(domain, list(zip(coefs, names)))
-            coef_table.name = "coefficients"
+            coef_table.name = "系数"
         self.Outputs.coefficients.send(coef_table)
 
     def get_learner_parameters(self):
-        regularization = "No Regularization"
+        regularization = "无正则化"
         if self.reg_type == OWLinearRegression.Ridge:
-            regularization = ("Ridge Regression (L2) with α={}"
+            regularization = ("岭回归 (L2) 且 α={}"
                               .format(self.alphas[self.alpha_index]))
         elif self.reg_type == OWLinearRegression.Lasso:
-            regularization = ("Lasso Regression (L1) with α={}"
+            regularization = ("Lasso 回归 (L1) 且 α={}"
                               .format(self.alphas[self.alpha_index]))
         elif self.reg_type == OWLinearRegression.Elastic:
-            regularization = ("Elastic Net Regression with α={}"
-                              " and L1:L2 ratio of {}:{}"
+            regularization = ("弹性网络回归且 α={}"
+                              "且 L1:L2 比率为 {}:{}"
                               .format(self.alphas[self.alpha_index],
                                       self.l2_ratio,
                                       1 - self.l2_ratio))
         return (
-            ("Regularization", regularization),
-            ("Fit intercept", ["No", "Yes"][self.fit_intercept])
+            ("正则化", regularization),
+            ("拟合截距", ["否", "是"][self.fit_intercept])
         )
 
 

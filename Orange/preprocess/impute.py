@@ -75,8 +75,8 @@ class BaseImputeMethod(Reprable):
 
 
 class DoNotImpute(BaseImputeMethod):
-    name = "Don't impute"
-    short_name = "leave"
+    name = "不填充"
+    short_name = "保留"
     description = ""
 
     def __call__(self, data, variable):
@@ -84,8 +84,8 @@ class DoNotImpute(BaseImputeMethod):
 
 
 class DropInstances(BaseImputeMethod):
-    name = "Remove instances with unknown values"
-    short_name = "drop"
+    name = "删除带有未知值的实例"
+    short_name = "删除 "
     description = ""
 
     def __call__(self, data, variable):
@@ -94,9 +94,9 @@ class DropInstances(BaseImputeMethod):
 
 
 class Average(BaseImputeMethod):
-    name = "Average/Most frequent"
-    short_name = "average"
-    description = "Replace with average/mode of the column"
+    name = "平均值/最频繁值"
+    short_name = "平均值"
+    description = "用列的平均值/众数替换"
 
     def __call__(self, data, variable, value=None):
         variable = data.domain[variable]
@@ -108,7 +108,7 @@ class Average(BaseImputeMethod):
                 dist = distribution.get_distribution(data, variable)
                 value = dist.modus()
             else:
-                raise TypeError("Variable must be numeric or categorical.")
+                raise TypeError("变量必须是数值型或分类型。")
 
         a = variable.copy(compute_value=ReplaceUnknowns(variable, value))
         a.to_sql = ImputeSql(variable, value)
@@ -129,7 +129,7 @@ class ImputeSql(Reprable):
 
 
 class Default(BaseImputeMethod):
-    name = "Fixed value"
+    name = "固定值"
     short_name = "value"
     description = ""
     columns_only = True
@@ -148,8 +148,8 @@ class Default(BaseImputeMethod):
 
 
 class FixedValueByType(BaseImputeMethod):
-    name = "Fixed value"
-    short_name = "Fixed Value"
+    name = "固定值"
+    short_name = "固定值"
     format = "{var.name}"
 
     def __init__(self,
@@ -224,8 +224,8 @@ class ReplaceUnknownsModel(Transformation):
 
 
 class Model(BaseImputeMethod):
-    _name = "Model-based imputer"
-    short_name = "model"
+    _name = "基于模型的填充"
+    short_name = "模型"
     description = ""
     format = BaseImputeMethod.format + " ({self.learner.name})"
     @property
@@ -247,7 +247,7 @@ class Model(BaseImputeMethod):
             return variable.copy(
                 compute_value=ReplaceUnknownsModel(variable, model))
         else:
-            raise ValueError("`{}` doesn't support domain type"
+            raise ValueError("`{}` 不支持域类型"
                              .format(self.learner.name))
 
     def copy(self):
@@ -283,8 +283,8 @@ class IsDefined(Transformation):
 
 
 class AsValue(BaseImputeMethod):
-    name = "As a distinct value"
-    short_name = "new value"
+    name = "作为一个不同的值"
+    short_name = "新值"
     description = ""
 
     def __call__(self, data, variable):
@@ -307,7 +307,7 @@ class AsValue(BaseImputeMethod):
             fmt = "{var.name}_def"
             indicator_var = Orange.data.DiscreteVariable(
                 fmt.format(var=variable),
-                values=("undef", "def"),
+                values=("未定义", "定义"),
                 compute_value=IsDefined(variable),
                 sparse=variable.sparse,
             )
@@ -345,8 +345,8 @@ class ReplaceUnknownsRandom(Transformation):
         elif variable.is_continuous:
             counts = np.array(distribution)[1, :]
         else:
-            raise TypeError("Only categorical and numeric "
-                            "variables are supported.")
+            raise TypeError("只支持分类和数值"
+                            "变量。")
         csum = np.sum(counts)
         if csum > 0:
             self.sample_prob = counts / csum
@@ -380,9 +380,9 @@ class ReplaceUnknownsRandom(Transformation):
 
 
 class Random(BaseImputeMethod):
-    name = "Random values"
-    short_name = "random"
-    description = "Replace with a random value"
+    name = "随机值"
+    short_name = "随机"
+    description = "用随机值替换"
 
     def __call__(self, data, variable):
         variable = data.domain[variable]

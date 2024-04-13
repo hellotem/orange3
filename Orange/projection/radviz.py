@@ -22,8 +22,8 @@ class RadViz(LinearProjector):
         if data is not None:
             if len([attr for attr in data.domain.attributes
                     if attr.is_discrete and len(attr.values) > 2]):
-                raise ValueError("Can not handle categorical variables"
-                                 " with more than two values")
+                raise ValueError("无法处理分类变量"
+                                 "值超过两个")
         return super().__call__(data)
 
     def get_components(self, X, Y):

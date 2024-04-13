@@ -99,52 +99,52 @@ def format_summary(summary: Union[ApproxSummary, Summary]) -> List[str]:
             if not part.nans:
                 return ""
             perc = 100 * part.nans / (part.nans + part.non_nans)
-            return f" ({perc:.1f} % missing data)"
+            return f" ({perc:.1f} % 缺失数据)"
 
         if isinstance(part, SparseArray):
-            tag = "sparse"
+            tag = "稀疏"
         elif isinstance(part, SparseBoolArray):
-            tag = "tags"
+            tag = "标签"
         else:  # isinstance(part, NotAvailable)
             return ""
         dens = 100 * part.non_nans / (part.nans + part.non_nans)
-        return f" ({tag}, density {dens:.2f} %)"
+        return f" ({tag}, 密度 {dens:.2f} %)"
 
     text = []
     if isinstance(summary, ApproxSummary):
         if summary.len.done():
             ninst = summary.len.result()
-            text.append(f"{ninst} {pl(ninst, 'instance')}")
+            text.append(f"{ninst} {pl(ninst, '实例')}")
         else:
             ninst = summary.approx_len
-            text.append(f"~{ninst} {pl(ninst, 'instance')}")
+            text.append(f"~{ninst} {pl(ninst, '实例')}")
     elif isinstance(summary, Summary):
         ninst = summary.len
-        text.append(f"{ninst} {pl(ninst, 'instance')}")
+        text.append(f"{ninst} {pl(ninst, '实例')}")
         if sum(p.nans for p in [summary.X, summary.Y, summary.M]) == 0:
-            text[-1] += " (no missing data)"
+            text[-1] += " (无缺失数据)"
 
     nattrs = len(summary.domain.attributes)
-    text.append(f"{nattrs}  {pl(nattrs, 'feature')}"
+    text.append(f"{nattrs} {pl(nattrs, '特征')}"
                 + format_part(summary.X))
 
     if not summary.domain.class_vars:
-        text.append("No target variable.")
+        text.append("无目标变量。")
     else:
         nclasses = len(summary.domain.class_vars)
         if nclasses > 1:
-            c_text = f"{nclasses} {pl(nclasses, 'outcome')}"
+            c_text = f"{nclasses} {pl(nclasses, '结果')}"
         elif summary.domain.has_continuous_class:
-            c_text = "Numeric outcome"
+            c_text = "数值结果"
         else:
             nvalues = len(summary.domain.class_var.values)
-            c_text = f"Target with {nvalues} {pl(nvalues, 'value')}"
+            c_text = f"目标有 {nvalues} {pl(nvalues, '值')}"
         text.append(c_text + format_part(summary.Y))
 
     nmetas = len(summary.domain.metas)
     if nmetas:
-        text.append(f"{nmetas} {pl(nmetas, 'meta attribute')}"
+        text.append(f"{nmetas} {pl(nmetas, '元属性')}"
                     + format_part(summary.M))
     else:
-        text.append("No meta attributes.")
+        text.append("无元属性。")
     return text

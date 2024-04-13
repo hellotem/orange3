@@ -45,16 +45,16 @@ class CurveTypes(IntEnum):
 
 
 class ParameterSetter(CommonParameterSetter):
-    WIDE_LINE_LABEL = "Line"
-    DEFAULT_LINE_LABEL = "Default Line"
+    WIDE_LINE_LABEL = "线"
+    DEFAULT_LINE_LABEL = "默认线"
 
     WIDE_LINE_WIDTH = 3
     LINE_WIDTH = 1
     DEFAULT_LINE_WIDTH = 1
 
-    WIDE_LINE_STYLE = "Solid line"
-    LINE_STYLE = "Solid line"
-    DEFAULT_LINE_STYLE = "Dash line"
+    WIDE_LINE_STYLE = "实线"
+    LINE_STYLE = "实线"
+    DEFAULT_LINE_STYLE = "虚线"
 
     def __init__(self, master):
         self.master = master
@@ -124,29 +124,29 @@ class ParameterSetter(CommonParameterSetter):
 
 
 class OWLiftCurve(widget.OWWidget):
-    name = "Performance Curve"
-    description = "Construct and display a performance curve " \
-                  "from the evaluation of classifiers."
+    name = "性能曲线 Performance Curve"
+    description = "构建和显示性能曲线" \
+                  "根据分类器的评估。"
     icon = "icons/LiftCurve.svg"
     priority = 1020
-    keywords = "performance curve, lift, cumulative gain, precision, recall, curve"
+    keywords = "性能曲线、提升、累积增益、精度、召回率、曲线"
 
     class Inputs:
         evaluation_results = Input(
-            "Evaluation Results", Orange.evaluation.Results)
+            "评估结果", Orange.evaluation.Results)
 
     class Outputs:
-        calibrated_model = Output("Calibrated Model", Model)
+        calibrated_model = Output("校准模型", Model)
 
     class Warning(widget.OWWidget.Warning):
         undefined_curves = Msg(
-            "Some curves are undefined; check models and data")
+            "有些曲线未定义;请检查模型和数据")
 
     class Error(widget.OWWidget.Error):
-        undefined_curves = Msg("No defined curves; check models and data")
+        undefined_curves = Msg("没有定义曲线;请检查模型和数据")
 
     class Information(widget.OWWidget.Information):
-        no_output = Msg("Can't output a model: {}")
+        no_output = Msg("无法输出模型: {}")
 
     settingsHandler = EvaluationResultsContextHandler()
     target_index = settings.ContextSetting(0)
@@ -161,8 +161,8 @@ class OWLiftCurve(widget.OWWidget):
 
     graph_name = "plot"  # pg.GraphicsItem (pg.PlotItem)
 
-    XLabels = ("P Rate", "P Rate", "Recall")
-    YLabels = ("Lift", "TP Rate", "Precision")
+    XLabels = ("正例率", "正例率", "召回率")
+    YLabels = ("提升", "真正例率", "精度")
 
     def __init__(self):
         super().__init__()
@@ -174,36 +174,36 @@ class OWLiftCurve(widget.OWWidget):
         self.line = None
         self.tooltip = None
 
-        box = gui.vBox(self.controlArea, box="Curve")
+        box = gui.vBox(self.controlArea, box="曲线")
         self.target_cb = gui.comboBox(
             box, self, "target_index",
-            label="Target: ", orientation=Qt.Horizontal,
+            label="目标: ", orientation=Qt.Horizontal,
             callback=self._on_target_changed,
             contentsLength=8, searchable=True
         )
         gui.radioButtons(
             box, self, "curve_type",
-            ("Lift Curve", "Cumulative Gains", "Precision Recall"),
+            ("提升曲线", "累积增益", "精确召回"),
             callback=self._on_curve_type_changed
         )
 
         self.classifiers_list_box = gui.listBox(
             self.controlArea, self, "selected_classifiers", "classifier_names",
-            box="Models",
+            box="模型",
             selectionMode=QListView.MultiSelection,
             callback=self._on_classifiers_changed
         )
         self.classifiers_list_box.setMaximumHeight(100)
 
-        box = gui.vBox(self.controlArea, box="Settings")
-        gui.checkBox(box, self, "show_threshold", "Show thresholds",
+        box = gui.vBox(self.controlArea, box="设置")
+        gui.checkBox(box, self, "show_threshold", "显示阈值",
                      callback=self._on_show_threshold_changed)
-        gui.checkBox(box, self, "show_points", "Show points",
+        gui.checkBox(box, self, "show_points", "显示点",
                      callback=self._on_show_points_changed)
 
         gui.rubber(self.controlArea)
 
-        box = gui.vBox(self.controlArea, box="Area under the curve")
+        box = gui.vBox(self.controlArea, box="曲线下面积")
         self._area_info = gui.label(box, self, "/", textFormat=Qt.RichText)
 
         gui.auto_apply(self.buttonsArea, self, "auto_commit")
@@ -372,7 +372,7 @@ class OWLiftCurve(widget.OWWidget):
             ylabel = self.YLabels[int(self.curve_type)]
             return f"{xlabel}: {round(x, 3)}\n" \
                    f"{ylabel}: {round(y, 3)}\n" \
-                   f"Threshold: {round(data, 3)}"
+                   f"阈值: {round(data, 3)}"
 
         def _plot(points, pen, kwargs):
             contacted, respondents, _ = points
@@ -431,7 +431,7 @@ class OWLiftCurve(widget.OWWidget):
         html = ""
         if len(self.plot.curve_items) > 0:
             html = '<div style="color: #333; font-size: 12px;"' \
-                   ' <span>Probability threshold(s):</span>'
+                   '<span>概率阈值:</span>'
             for item in self.plot.curve_items:
                 threshold = self._get_threshold(item.xData, item.opts["data"])
                 html += f'<div>' \
@@ -513,7 +513,7 @@ class OWLiftCurve(widget.OWWidget):
             return
         caption = report.list_legend(self.classifiers_list_box,
                                      self.selected_classifiers)
-        self.report_items((("Target class", self.target_cb.currentText()),))
+        self.report_items((("目标类", self.target_cb.currentText()),))
         self.report_plot()
         self.report_caption(caption)
 

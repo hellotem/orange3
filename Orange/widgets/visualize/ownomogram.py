@@ -41,8 +41,8 @@ class SortBy(IntEnum):
 
     @staticmethod
     def items():
-        return ["Original order", "Alphabetically", "Absolute importance",
-                "Positive influence", "Negative influence"]
+        return ["原始顺序", "按字母顺序", "绝对重要性",
+                "正向影响", "负向影响"]
 
 
 class MovableToolTip(QLabel):
@@ -134,7 +134,7 @@ class ProbabilitiesDotItem(DotItem):
         self.parentItem().rescale()
 
     def get_tooltip_text(self):
-        text = "Total: {} <br/>Probability: {:.0%}".format(
+        text = "总计: {} <br/>概率: {:.0%}".format(
             np.round(self.value, 2),
             np.round(self.get_probabilities(self.value), 2))
         return self.TOOLTIP_TEMPLATE.format(
@@ -241,7 +241,7 @@ class DiscreteMovableDotItem(MovableDotItem):
     def get_tooltip_text(self):
         labels = self._get_tooltip_labels_with_percentages()
         return self.TOOLTIP_TEMPLATE.format(
-            self.TOOLTIP_STYLE, "Points: {}".format(np.round(self.value, 2)),
+            self.TOOLTIP_STYLE, "分数: {}".format(np.round(self.value, 2)),
             "".join("{}: {:.0%}<br/>".format(l, v) for l, v in labels)[:-5])
 
     def _get_tooltip_labels_with_percentages(self):
@@ -307,8 +307,8 @@ class GraphicsColorAnimator(QObject):
 class ContinuousItemMixin:
     def get_tooltip_text(self):
         return self.TOOLTIP_TEMPLATE.format(
-            self.TOOLTIP_STYLE, "Points: {}".format(np.round(self.value, 2)),
-            "Value: {}".format(np.round(self._get_tooltip_label_value(), 1)))
+            self.TOOLTIP_STYLE, "分数: {}".format(np.round(self.value, 2)),
+            "值: {}".format(np.round(self._get_tooltip_label_value(), 1)))
 
     def _get_tooltip_label_value(self):
         if not len(self.tooltip_labels):
@@ -447,7 +447,7 @@ class ProbabilitiesRulerItem(QGraphicsWidget):
         # leading labels
         font = name.document().defaultFont()
         font.setWeight(QFont.Bold)
-        name_total = QGraphicsTextItem("Total", self)
+        name_total = QGraphicsTextItem("总计", self)
         name_total.setFont(font)
         name_total.setPos(name_offset, -25)
         name.setFont(font)
@@ -646,19 +646,19 @@ class NomogramItem(QGraphicsWidget):
 
 
 class OWNomogram(OWWidget):
-    name = "Nomogram"
-    description = " Nomograms for Visualization of Naive Bayesian" \
-                  " and Logistic Regression Classifiers."
+    name = "诺莫图 Nomogram"
+    description = "用于可视化朴素贝叶斯 " \
+                  "和逻辑回归分类器的诺莫图。"
     icon = "icons/Nomogram.svg"
     priority = 2000
-    keywords = "nomogram"
+    keywords = "诺莫图"
 
     class Inputs:
-        classifier = Input("Classifier", Model)
-        data = Input("Data", Table)
+        classifier = Input("分类器", Model)
+        data = Input("数据", Table)
 
     class Outputs:
-        features = Output("Features", AttributeList)
+        features = Output("特征", AttributeList)
 
     MAX_N_ATTRS = 1000
     POINT_SCALE = 0
@@ -677,8 +677,8 @@ class OWNomogram(OWWidget):
     graph_name = "scene"  # QGraphicsScene
 
     class Error(OWWidget.Error):
-        invalid_classifier = Msg("Nomogram accepts only Naive Bayes and "
-                                 "Logistic Regression classifiers.")
+        invalid_classifier = Msg("诺莫图只接受朴素贝叶斯和 "
+                                 "逻辑回归分类器。")
 
     def __init__(self):
         super().__init__()
@@ -714,40 +714,40 @@ class OWNomogram(OWWidget):
             callback=self._class_combo_changed,
             sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed),
             searchable=True)
-        grid.addWidget(QLabel("Target class: "), 0, 0, lab_align)
+        grid.addWidget(QLabel("目标类: "), 0, 0, lab_align)
         grid.addWidget(self.class_combo, 0, 1)
 
         self.norm_check = gui.checkBox(
-            None, self, "normalize_probabilities", "Normalize probabilities",
+            None, self, "normalize_probabilities", "标准化概率",
             hidden=True, callback=self.update_scene,
-            tooltip="For multiclass data 1 vs. all probabilities do not"
-                    " sum to 1 and therefore could be normalized.")
+            tooltip="对于多类数据,1对其他的概率不会"
+                    "求和为1,因此可以标准化。")
         self.norm_check.setStyleSheet("margin-bottom: 12px")
         grid.addWidget(self.norm_check, 1, 1)
 
         group = gui.radioButtons(
             None, self, "scale", callback=self.update_scene)
-        grid.addWidget(QLabel("Scale: "), 2, 0, lab_align)
+        grid.addWidget(QLabel("刻度: "), 2, 0, lab_align)
         grid.addWidget(gui.appendRadioButton(
-            group, "Point scale", addToLayout=False), 2, 1)
+            group, "分数刻度", addToLayout=False), 2, 1)
         grid.addWidget(gui.appendRadioButton(
-            group, "Log odds ratios", addToLayout=False), 3, 1)
+            group, "对数几率比", addToLayout=False), 3, 1)
 
         grid = QGridLayout()
-        gui.widgetBox(self.controlArea, "Displayed features", orientation=grid)
+        gui.widgetBox(self.controlArea, "显示特征", orientation=grid)
 
         self.sort_combo = gui.comboBox(
             None, self, "sort_index", items=SortBy.items(),
             callback=self.update_scene,
             sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         )
-        grid.addWidget(QLabel("Order: "), 0, 0, lab_align)
+        grid.addWidget(QLabel("顺序: "), 0, 0, lab_align)
         grid.addWidget(self.sort_combo, 0, 1, 1, 2)
 
         radio_group = gui.radioButtons(
             None, self, "display_index", callback=self.update_scene)
         radio_all = gui.appendRadioButton(
-            radio_group, "All features", addToLayout=False)
+            radio_group, "所有特征", addToLayout=False)
         radio_best = gui.appendRadioButton(
             radio_group, "Best ranked:", addToLayout=False)
         self.n_spin = gui.spin(
@@ -755,14 +755,14 @@ class OWNomogram(OWWidget):
             callback=self._n_spin_changed, alignment=Qt.AlignRight,
             sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         )
-        grid.addWidget(QLabel("Show: "), 1, 0, lab_align)
+        grid.addWidget(QLabel("显示: "), 1, 0, lab_align)
         grid.addWidget(radio_all, 1, 1, 1, 2)
         grid.addWidget(radio_best, 2, 1)
         grid.addWidget(self.n_spin, 2, 2, Qt.AlignLeft)
 
         self.cont_feature_dim_combo = gui.comboBox(
             None, self, "cont_feature_dim_index", label="Numeric features:",
-            items=["1D projection", "2D curve"], orientation=Qt.Horizontal,
+            items=["1D投影", "2D曲线"], orientation=Qt.Horizontal,
             callback=self.update_scene,
             sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed))
         grid.setRowMinimumHeight(3, 12)
@@ -974,7 +974,7 @@ class OWNomogram(OWWidget):
         attr_inds, attributes = zip(*self.get_ordered_attributes()[:n_attrs])
         self.Outputs.features.send(AttributeList(attributes))
 
-        point_text = QGraphicsTextItem("Points")
+        point_text = QGraphicsTextItem("分数")
         metric = QFontMetrics(point_text.font())
 
         def text_item(text):
@@ -985,7 +985,7 @@ class OWNomogram(OWWidget):
 
         name_items = [text_item(attr.name) for attr in attributes]
 
-        probs_text = QGraphicsTextItem("Probabilities (%)")
+        probs_text = QGraphicsTextItem("概率 (%)")
         all_items = name_items + [point_text, probs_text]
         name_offset = -max(t.boundingRect().width() for t in all_items) - 30
         w = self.view.viewport().rect().width()

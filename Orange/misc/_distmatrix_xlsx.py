@@ -24,7 +24,7 @@ def _get_sheet(filename, sheet_name):
     if sheet_name is None:
         return workbook.active
     if sheet_name not in workbook.sheetnames:
-        raise ValueError(f"No such sheet: {sheet_name}")
+        raise ValueError(f"没有这个工作表: {sheet_name}")
     return workbook.worksheets[workbook.sheetnames.index(sheet_name)]
 
 
@@ -41,7 +41,7 @@ def _non_empty_cells(sheet):
          - number of empty rows above
     """
     def raise_empty():
-        raise ValueError("empty sheet")
+        raise ValueError("空工作表")
 
     cells = np.array([[cell.value for cell in row] for row in sheet.rows])
     # Quick route out for any large table of numbers
@@ -96,7 +96,7 @@ def _matrix_from_cells(cells, row_offset, col_offset):
                 matrix[y, x] = float(value)
             except (AttributeError, ValueError):
                 raise ValueError(
-                    "invalid data in cell "
+                    "单元格中的数据无效"
                     f"{openpyxl.utils.get_column_letter(x + col_offset + 1)}"
                     f"{y + row_offset + 1}") from None
     return matrix

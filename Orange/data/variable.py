@@ -1058,7 +1058,7 @@ class TimeVariable(ContinuousVariable):
     class InvalidDateTimeFormatError(ValueError):
         def __init__(self, date_string):
             super().__init__(
-                f"Invalid datetime format '{date_string}'. Only ISO 8601 supported."
+                f"无效的日期时间格式 '{date_string}'。仅支持ISO 8601。"
             )
 
     _matches_iso_format = re.compile(REGEX).match

@@ -22,16 +22,16 @@ else:
 
 
 class OWDataInfo(widget.OWWidget):
-    name = "Data Info"
+    name = "数据信息 Data Info"
     id = "orange.widgets.data.info"
-    description = "Display basic information about the data set"
+    description = "显示数据集的基本信息"
     icon = "icons/DataInfo.svg"
     priority = 80
-    category = "Data"
-    keywords = "data info, information, inspect"
+    category = "数据"
+    keywords = "数据信息，信息，检查"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     want_main_area = False
     buttons_area_orientation = None
@@ -43,9 +43,9 @@ class OWDataInfo(widget.OWWidget):
         self.data_desc = {}
         self.data_attrs = {}
         self.description = gui.widgetLabel(
-            gui.vBox(self.controlArea, box="Data table properties"))
+            gui.vBox(self.controlArea, box="数据表属性"))
         self.attributes = gui.widgetLabel(
-            gui.vBox(self.controlArea, box="Additional attributes"))
+            gui.vBox(self.controlArea, box="附加属性"))
 
     @Inputs.data
     def data(self, data):
@@ -55,12 +55,12 @@ class OWDataInfo(widget.OWWidget):
         else:
             self.data_desc = {
                 label: value
-                for label, func in (("Name", self._p_name),
-                                    ("Location", self._p_location),
-                                    ("Size", self._p_size),
-                                    ("Features", self._p_features),
-                                    ("Targets", self._p_targets),
-                                    ("Metas", self._p_metas),
+                for label, func in (("名称", self._p_name),
+                                    ("位置", self._p_location),
+                                    ("大小", self._p_size),
+                                    ("特征", self._p_features),
+                                    ("目标", self._p_targets),
+                                    ("元", self._p_metas),
                                     ("Missing data", self._p_missing))
                 if bool(value := func(data))}
             self.data_attrs = data.attributes
@@ -68,7 +68,7 @@ class OWDataInfo(widget.OWWidget):
 
             if is_sql(data):
                 def set_exact_length():
-                    self.data_desc["Size"] = self._p_size(data, exact=True)
+                    self.data_desc["大小"] = self._p_size(data, exact=True)
                     self.update_info()
 
                 threading.Thread(target=set_exact_length).start()
@@ -88,7 +88,7 @@ class OWDataInfo(widget.OWWidget):
                    "</table>"
 
         if not self.data_desc:
-            self.description.setText("No data.")
+            self.description.setText("无数据。")
         else:
             self.description.setText(style + dict_as_table(self.data_desc))
         self.attributes.setHidden(not self.data_attrs)
@@ -99,9 +99,9 @@ class OWDataInfo(widget.OWWidget):
 
     def send_report(self):
         if self.data_desc:
-            self.report_items("Data table properties", self.data_desc)
+            self.report_items("数据表属性", self.data_desc)
         if self.data_attrs:
-            self.report_items("Additional attributes", self.data_attrs)
+            self.report_items("附加属性", self.data_attrs)
 
     @staticmethod
     def _p_name(data):
@@ -116,7 +116,7 @@ class OWDataInfo(widget.OWWidget):
             f'{key}={value}'
             for key, value in data.connection_params.items()
             if value is not None and key != 'password')
-        return f"SQL Table using connection:<br/>{connection_string}"
+        return f"使用连接的 SQL 表:<br/>{connection_string}"
 
     @staticmethod
     def _p_size(data, exact=False):
@@ -130,9 +130,9 @@ class OWDataInfo(widget.OWWidget):
         ncols = len(data.domain.variables) + len(data.domain.metas)
         desc += f", {ncols} {pl(ncols, 'column')}"
 
-        sparseness = [s for s, m in (("features", data.X_density),
-                                     ("meta attributes", data.metas_density),
-                                     ("targets", data.Y_density)) if m() > 1]
+        sparseness = [s for s, m in (("特征", data.X_density),
+                                     ("元属性", data.metas_density),
+                                     ("目标", data.Y_density)) if m() > 1]
         if sparseness:
             desc += "; sparse {', '.join(sparseness)}"
         return desc
@@ -144,19 +144,19 @@ class OWDataInfo(widget.OWWidget):
     def _p_targets(self, data):
         if class_var := data.domain.class_var:
             if class_var.is_continuous:
-                return "numeric target variable"
+                return "数值目标变量"
             else:
                 nclasses = len(class_var.values)
-                return "categorical outcome with " \
-                       f"{nclasses} {pl(nclasses, 'class|classes')}"
+                return "分类结果，共 " \
+                       f"{nclasses} {pl(nclasses, '类')}"
         if class_vars := data.domain.class_vars:
             disc_class = self._count(class_vars, DiscreteVariable)
             cont_class = self._count(class_vars, ContinuousVariable)
             if not cont_class:
-                return f"{disc_class} categorical {pl(disc_class, 'target')}"
+                return f"{disc_class} 分类 {pl(disc_class, '目标')}"
             elif not disc_class:
-                return f"{cont_class} numeric {pl(cont_class, 'target')}"
-            return "multi-target data,<br/>" + self._pack_var_counts(class_vars)
+                return f"{cont_class} 数值 {pl(cont_class, '目标')}"
+            return "多目标数据,<br/>" + self._pack_var_counts(class_vars)
 
     @classmethod
     def _p_metas(cls, data):
@@ -189,9 +189,9 @@ class OWDataInfo(widget.OWWidget):
     def _pack_var_counts(cls, s):
         counts = (
             (name, cls._count(s, type_))
-            for name, type_ in (("categorical", DiscreteVariable),
-                                ("numeric", ContinuousVariable),
-                                ("text", StringVariable)))
+            for name, type_ in (("分类", DiscreteVariable),
+                                ("数值", ContinuousVariable),
+                                ("文本", StringVariable)))
         return ", ".join(f"{count} {name}" for name, count in counts if count)
 
 

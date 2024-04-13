@@ -801,7 +801,7 @@ class FileFormatBase(_FileReader, _FileWriter, metaclass=_FileFormatMeta):
             absolute_filename = ""
 
         if not path.exists(absolute_filename):
-            raise IOError('File "{}" was not found.'.format(filename))
+            raise IOError('未找到文件 "{}"。'.format(filename))
 
         return absolute_filename
 

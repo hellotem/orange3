@@ -168,14 +168,14 @@ def instance_tooltip(domain, row, skip_attrs=()):
             return ""
         n_vars = len(_vars)
         if n_vars > max_shown:
-            cols[-1] = f'... and {n_vars - max_shown + 1} others'
+            cols[-1] = f'...和其他 {n_vars - max_shown + 1} 个'
         return \
             "<b>{}</b>:<br/>".format(singular if n_vars < 2 else plural) \
             + "<br/>".join(cols)
 
-    parts = (("Class", "Classes", 4, domain.class_vars),
+    parts = (("类", "类", 4, domain.class_vars),
              ("Meta", "Metas", 4, domain.metas),
-             ("Feature", "Features", 10, domain.attributes))
+             ("特征", "特征", 10, domain.attributes))
     return "<br/>".join(show_part(row, *columns) for columns in parts)
 
 

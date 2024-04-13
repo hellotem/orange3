@@ -516,13 +516,13 @@ def time_binnings(data, *, min_bins=2, max_bins=50, min_unique=5, add_unique=0
 def _time_binnings(mn, mx, min_pts, max_pts):
     bins = []
     for place, step, fmt, unit in (
-            [(5, x, "%H:%M:%S", "second") for x in (1, 5, 10, 15, 30)] +
-            [(4, x, "%b %d %H:%M", "minute") for x in (1, 5, 10, 15, 30)] +
-            [(3, x, "%y %b %d %H:%M", "hour") for x in (1, 2, 3, 6, 12)] +
-            [(2, 1, "%y %b %d", "day")] +
-            [(2, x, "%y %b %d", "week") for x in (7, 14)] +
-            [(1, x, "%y %b", "month") for x in (1, 2, 3, 6)] +
-            [(0, x, "%Y", "year") for x in (1, 2, 5, 10, 25, 50, 100)]):
+            [(5, x, "%H:%M:%S", "秒") for x in (1, 5, 10, 15, 30)] +
+            [(4, x, "%b %d %H:%M", "分钟") for x in (1, 5, 10, 15, 30)] +
+            [(3, x, "%y %b %d %H:%M", "小时") for x in (1, 2, 3, 6, 12)] +
+            [(2, 1, "%y %b %d", "天")] +
+            [(2, x, "%y %b %d", "周") for x in (7, 14)] +
+            [(1, x, "%y %b", "月") for x in (1, 2, 3, 6)] +
+            [(0, x, "%Y", "年") for x in (1, 2, 5, 10, 25, 50, 100)]):
         times = _time_range(mn, mx, place, step, min_pts, max_pts)
         if not times:
             continue
@@ -635,9 +635,9 @@ def _min_max_unique(data):
     return unique[0], unique[-1], unique
 
 
-short_time_units = dict(seconds="sec", minutes="min", hours="hrs",
-                        weeks="wks", months="mon", years="yrs",
-                        second="sec", minute="min", month="mon")
+short_time_units = dict(seconds="秒", minutes="分", hours="小时",
+                        weeks="周", months="月", years="年",
+                        second="秒", minute="分", month="月")
 
 
 # noinspection PyPep8Naming

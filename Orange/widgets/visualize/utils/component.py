@@ -14,7 +14,7 @@ from Orange.widgets.visualize.utils.plotutils import (
 )
 
 class AnchorParameterSetter(ScatterBaseParameterSetter):
-    ANCHOR_LABEL = "Anchor"
+    ANCHOR_LABEL = "锚点"
 
     def __init__(self, master):
         super().__init__(master)

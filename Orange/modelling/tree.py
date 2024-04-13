@@ -9,14 +9,14 @@ __all__ = ['SklTreeLearner', 'TreeLearner']
 
 
 class SklTreeLearner(SklFitter):
-    name = 'tree'
+    name = '树'
 
     __fits__ = {'classification': SklTreeLearner,
                 'regression': SklTreeRegressionLearner}
 
 
 class TreeLearner(Fitter):
-    name = 'tree'
+    name = '树'
 
     __fits__ = {'classification': ClassificationTreeLearner,
                 'regression': RegressionTreeLearner}

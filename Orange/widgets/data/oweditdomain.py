@@ -463,7 +463,7 @@ class DictItemsModel(QStandardItemModel):
     def __init__(self, parent=None, a_dict=None):
         super().__init__(parent)
         self._dict = {}
-        self.setHorizontalHeaderLabels(["Key", "Value"])
+        self.setHorizontalHeaderLabels(["键", "值"])
         if a_dict is not None:
             self.set_dict(a_dict)
 
@@ -523,11 +523,11 @@ class VariableEditor(BaseEditor):
         form.addRow("Name:", self.name_edit)
 
         self.unlink_var_cb = QCheckBox(
-            "Unlink variable from its source variable", self,
-            toolTip="Make Orange forget that the variable is derived from "
-                    "another.\n"
-                    "Use this for instance when you want to consider variables "
-                    "with the same name but from different sources as the same "
+            "从源变量解除链接", self,
+            toolTip="使Orange忘记该变量源自"
+                    "另一个变量。\n"
+                    "当您希望将具有相同名称但来自不同源"
+                    "的变量视为同一变量时,使用此选项。"
                     "variable."
         )
         self.unlink_var_cb.toggled.connect(self._set_unlink)
@@ -548,13 +548,13 @@ class VariableEditor(BaseEditor):
         agrp = QActionGroup(view, objectName="annotate-action-group")
         action_add = QAction(
             "+", self, objectName="action-add-label",
-            toolTip="Add a new label.",
+            toolTip="添加新标签。",
             shortcut=QKeySequence(QKeySequence.New),
             shortcutContext=Qt.WidgetShortcut
         )
         action_delete = QAction(
             "\N{MINUS SIGN}", self, objectName="action-delete-label",
-            toolTip="Remove selected label.",
+            toolTip="移除所选标签。",
             shortcut=QKeySequence(QKeySequence.Delete),
             shortcutContext=Qt.WidgetShortcut
         )
@@ -593,13 +593,13 @@ class VariableEditor(BaseEditor):
         hlayout.setContentsMargins(0, 0, 0, 0)
         button = FixedSizeButton(
             self, defaultAction=self.add_label_action,
-            accessibleName="Add",
+            accessibleName="添加",
         )
         hlayout.addWidget(button)
 
         button = FixedSizeButton(
             self, defaultAction=self.remove_label_action,
-            accessibleName="Remove",
+            accessibleName="移除",
         )
 
         hlayout.addWidget(button)
@@ -680,7 +680,7 @@ class GroupItemsDialog(QDialog):
     """
     A dialog for group less frequent values.
     """
-    DEFAULT_LABEL = "other"
+    DEFAULT_LABEL = "其他"
 
     def __init__(
             self, variable: Categorical,
@@ -694,15 +694,15 @@ class GroupItemsDialog(QDialog):
         self.selected_attributes = selected_attributes
 
         # grouping strategy
-        self.selected_radio = radio1 = QRadioButton("Group selected values")
+        self.selected_radio = radio1 = QRadioButton("分组所选值")
         self.frequent_abs_radio = radio2 = QRadioButton(
-            "Group values with less than"
+            "将少于"
         )
         self.frequent_rel_radio = radio3 = QRadioButton(
-            "Group values with less than"
+            "将少于"
         )
         self.n_values_radio = radio4 = QRadioButton(
-            "Group all except"
+            "将所有除"
         )
 
         # if selected attributes available check the first radio button,
@@ -716,9 +716,9 @@ class GroupItemsDialog(QDialog):
             checked = dialog_settings.get("selected_radio", 0)
             [radio2, radio3, radio4][checked].setChecked(True)
 
-        label2 = QLabel("occurrences")
-        label3 = QLabel("occurrences")
-        label4 = QLabel("most frequent values")
+        label2 = QLabel("出现次数")
+        label3 = QLabel("出现次数")
+        label4 = QLabel("最频繁值")
 
         self.frequent_abs_spin = spin2 = QSpinBox(alignment=Qt.AlignRight)
         max_val = len(data)
@@ -781,7 +781,7 @@ class GroupItemsDialog(QDialog):
         group_box.setLayout(grid_layout)
 
         # grouped variable name
-        new_name_label = QLabel("New value name: ")
+        new_name_label = QLabel("新值名称:")
         self.new_name_line_edit = n_line_edit = QLineEdit(
             dialog_settings.get("name_line_edit", self.DEFAULT_LABEL)
         )
@@ -1051,13 +1051,13 @@ class CategoriesEditDelegate(QStyledItemDelegate):
             option.state &= ~QStyle.State_Enabled
             option.font.setStrikeOut(True)
             text = sourcename
-            suffix = "(dropped)"
+            suffix = "(丢弃)"
         elif editstate == ItemEditState.Added:
-            suffix = "(added)"
+            suffix = "(添加)"
         else:
             text = f"{sourcename} \N{RIGHTWARDS ARROW} {text}"
             if counts > 1:
-                suffix = "(merged)"
+                suffix = "(合并)"
         if suffix is not None:
             text = text + " " + suffix
         option.text = text
@@ -1161,9 +1161,9 @@ class DiscreteVariableEditor(VariableEditor):
             self, objectName="action-group-categories", enabled=False
         )
         self.move_value_up = QAction(
-            "Move up", group,
+            "上移", group,
             iconText="\N{UPWARDS ARROW}",
-            toolTip="Move the selected item up.",
+            toolTip="将选中项上移。",
             shortcut=QKeySequence(Qt.ControlModifier | Qt.AltModifier |
                                   Qt.Key_BracketLeft),
             shortcutContext=Qt.WidgetShortcut,
@@ -1171,9 +1171,9 @@ class DiscreteVariableEditor(VariableEditor):
         self.move_value_up.triggered.connect(self.move_up)
 
         self.move_value_down = QAction(
-            "Move down", group,
+            "下移", group,
             iconText="\N{DOWNWARDS ARROW}",
-            toolTip="Move the selected item down.",
+            toolTip="将选中项下移。",
             shortcut=QKeySequence(Qt.ControlModifier | Qt.AltModifier |
                                   Qt.Key_BracketRight),
             shortcutContext=Qt.WidgetShortcut,
@@ -1181,34 +1181,34 @@ class DiscreteVariableEditor(VariableEditor):
         self.move_value_down.triggered.connect(self.move_down)
 
         self.add_new_item = QAction(
-            "Add", group,
+            "添加", group,
             iconText="+",
             objectName="action-add-item",
-            toolTip="Append a new item.",
+            toolTip="追加新项。",
             shortcut=QKeySequence(QKeySequence.New),
             shortcutContext=Qt.WidgetShortcut,
         )
         self.remove_item = QAction(
-            "Remove item", group,
+            "移除项", group,
             iconText="\N{MINUS SIGN}",
             objectName="action-remove-item",
-            toolTip="Delete the selected item.",
+            toolTip="删除选中项。",
             shortcut=QKeySequence(QKeySequence.Delete),
             shortcutContext=Qt.WidgetShortcut,
         )
         self.rename_selected_items = QAction(
-            "Rename selected items", group,
+            "重命名选中项", group,
             iconText="=",
             objectName="action-rename-selected-items",
-            toolTip="Rename selected items.",
+            toolTip="重命名选中项。",
             shortcut=QKeySequence(Qt.ControlModifier | Qt.Key_Equal),
             shortcutContext=Qt.WidgetShortcut,
         )
         self.merge_items = QAction(
-            "Merge", group,
+            "合并", group,
             iconText="M",
             objectName="action-activate-merge-dialog",
-            toolTip="Merge infrequent items.",
+            toolTip="合并低频项。",
             shortcut=QKeySequence(Qt.ControlModifier | Qt.MetaModifier | Qt.Key_Equal),
             shortcutContext=Qt.WidgetShortcut
         )
@@ -1220,27 +1220,27 @@ class DiscreteVariableEditor(VariableEditor):
 
         button1 = FixedSizeButton(
             self, defaultAction=self.move_value_up,
-            accessibleName="Move up"
+            accessibleName="上移"
         )
         button2 = FixedSizeButton(
             self, defaultAction=self.move_value_down,
-            accessibleName="Move down"
+            accessibleName="下移"
         )
         button3 = FixedSizeButton(
             self, defaultAction=self.add_new_item,
-            accessibleName="Add"
+            accessibleName="添加"
         )
         button4 = FixedSizeButton(
             self, defaultAction=self.remove_item,
-            accessibleName="Remove"
+            accessibleName="移除"
         )
         button5 = FixedSizeButton(
             self, defaultAction=self.rename_selected_items,
-            accessibleName="Merge selected items"
+            accessibleName="合并选中项"
         )
         button6 = FixedSizeButton(
             self, defaultAction=self.merge_items,
-            accessibleName="Merge infrequent",
+            accessibleName="合并低频",
         )
 
         self.values_edit.addActions([
@@ -1494,7 +1494,7 @@ class DiscreteVariableEditor(VariableEditor):
         dlg = GroupItemsDialog(
             self.var, self._values, selected_attributes,
             self.merge_dialog_settings.get(self.var, {}), self,
-            windowTitle="Import Options",
+            windowTitle="导入选项",
             sizeGripEnabled=True,
         )
         dlg.setWindowModality(Qt.WindowModal)
@@ -1545,7 +1545,7 @@ class TimeVariableEditor(VariableEditor):
         form = self.layout().itemAt(0)
 
         self.format_cb = QComboBox()
-        for item, data in [("Detect automatically", (None, 1, 1))] + list(
+        for item, data in [("自动检测", (None, 1, 1))] + list(
             Orange.data.TimeVariable.ADDITIONAL_FORMATS.items()
         ):
             self.format_cb.addItem(item, StrpTime(item, *data))
@@ -1597,8 +1597,8 @@ TransformRole = Qt.UserRole + 42
 
 class VariableEditDelegate(QStyledItemDelegate):
     ReinterpretNames = {
-        AsCategorical: "categorical", AsContinuous: "numeric",
-        AsString: "string", AsTime: "time"
+        AsCategorical: "分类", AsContinuous: "数值",
+        AsString: "字符串", AsTime: "时间"
     }
 
     def initStyleOption(self, option, index):
@@ -1633,7 +1633,7 @@ class VariableEditDelegate(QStyledItemDelegate):
                     text = f"{var.name} \N{RIGHTWARDS ARROW} {tr.name}"
             for tr in transform:
                 if isinstance(tr, ReinterpretTransformTypes):
-                    text += f" (reinterpreted as " \
+                    text += f"(重新解释为" \
                             f"{self.ReinterpretNames[type(tr)]})"
             option.text = text
         if transform:
@@ -1652,7 +1652,7 @@ class VariableEditDelegate(QStyledItemDelegate):
         if isinstance(multiplicity, int) and multiplicity > 1 \
                 and name is not None:
             QToolTip.showText(
-                event.globalPos(), f"Name `{name}` is duplicated",
+                event.globalPos(), f'名称"{name}"重复',
                 view.viewport()
             )
             return True
@@ -1745,12 +1745,12 @@ class ReinterpretVariableEditor(VariableEditor):
             form = editor.layout().itemAt(0)
             assert isinstance(form, QFormLayout)
             typecb = QComboBox(objectName="type-combo")
-            typecb.addItem(variable_icon(Categorical), "Categorical", Categorical)
-            typecb.addItem(variable_icon(Real), "Numeric", Real)
-            typecb.addItem(variable_icon(String), "Text", String)
-            typecb.addItem(variable_icon(Time), "Time", Time)
+            typecb.addItem(variable_icon(Categorical), "分类", Categorical)
+            typecb.addItem(variable_icon(Real), "数值", Real)
+            typecb.addItem(variable_icon(String), "文本", String)
+            typecb.addItem(variable_icon(Time), "时间", Time)
             if type(editor) is BaseEditor:  # pylint: disable=unidiomatic-typecheck
-                typecb.addItem("(Restore original)", RestoreOriginal)
+                typecb.addItem("(恢复原始)", RestoreOriginal)
                 typecb.addItem("")
                 typecb.activated[int].connect(self.__reinterpret_activated_multi)
             else:
@@ -2014,20 +2014,20 @@ class ReinterpretVariableEditor(VariableEditor):
 
 
 class OWEditDomain(widget.OWWidget):
-    name = "Edit Domain"
-    description = "Rename variables, edit categories and variable annotations."
+    name = "编辑域 Edit Domain"
+    description = "重命名变量,编辑分类和变量注释。"
     icon = "icons/EditDomain.svg"
     priority = 3125
-    keywords = "edit domain, rename, drop, reorder, order"
+    keywords = "编辑与，重命名，丢掉，重排序，排序"
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
+        data = Input("数据", Orange.data.Table)
 
     class Outputs:
-        data = Output("Data", Orange.data.Table)
+        data = Output("数据", Orange.data.Table)
 
     class Error(widget.OWWidget.Error):
-        duplicate_var_name = widget.Msg("A variable name is duplicated.")
+        duplicate_var_name = widget.Msg("变量名重复。")
 
     settings_version = 4
 
@@ -2046,7 +2046,7 @@ class OWEditDomain(widget.OWWidget):
         self.typeindex = 0
 
         main = gui.hBox(self.controlArea, spacing=6)
-        box = gui.vBox(main, "Variables")
+        box = gui.vBox(main, "变量")
 
         self.variables_model = VariableListModel(parent=self)
         self.variables_view = self.domain_view = ListViewSearch(
@@ -2060,35 +2060,35 @@ class OWEditDomain(widget.OWWidget):
         )
         box.layout().addWidget(self.variables_view)
 
-        box = gui.vBox(main, "Edit")
+        box = gui.vBox(main, "编辑")
         self._editor = ReinterpretVariableEditor()
         box.layout().addWidget(self._editor)
 
         self.le_output_name = gui.lineEdit(
-            self.buttonsArea, self, "output_table_name", "Output table name: ",
+            self.buttonsArea, self, "output_table_name", "输出表名:",
             orientation=Qt.Horizontal)
 
         gui.rubber(self.buttonsArea)
 
         bbox = gui.hBox(self.buttonsArea)
         gui.button(
-            bbox, self, "Reset All",
+            bbox, self, "全部重置",
             objectName="button-reset-all",
-            toolTip="Reset all variables to their input state.",
+            toolTip="将所有变量重置为输入状态。",
             autoDefault=False,
             callback=self.reset_all
         )
         gui.button(
-            bbox, self, "Reset Selected",
+            bbox, self, "重置选中",
             objectName="button-reset",
-            toolTip="Rest selected variable to its input state.",
+            toolTip="将选中变量重置为输入状态。",
             autoDefault=False,
             callback=self.reset_selected
         )
         gui.button(
-            bbox, self, "Apply",
+            bbox, self, "应用",
             objectName="button-apply",
-            toolTip="Apply changes and commit data on output.",
+            toolTip="应用更改并提交输出数据。",
             default=True,
             autoDefault=False,
             callback=self.commit
@@ -2399,7 +2399,7 @@ class OWEditDomain(widget.OWWidget):
                         "".join(f"<li>{part}</li>" for part in parts) +
                         "</ul>")
             else:
-                html = "No changes"
+                html = "无更改"
             self.report_raw("", html)
         else:
             self.report_data(None)
@@ -2585,15 +2585,15 @@ def report_transform(var, trs):
     else:
         header = var.name
     if unlink is not None:
-        header += "(unlinked from source)"
+        header += "(从源解除链接)"
 
     values_section = None
     if catmap is not None:
-        values_section = ("Values", [])
+        values_section = ("值", [])
         lines = values_section[1]
         for ci, cj in catmap.mapping:
             if ci is None:
-                item = cj + ("&nbsp;" * 3) + "(added)"
+                item = cj + ("&nbsp;" * 3) + "(添加)"
             elif cj is None:
                 item = strike(ci)
             else:
@@ -2602,7 +2602,7 @@ def report_transform(var, trs):
 
     annotate_section = None
     if annotate is not None:
-        annotate_section = ("Labels", [])
+        annotate_section = ("标签", [])
         lines = annotate_section[1]
         old = dict(var.annotations)
         new = dict(annotate.annotations)
@@ -2612,7 +2612,7 @@ def report_transform(var, trs):
             )
         for name in sorted(set(new) - set(old)):
             lines.append(
-                i(name) + " : " + text(new[name]) + "&nbsp;" * 3 + i("(new)")
+                i(name) + " : " + text(new[name]) + "&nbsp;" * 3 + i("(新)")
             )
 
         for name in sorted(set(new) & set(old)):

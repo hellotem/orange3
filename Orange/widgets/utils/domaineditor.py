@@ -37,8 +37,8 @@ class Place:
 class VarTableModel(QAbstractTableModel):
     DISCRETE_VALUE_DISPLAY_LIMIT = 20
 
-    places = "feature", "target", "meta", "skip"
-    typenames = "categorical", "numeric", "text", "datetime"
+    places = "特征", "目标", "meta", "跳过"
+    typenames = "分类", "数值", "文本", "日期时间"
     vartypes = DiscreteVariable, ContinuousVariable, StringVariable, TimeVariable
     name2type = dict(zip(typenames, vartypes))
     type2name = dict(zip(vartypes, typenames))
@@ -118,7 +118,7 @@ class VarTableModel(QAbstractTableModel):
 
     def headerData(self, i, orientation, role=Qt.DisplayRole):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole and i < 4:
-            return ("Name", "Type", "Role", "Values")[i]
+            return ("名称", "类型", "角色", "值")[i]
         if role == Qt.TextAlignmentRole:
             return Qt.AlignLeft
         return super().headerData(i, orientation, role)
@@ -172,7 +172,7 @@ class VarTypeDelegate(ComboDelegate):
             index.row()][Column.not_valid]
         if no_numeric:
             # Do not allow selection of numeric and datetime
-            items = [i for i in self.items if i not in ("numeric", "datetime")]
+            items = [i for i in self.items if i not in ("数值", "日期时间")]
         else:
             items = self.items
 

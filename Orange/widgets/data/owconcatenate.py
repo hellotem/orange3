@@ -26,33 +26,33 @@ from Orange.widgets.widget import Input, MultiInput, Output, Msg
 
 
 class OWConcatenate(widget.OWWidget):
-    name = "Concatenate"
-    description = "Concatenate (append) two or more datasets."
-    category = "Transform"
+    name = "连接 Concatenate"
+    description = "连接(追加)两个或多个数据集。"
+    category = "变换"
     priority = 1111
     icon = "icons/Concatenate.svg"
-    keywords = "concatenate, append, join, extend"
+    keywords = "连接、追加、加入、扩展"
 
     class Inputs:
-        primary_data = Input("Primary Data", Orange.data.Table)
+        primary_data = Input("主数据", Orange.data.Table)
         additional_data = MultiInput(
-            "Additional Data", Orange.data.Table, default=True
+            "附加数据", Orange.data.Table, default=True
         )
 
     class Outputs:
-        data = Output("Data", Orange.data.Table)
+        data = Output("数据", Orange.data.Table)
 
     class Error(widget.OWWidget.Error):
-        bow_concatenation = Msg("Inputs must be of the same type.")
+        bow_concatenation = Msg("输入必须是相同类型。")
         incompatible_domains = \
             Msg("Ignoring column names requires matching column types")
 
     class Warning(widget.OWWidget.Warning):
         renamed_variables = Msg(
-            "Variables with duplicated names have been renamed.")
+            "重命名了名称重复的变量。")
         unmergeable_attributes = Msg(
-            "Some variables may not be concatenated correctly due "
-            "to attributes difference ({}).")
+            "由于属性差异,"
+            "某些变量可能无法正确连接({})。")
 
     merge_type: int
     append_source_column: bool
@@ -73,7 +73,7 @@ class OWConcatenate(widget.OWWidget):
     #: Selected "Source ID" domain role
     source_column_role = settings.Setting(0)
     #: User specified name for the "Source ID" attr
-    source_attr_name = settings.Setting("Source ID")
+    source_attr_name = settings.Setting("源ID")
     #: Use names from the primary table, ignore others
     ignore_names = settings.Setting(False)
 
@@ -82,10 +82,10 @@ class OWConcatenate(widget.OWWidget):
     want_main_area = False
     resizing_enabled = False
 
-    domain_opts = ("all variables that appear in input tables",
-                   "only variables that appear in all tables")
+    domain_opts = ("输入表中出现的所有变量",
+                   "仅出现在所有表中的变量")
 
-    id_roles = ("Class attribute", "Attribute", "Meta attribute")
+    id_roles = ("类属性", "属性", "元属性")
 
     auto_commit = Setting(True)
 
@@ -97,8 +97,8 @@ class OWConcatenate(widget.OWWidget):
 
         self.mergebox = gui.vBox(self.controlArea, "Variable Sets Merging")
         gui.widgetLabel(
-            self.mergebox, self.tr("When there is no primary table, " +
-                                   "the output should contain"))
+            self.mergebox, self.tr("当没有主表时," +
+                                   "输出应包含"))
 
         gui.radioButtons(
             gui.indentedBox(self.mergebox, 10), self, "merge_type", self.domain_opts,
@@ -106,8 +106,8 @@ class OWConcatenate(widget.OWWidget):
 
         label = gui.widgetLabel(
             self.mergebox,
-            self.tr("The resulting table will have a class only if there " +
-                    "is no conflict between input classes."))
+            self.tr("只有当所有输入类无冲突时," +
+                    "结果表才会有一个类。"))
         label.setWordWrap(True)
 
         box = gui.vBox(self.controlArea, "Variable matching")
@@ -120,17 +120,17 @@ class OWConcatenate(widget.OWWidget):
         gui.separator(self.controlArea)
         gui.checkBox(
             box, self, "ignore_compute_value",
-            "Treat variables with the same name as the same variable,\n"
-            "even if they are computed using different formulae.",
+            "将同名变量视为相同变量,\n"
+            "即使它们是使用不同公式计算的。",
             callback=self.commit.deferred, stateWhenDisabled=False)
         ###
         box = gui.vBox(
-            self.controlArea, self.tr("Source Identification"),
+            self.controlArea, self.tr("源标识"),
         )
 
         cb = gui.checkBox(
             box, self, "append_source_column",
-            self.tr("Append data source IDs"),
+            self.tr("追加数据源ID"),
             callback=self._source_changed)
 
         ibox = gui.indentedBox(box, sep=gui.checkButtonOffsetHint(cb))
@@ -324,11 +324,11 @@ class OWConcatenate(widget.OWWidget):
     def send_report(self):
         items = OrderedDict()
         if self.primary_data is not None:
-            items["Domain"] = "from primary data"
+            items["域"] = "来自主数据"
         else:
-            items["Domain"] = self.tr(self.domain_opts[self.merge_type]).lower()
+            items["域"] = self.tr(self.domain_opts[self.merge_type]).lower()
         if self.append_source_column:
-            items["Source data ID"] = "{} (as {})".format(
+            items["源数据ID"] = "{} (as {})".format(
                 self.source_attr_name,
                 self.id_roles[self.source_column_role].lower())
         self.report_items(items)

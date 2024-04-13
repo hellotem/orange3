@@ -788,12 +788,12 @@ class Rule:
         class_var = self.domain.class_var
 
         if self.selectors:
-            cond = " AND ".join([attributes[s.column].name + s.op +
+            cond = "且".join([attributes[s.column].name + s.op +
                                  (str(attributes[s.column].values[int(s.value)])
                                   if attributes[s.column].is_discrete
                                   else str(s.value)) for s in self.selectors])
         else:
-            cond = "TRUE"
+            cond = "真"
 
         # it is possible that prediction is not set yet - use _ for outcome
         outcome = (

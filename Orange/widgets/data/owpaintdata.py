@@ -729,29 +729,29 @@ def _icon(name, icon_path="icons/paintdata",
 
 class OWPaintData(OWWidget):
     TOOLS = [
-        ("Brush", "Create multiple instances", AirBrushTool, _icon("brush.svg")),
-        ("Put", "Put individual instances", PutInstanceTool, _icon("put.svg")),
-        ("Select", "Select and move instances", SelectTool,
+        ("画笔 Brush", "创建多个实例", AirBrushTool, _icon("brush.svg")),
+        ("放置", "放置单个实例", PutInstanceTool, _icon("put.svg")),
+        ("选择", "选择和移动实例", SelectTool,
          _icon("select-transparent_42px.png")),
-        ("Jitter", "Jitter instances", JitterTool, _icon("jitter.svg")),
-        ("Magnet", "Attract multiple instances", MagnetTool, _icon("magnet.svg")),
-        ("Clear", "Clear the plot", ClearTool, _icon("../../../icons/Dlg_clear.png"))
+        ("抖动", "抖动实例", JitterTool, _icon("jitter.svg")),
+        ("磁铁", "吸引多个实例", MagnetTool, _icon("magnet.svg")),
+        ("清除", "清除绘图", ClearTool, _icon("../../../icons/Dlg_clear.png"))
     ]
 
-    name = "Paint Data"
-    description = "Create data by painting data points on a plane."
+    name = "绘制数据"
+    description = "通过在平面上绘制数据点来创建数据。"
     icon = "icons/PaintData.svg"
     priority = 60
-    keywords = "paint data, create, draw"
+    keywords = "绘制数据,创建,绘制"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数据", Table)
 
     autocommit = Setting(True)
-    table_name = Setting("Painted data")
+    table_name = Setting("绘制的数据")
     attr1 = Setting("x")
     attr2 = Setting("y")
     hasAttr2 = Setting(True)
@@ -768,15 +768,15 @@ class OWPaintData(OWWidget):
     graph_name = "plot"  # pg.GraphicsItem (pg.PlotItem)
 
     class Warning(OWWidget.Warning):
-        no_input_variables = Msg("Input data has no variables")
-        continuous_target = Msg("Numeric target value can not be used.")
-        sparse_not_supported = Msg("Sparse data is ignored.")
-        renamed_vars = Msg("Some variables have been renamed "
-                           "to avoid duplicates.\n{}")
+        no_input_variables = Msg("输入数据没有变量")
+        continuous_target = Msg("无法使用数字目标值。")
+        sparse_not_supported = Msg("忽略稀疏数据。")
+        renamed_vars = Msg("某些变量已被重命名"
+                           "以避免重复。\n{}")
 
     class Information(OWWidget.Information):
         use_first_two = \
-            Msg("Paint Data uses data from the first two attributes.")
+            Msg("绘制数据使用前两个属性的数据。")
 
     def __init__(self):
         super().__init__()
@@ -822,15 +822,15 @@ class OWPaintData(OWWidget):
         self.commit.now()
 
     def _init_ui(self):
-        namesBox = gui.vBox(self.controlArea, "Names")
+        namesBox = gui.vBox(self.controlArea, "名称")
 
         hbox = gui.hBox(namesBox, margin=0, spacing=0)
-        gui.lineEdit(hbox, self, "attr1", "Variable X: ",
+        gui.lineEdit(hbox, self, "attr1", "变量X: ",
                      controlWidth=80, orientation=Qt.Horizontal,
                      callback=self._attr_name_changed)
         gui.separator(hbox, 21)
         hbox = gui.hBox(namesBox, margin=0, spacing=0)
-        attr2 = gui.lineEdit(hbox, self, "attr2", "Variable Y: ",
+        attr2 = gui.lineEdit(hbox, self, "attr2", "变量Y: ",
                              controlWidth=80, orientation=Qt.Horizontal,
                              callback=self._attr_name_changed)
         gui.separator(hbox)
@@ -838,7 +838,7 @@ class OWPaintData(OWWidget):
                      labelWidth=0,
                      callback=self.set_dimensions)
 
-        gui.widgetLabel(namesBox, "Labels")
+        gui.widgetLabel(namesBox, "标签")
         self.classValuesView = listView = gui.ListViewWithSizeHint(
             preferred_size=(-1, 30))
         listView.setModel(self.class_model)
@@ -847,13 +847,13 @@ class OWPaintData(OWWidget):
 
         self.addClassLabel = QAction(
             "+", self,
-            toolTip="Add new class label",
+            toolTip="添加新的类标签",
             triggered=self.add_new_class_label
         )
 
         self.removeClassLabel = QAction(
             unicodedata.lookup("MINUS SIGN"), self,
-            toolTip="Remove selected class label",
+            toolTip="删除选定的类标签",
             triggered=self.remove_selected_class_label
         )
 
@@ -864,7 +864,7 @@ class OWPaintData(OWWidget):
         actionsWidget.layout().setSpacing(1)
         namesBox.layout().addWidget(actionsWidget)
 
-        tBox = gui.vBox(self.buttonsArea, "Tools")
+        tBox = gui.vBox(self.buttonsArea, "工具")
         toolsBox = gui.widgetBox(tBox, orientation=QGridLayout())
 
         self.toolActions = QActionGroup(self)
@@ -933,7 +933,7 @@ class OWPaintData(OWWidget):
         form.addRow("Symbol:", slider)
 
         self.btResetToInput = gui.button(
-            tBox, self, "Reset to Input Data", self.reset_to_input)
+            tBox, self, "重置为输入数据", self.reset_to_input)
         self.btResetToInput.setDisabled(True)
 
         gui.auto_send(self.buttonsArea, self, "autocommit")
@@ -1088,7 +1088,7 @@ class OWPaintData(OWWidget):
         mask = self.__buffer[:, 2] == index
         move_mask = self.__buffer[~mask][:, 2] > index
 
-        self.undo_stack.beginMacro("Delete class label")
+        self.undo_stack.beginMacro("删除类标签")
         self.undo_stack.push(UndoCommand(DeleteIndices(mask), self))
         self.undo_stack.push(UndoCommand(Move((move_mask, 2), -1), self))
         self.undo_stack.push(
@@ -1172,7 +1172,7 @@ class OWPaintData(OWWidget):
 
     def _add_command(self, cmd):
         # pylint: disable=too-many-branches
-        name = "Name"
+        name = "名称"
 
         if (not self.hasAttr2 and
                 isinstance(cmd, (Move, MoveSelection, Jitter, Magnet))):
@@ -1195,7 +1195,7 @@ class OWPaintData(OWWidget):
             indices = self._selected_indices
             if indices is not None and indices.size:
                 self.undo_stack.push(
-                    UndoCommand(DeleteIndices(indices), self, text="Delete")
+                    UndoCommand(DeleteIndices(indices), self, text="删除")
                 )
         elif isinstance(cmd, MoveSelection):
             indices = self._selected_indices
@@ -1204,10 +1204,10 @@ class OWPaintData(OWWidget):
                     UndoCommand(
                         Move((self._selected_indices, slice(0, 2)),
                              np.array([cmd.delta.x(), cmd.delta.y()])),
-                        self, text="Move")
+                        self, text="移动")
                 )
         elif isinstance(cmd, DeleteIndices):
-            self.undo_stack.push(UndoCommand(cmd, self, text="Delete"))
+            self.undo_stack.push(UndoCommand(cmd, self, text="删除"))
         elif isinstance(cmd, Insert):
             self.undo_stack.push(UndoCommand(cmd, self))
         elif isinstance(cmd, AirBrush):
@@ -1316,9 +1316,9 @@ class OWPaintData(OWWidget):
             return
         settings = []
         if self.attr1 != "x" or self.attr2 != "y":
-            settings += [("Axis x", self.attr1), ("Axis y", self.attr2)]
-        settings += [("Number of points", len(self.data))]
-        self.report_items("Painted data", settings)
+            settings += [("x轴", self.attr1), ("y轴", self.attr2)]
+        settings += [("点数", len(self.data))]
+        self.report_items("绘制的数据", settings)
         self.report_plot()
 
 

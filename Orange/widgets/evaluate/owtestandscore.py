@@ -131,24 +131,24 @@ class State(enum.Enum):
 
 
 class OWTestAndScore(OWWidget):
-    name = "Test and Score"
-    description = "Cross-validation accuracy estimation."
+    name = "测试和评分 Test and Score"
+    description = "交叉验证准确性估计。"
     icon = "icons/TestLearners1.svg"
     priority = 100
-    keywords = "test and score, cross validation, cv"
+    keywords = "测试和评分、交叉验证、cv"
     replaces = ["Orange.widgets.evaluate.owtestlearners.OWTestLearners"]
 
     class Inputs:
-        train_data = Input("Data", Table, default=True)
-        test_data = Input("Test Data", Table)
+        train_data = Input("数据", Table, default=True)
+        test_data = Input("测试数据", Table)
         learner = MultiInput(
-            "Learner", Learner, filter_none=True
+            "学习器", Learner, filter_none=True
         )
-        preprocessor = Input("Preprocessor", Preprocess)
+        preprocessor = Input("预处理器", Preprocess)
 
     class Outputs:
-        predictions = Output("Predictions", Table)
-        evaluations_results = Output("Evaluation Results", Results)
+        predictions = Output("预测", Table)
+        evaluations_results = Output("评估结果", Results)
 
     settings_version = 4
     buttons_area_orientation = None
@@ -186,39 +186,39 @@ class OWTestAndScore(OWWidget):
     rope = settings.Setting(0.1)
     comparison_criterion = settings.Setting(0, schema_only=True)
 
-    TARGET_AVERAGE = "(None, show average over classes)"
+    TARGET_AVERAGE = "(None, 显示类平均值)"
     class_selection = settings.ContextSetting(TARGET_AVERAGE)
 
     class Error(OWWidget.Error):
-        test_data_empty = Msg("Test dataset is empty.")
-        class_required_test = Msg("Test data input requires a target variable.")
-        too_many_folds = Msg("Number of folds exceeds the data size")
-        class_inconsistent = Msg("Test and train datasets "
-                                 "have different target variables.")
-        memory_error = Msg("Not enough memory.")
+        test_data_empty = Msg("测试数据集为空。")
+        class_required_test = Msg("测试数据输入需要目标变量。")
+        too_many_folds = Msg("折数超过数据大小")
+        class_inconsistent = Msg("测试和训练数据集"
+                                 "具有不同的目标变量。")
+        memory_error = Msg("内存不足。")
         test_data_incompatible = Msg(
-            "Test data may be incompatible with train data.")
+            "测试数据可能与训练数据不兼容。")
         train_data_error = Msg("{}")
 
     class Warning(OWWidget.Warning):
         missing_data = \
-            Msg("Instances with unknown target values were removed from{}data.")
-        test_data_missing = Msg("Missing separate test data input.")
-        scores_not_computed = Msg("Some scores could not be computed.")
-        test_data_unused = Msg("Test data is present but unused. "
-                               "Select 'Test on test data' to use it.")
+            Msg("已从{}数据中移除了未知目标值的实例。")
+        test_data_missing = Msg("缺少单独的测试数据输入。")
+        scores_not_computed = Msg("无法计算某些分数。")
+        test_data_unused = Msg("存在但未使用测试数据。"
+                               '选择"在测试数据上测试"以使用它。')
         cant_stratify = \
-            Msg("Can't run stratified {}-fold cross validation; "
-                "the least common class has only {} instances.")
+            Msg("无法运行分层{}-折交叉验证;"
+                "最小公共类只有 {} 个实例。")
 
     class Information(OWWidget.Information):
-        data_sampled = Msg("Train data has been sampled")
-        test_data_sampled = Msg("Test data has been sampled")
+        data_sampled = Msg("训练数据已被采样")
+        test_data_sampled = Msg("测试数据已被采样")
         test_data_transformed = Msg(
-            "Test data has been transformed to match the train data.")
-        cant_stratify_numeric = Msg("Stratification is ignored for regression")
-        cant_stratify_multitarget = Msg("Stratification is ignored when there are"
-                                        " multiple target variables.")
+            "测试数据已被转换以匹配训练数据。")
+        cant_stratify_numeric = Msg("对于回归, 忽略分层")
+        cant_stratify_multitarget = Msg("当存在"
+                                        "多个目标变量时, 忽略分层。")
 
     def __init__(self):
         super().__init__()
@@ -247,16 +247,16 @@ class OWTestAndScore(OWWidget):
         rbox = gui.radioButtons(
             sbox, self, "resampling", callback=self._param_changed)
 
-        gui.appendRadioButton(rbox, "Cross validation")
+        gui.appendRadioButton(rbox, "交叉验证")
         ibox = gui.indentedBox(rbox)
         gui.comboBox(
-            ibox, self, "n_folds", label="Number of folds: ",
+            ibox, self, "n_folds", label="折数: ",
             items=[str(x) for x in self.NFolds],
             orientation=Qt.Horizontal, callback=self.kfold_changed)
         gui.checkBox(
-            ibox, self, "cv_stratified", "Stratified",
+            ibox, self, "cv_stratified", "分层",
             callback=self.kfold_changed)
-        gui.appendRadioButton(rbox, "Cross validation by feature")
+        gui.appendRadioButton(rbox, "按特征进行交叉验证")
         ibox = gui.indentedBox(rbox)
         self.feature_model = DomainModel(
             order=DomainModel.METAS, valid_types=DiscreteVariable)
@@ -265,26 +265,26 @@ class OWTestAndScore(OWWidget):
             orientation=Qt.Horizontal, searchable=True,
             callback=self.fold_feature_changed)
 
-        gui.appendRadioButton(rbox, "Random sampling")
+        gui.appendRadioButton(rbox, "随机采样")
         ibox = gui.indentedBox(rbox)
         gui.comboBox(
-            ibox, self, "n_repeats", label="Repeat train/test: ",
+            ibox, self, "n_repeats", label="重复训练/测试: ",
             items=[str(x) for x in self.NRepeats], orientation=Qt.Horizontal,
             callback=self.shuffle_split_changed
         )
         gui.comboBox(
-            ibox, self, "sample_size", label="Training set size: ",
+            ibox, self, "sample_size", label="训练集大小: ",
             items=["{} %".format(x) for x in self.SampleSizes],
             orientation=Qt.Horizontal, callback=self.shuffle_split_changed
         )
         gui.checkBox(
-            ibox, self, "shuffle_stratified", "Stratified",
+            ibox, self, "shuffle_stratified", "分层",
             callback=self.shuffle_split_changed)
 
-        gui.appendRadioButton(rbox, "Leave one out")
+        gui.appendRadioButton(rbox, "留一法")
 
-        gui.appendRadioButton(rbox, "Test on train data")
-        gui.appendRadioButton(rbox, "Test on test data")
+        gui.appendRadioButton(rbox, "在训练数据上测试")
+        gui.appendRadioButton(rbox, "在测试数据上测试")
 
         gui.rubber(self.controlArea)
 
@@ -297,7 +297,7 @@ class OWTestAndScore(OWWidget):
         self.cbox = gui.hBox(self.results_box)
         self.class_selection_combo = gui.comboBox(
             self.cbox, self, "class_selection", items=[],
-            label="Evaluation results for target", orientation=Qt.Horizontal,
+            label="目标的评估结果", orientation=Qt.Horizontal,
             sendSelectedValue=True, searchable=True, contentsLength=25,
             callback=self._on_target_class_changed
         )
@@ -314,7 +314,7 @@ class OWTestAndScore(OWWidget):
             orientation=Qt.Horizontal, callback=self.update_comparison_table).box
 
         gui.separator(cbox, 8)
-        gui.checkBox(cbox, self, "use_rope", "Negligible diff.: ",
+        gui.checkBox(cbox, self, "use_rope", "可忽略差异:   ",
                      callback=self._on_use_rope_changed)
         gui.lineEdit(cbox, self, "rope", validator=QDoubleValidator(),
                      controlWidth=50, callback=self.update_comparison_table,
@@ -341,10 +341,10 @@ class OWTestAndScore(OWWidget):
         header.setDefaultSectionSize(15 * avg_width)
         box.layout().addWidget(table)
         box.layout().addWidget(QLabel(
-            "<small>Table shows probabilities that the score for the model in "
-            "the row is higher than that of the model in the column. "
-            "Small numbers show the probability that the difference is "
-            "negligible.</small>", wordWrap=True))
+            "<small>表格显示模型行分数高于列模型的概率。"
+            "分布"
+            "小数字显示差异为"
+            "可忽略的概率。</small>", wordWrap=True))
 
     def sizeHint(self):
         sh = super().sizeHint()
@@ -409,17 +409,17 @@ class OWTestAndScore(OWWidget):
 
         if data is not None:
             data_errors = [
-                ("Train dataset is empty.", len(data) == 0),
+                ("训练数据集为空。", len(data) == 0),
                 (
-                    "Train data input requires a target variable.",
+                    "训练数据输入需要目标变量。",
                     not data.domain.class_vars
                 ),
-                ("Target variable has no values.", np.isnan(data.Y).all()),
+                ("目标变量无值。", np.isnan(data.Y).all()),
                 (
-                    "Target variable has only one value.",
+                    "目标变量只有一个值。",
                     data.domain.has_discrete_class and len(unique(data.Y)) < 2
                 ),
-                ("Data has no features to learn from.", data.X.shape[1] == 0),
+                ("数据没有可学习的特征。", data.X.shape[1] == 0),
             ]
 
             for error_msg, cond in data_errors:
@@ -503,8 +503,8 @@ class OWTestAndScore(OWWidget):
 
     def _which_missing_data(self):
         return {(True, True): " ",  # both, don't specify
-                (True, False): " train ",
-                (False, True): " test "}[(self.train_data_missing_vals,
+                (True, False): "训练",
+                (False, True): "测试"}[(self.train_data_missing_vals,
                                           self.test_data_missing_vals)]
 
     # List of scorers shouldn't be retrieved globally, when the module is
@@ -616,14 +616,14 @@ class OWTestAndScore(OWWidget):
                 row = [head]
             if isinstance(results, Try.Fail):
                 head.setToolTip(str(results.exception))
-                head.setText("{} (error)".format(name))
+                head.setText("{} (错误)".format(name))
                 head.setForeground(QtGui.QBrush(Qt.red))
                 if isinstance(results.exception, DomainTransformationError) \
                         and self.resampling == self.TestOnTest:
                     self.Error.test_data_incompatible()
                     self.Information.test_data_transformed.clear()
                 else:
-                    errors.append("{name} failed with error:\n"
+                    errors.append("{name} 失败,错误:\n"
                                   "{exc.__class__.__name__}: {exc!s}"
                                   .format(name=name, exc=slot.results.exception)
                                   )
@@ -863,28 +863,28 @@ class OWTestAndScore(OWWidget):
         if not self.data or not self.learners:
             return
         if self.resampling == self.KFold:
-            stratified = 'Stratified ' if self.cv_stratified else ''
-            items = [("Sampling type", "{}{}-fold Cross validation".
+            stratified = '分层' if self.cv_stratified else ''
+            items = [("采样类型", "{}{}-折交叉验证".
                       format(stratified, self.NFolds[self.n_folds]))]
         elif self.resampling == self.LeaveOneOut:
-            items = [("Sampling type", "Leave one out")]
+            items = [("采样类型", "留一法")]
         elif self.resampling == self.ShuffleSplit:
-            stratified = 'Stratified ' if self.shuffle_stratified else ''
-            items = [("Sampling type",
-                      "{}Shuffle split, {} random samples with {}% data "
+            stratified = '分层' if self.shuffle_stratified else ''
+            items = [("采样类型",
+                      "{}随机分割, {} 随机样本占 {}% 数据"
                       .format(stratified, self.NRepeats[self.n_repeats],
                               self.SampleSizes[self.sample_size]))]
         elif self.resampling == self.TestOnTrain:
-            items = [("Sampling type", "No sampling, test on training data")]
+            items = [("采样类型", "无采样, 在训练数据上测试")]
         elif self.resampling == self.TestOnTest:
-            items = [("Sampling type", "No sampling, test on testing data")]
+            items = [("采样类型", "无采样, 在测试数据上测试")]
         else:
             items = []
         if self.data.domain.has_discrete_class:
-            items += [("Target class", self.class_selection.strip("()"))]
+            items += [("目标类", self.class_selection.strip("()"))]
         if items:
-            self.report_items("Settings", items)
-        self.report_table("Scores", self.score_table.view)
+            self.report_items("设置", items)
+        self.report_table("分数", self.score_table.view)
 
     @classmethod
     def migrate_settings(cls, settings_, version):
@@ -1062,7 +1062,7 @@ class OWTestAndScore(OWWidget):
         self.Outputs.evaluations_results.invalidate()
         self.Outputs.predictions.invalidate()
         self.progressBarInit()
-        self.setStatusMessage("Running")
+        self.setStatusMessage("运行中")
 
         self.__state = State.Running
         self.__task = task

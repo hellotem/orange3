@@ -74,12 +74,12 @@ class SoftmaxRegressionLearner(Learner):
 
     def fit(self, X, Y, W=None):
         if len(Y.shape) > 1:
-            raise ValueError('Softmax regression does not support '
-                             'multi-label classification')
+            raise ValueError('Softmax回归不支持'
+                             '多标签分类')
 
         if np.isnan(np.sum(X)) or np.isnan(np.sum(Y)):
-            raise ValueError('Softmax regression does not support '
-                             'unknown values')
+            raise ValueError('Softmax回归不支持'
+                             '未知值')
 
         X = np.hstack((X, np.ones((X.shape[0], 1))))
 

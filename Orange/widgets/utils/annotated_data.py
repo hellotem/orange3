@@ -7,8 +7,8 @@ from orangewidget.utils.signals import LazyValue
 from Orange.data import Domain, DiscreteVariable, Table
 from Orange.data.util import get_unique_names
 
-ANNOTATED_DATA_SIGNAL_NAME = "Data"
-ANNOTATED_DATA_FEATURE_NAME = "Selected"
+ANNOTATED_DATA_SIGNAL_NAME = "数据"
+ANNOTATED_DATA_FEATURE_NAME = "选择的"
 
 
 def add_columns(domain, attributes=(), class_vars=(), metas=()):
@@ -37,7 +37,7 @@ def add_columns(domain, attributes=(), class_vars=(), metas=()):
 
 def domain_with_annotation_column(
         data: Union[Table, Domain],
-        values=("No", "Yes"),
+        values=("否", "是"),
         var_name=ANNOTATED_DATA_FEATURE_NAME):
     domain = data if isinstance(data, Domain) else data.domain
     var = DiscreteVariable(get_unique_names(domain, var_name), values)
@@ -77,7 +77,7 @@ def create_annotated_table(data, selected_indices):
     if selected_indices is not None:
         annotated[selected_indices] = 1
     return _table_with_annotation_column(
-        data, ("No", "Yes"), annotated, ANNOTATED_DATA_FEATURE_NAME)
+        data, ("否", "是"), annotated, ANNOTATED_DATA_FEATURE_NAME)
 
 
 def lazy_annotated_table(data, selected_indices):
@@ -125,5 +125,5 @@ def group_values(selection, include_unselected, values):
     if values is None:
         values = ["G{}".format(i + 1) for i in range(max_sel)]
         if include_unselected:
-            values.append("Unselected")
+            values.append("未选择")
     return values, max_sel

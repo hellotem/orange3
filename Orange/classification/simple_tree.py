@@ -102,7 +102,7 @@ class SimpleTreeModel(Model):
         self.cls_vars = list(data.domain.class_vars)
         if len(data.domain.class_vars) != 1:
             n_cls = len(data.domain.class_vars)
-            raise ValueError("Number of classes should be 1: {}".format(n_cls))
+            raise ValueError("类别数应为1: {}".format(n_cls))
 
         if data.domain.has_discrete_class:
             self.type = Classification
@@ -111,8 +111,8 @@ class SimpleTreeModel(Model):
             self.type = Regression
             self.cls_vals = 0
         else:
-            raise ValueError("Only Continuous and Discrete "
-                             "variables are supported")
+            raise ValueError("仅支持连续和离散"
+                             "变量")
 
         if isinstance(learner.skip_prob, (float, int)):
             skip_prob = learner.skip_prob
@@ -134,8 +134,8 @@ class SimpleTreeModel(Model):
                 attr_vals.append(0)
                 domain.append(FloatVar)
             else:
-                raise ValueError("Only Continuous and Discrete "
-                                 "variables are supported")
+                raise ValueError("仅支持连续和离散"
+                                 "变量")
         attr_vals = np.array(attr_vals, dtype=np.int32)
         domain = np.array(domain, dtype=np.int32)
 

@@ -8,16 +8,16 @@ from Orange.widgets.widget import Input, Output
 
 
 class OWDistanceTransformation(widget.OWWidget):
-    name = "Distance Transformation"
-    description = "Transform distances according to selected criteria."
+    name = "距离转换 Distance Transformation"
+    description = "根据选择的标准转换距离。"
     icon = "icons/DistancesTransformation.svg"
     keywords = "distance transformation"
 
     class Inputs:
-        distances = Input("Distances", DistMatrix)
+        distances = Input("距离", DistMatrix)
 
     class Outputs:
-        distances = Output("Distances", DistMatrix, dynamic=False)
+        distances = Output("距离", DistMatrix, dynamic=False)
 
     want_main_area = False
     resizing_enabled = False
@@ -27,14 +27,14 @@ class OWDistanceTransformation(widget.OWWidget):
     autocommit = settings.Setting(True)
 
     normalization_options = (
-        ("No normalization", lambda x: x),
-        ("To interval [0, 1]", lambda x: scale(x, min=0, max=1)),
-        ("To interval [-1, 1]", lambda x: scale(x, min=-1, max=1)),
-        ("Sigmoid function: 1/(1+exp(-X))", lambda x: 1/(1+np.exp(-x))),
+        ("无归一化", lambda x: x),
+        ("转换到区间 [0, 1]", lambda x: scale(x, min=0, max=1)),
+        ("转换到区间 [-1, 1]", lambda x: scale(x, min=-1, max=1)),
+        ("Sigmoid 函数: 1/(1+exp(-X))", lambda x: 1/(1+np.exp(-x))),
     )
 
     inversion_options = (
-        ("No inversion", lambda x: x),
+        ("无反转", lambda x: x),
         ("-X", lambda x: -x),
         ("1 - X", lambda x: 1-x),
         ("max(X) - X", lambda x: np.max(x) - x),
@@ -47,12 +47,12 @@ class OWDistanceTransformation(widget.OWWidget):
         self.data = None
 
         gui.radioButtons(self.controlArea, self, "normalization_method",
-                         box="Normalization",
+                         box="归一化",
                          btnLabels=[x[0] for x in self.normalization_options],
                          callback=self._invalidate)
 
         gui.radioButtons(self.controlArea, self, "inversion_method",
-                         box="Inversion",
+                         box="反转",
                          btnLabels=[x[0] for x in self.inversion_options],
                          callback=self._invalidate)
 
@@ -81,12 +81,12 @@ class OWDistanceTransformation(widget.OWWidget):
         inv, invopt = self.inversion_method, self.inversion_options
         parts = []
         if inv:
-            parts.append('inversion ({})'.format(invopt[inv][0]))
+            parts.append('反转 ({})'.format(invopt[inv][0]))
         if norm:
-            parts.append('normalization ({})'.format(normopt[norm][0]))
+            parts.append('归一化 ({})'.format(normopt[norm][0]))
         self.report_items(
-            'Model parameters',
-            {'Transformation': ', '.join(parts).capitalize() or 'None'})
+            '模型参数',
+            {'转换': ', '.join(parts).capitalize() or '无'})
 
     def _invalidate(self):
         self.commit.deferred()

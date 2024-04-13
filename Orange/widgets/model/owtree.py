@@ -15,8 +15,8 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 class OWTreeLearner(OWBaseLearner):
     """Tree algorithm with forward pruning."""
-    name = "Tree"
-    description = "A tree algorithm with forward pruning."
+    name = "决策树 Decision Tree"
+    description = "一种带有前向剪枝的树算法。"
     icon = "icons/Tree.svg"
     replaces = [
         "Orange.widgets.classify.owclassificationtree.OWClassificationTree",
@@ -42,21 +42,21 @@ class OWTreeLearner(OWBaseLearner):
     sufficient_majority = Setting(95)
 
     spin_boxes = (
-        ("Min. number of instances in leaves: ",
+        ("叶节点中实例的最小数量:",
          "limit_min_leaf", "min_leaf", 1, 1000),
-        ("Do not split subsets smaller than: ",
+        ("不拆分小于:",
          "limit_min_internal", "min_internal", 1, 1000),
-        ("Limit the maximal tree depth to: ",
+        ("限制最大树深度为:",
          "limit_depth", "max_depth", 1, 1000))
 
     classification_spin_boxes = (
-        ("Stop when majority reaches [%]: ",
+        ("当多数达到 [%] 时停止:",
          "limit_majority", "sufficient_majority", 51, 100),)
 
     def add_main_layout(self):
-        box = gui.widgetBox(self.controlArea, 'Parameters')
+        box = gui.widgetBox(self.controlArea, '参数')
         # the checkbox is put into vBox for alignemnt with other checkboxes
-        gui.checkBox(box, self, "binary_trees", "Induce binary tree",
+        gui.checkBox(box, self, "binary_trees", "归纳二叉树",
                      callback=self.settings_changed,
                      attribute=Qt.WA_LayoutUsesWidgetRect)
         for label, check, setting, fromv, tov in self.spin_boxes:
@@ -91,21 +91,21 @@ class OWTreeLearner(OWBaseLearner):
     def get_learner_parameters(self):
         from Orange.widgets.report import plural_w
         items = OrderedDict()
-        items["Pruning"] = ", ".join(s for s, c in (
-            (f'at least {self.min_leaf} '
-             f'{pl(self.min_leaf, "instance")} in leaves',
+        items["剪枝"] = ",".join(s for s, c in (
+            (f'至少 {self.min_leaf}'
+             f'{pl(self.min_leaf, "实例")} 在叶节点中',
              self.limit_min_leaf),
-            (f'at least {self.min_internal} '
-             f'{pl(self.min_internal, "instance")} in internal nodes',
+            (f'至少 {self.min_internal}'
+             f'{pl(self.min_internal, "实例")} 在内部节点中',
              self.limit_min_internal),
-            (f'maximum depth {self.max_depth}',
+            (f'最大深度 {self.max_depth}',
              self.limit_depth)
-        ) if c) or "None"
+        ) if c) or "无"
         if self.limit_majority:
-            items["Splitting"] = "Stop splitting when majority reaches %d%% " \
-                                 "(classification only)" % \
+            items["分裂"] = "当多数达到 %d%% 时停止分裂" \
+                                 "(仅分类)" % \
                                  self.sufficient_majority
-        items["Binary trees"] = ("No", "Yes")[self.binary_trees]
+        items["二叉树"] = ("否", "是")[self.binary_trees]
         return items
 
 

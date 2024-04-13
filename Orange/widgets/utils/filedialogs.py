@@ -24,7 +24,7 @@ def dialog_formats():
     """
     Return readable file types for QFileDialogs.
     """
-    return ("All readable files ({});;".format(
+    return ("所有可读文件 ({});;".format(
         '*' + ' *'.join(FileFormat.readers.keys())) +
             ";;".join("{} (*{})".format(f.DESCRIPTION, ' *'.join(f.EXTENSIONS))
                       for f in sorted(set(FileFormat.readers.values()),

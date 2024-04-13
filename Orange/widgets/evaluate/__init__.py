@@ -2,7 +2,7 @@
 Widgets from Evaluate category
 
 """
-NAME = "Evaluate"
+NAME = "评估"
 
 DESCRIPTION = "Evaluate classification/regression performance."
 

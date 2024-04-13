@@ -10,29 +10,29 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 
 class OWCalibratedLearner(OWBaseLearner):
-    name = "Calibrated Learner"
-    description = "Wraps another learner with probability calibration and " \
-                  "decision threshold optimization"
+    name = "校准学习器 Calibrated Learner"
+    description = "用概率校准和" \
+                  "决策阈值优化包装另一学习器"
     icon = "icons/CalibratedLearner.svg"
     priority = 20
-    keywords = "calibrated learner, calibration, threshold"
+    keywords = "校准学习器、校准、阈值"
 
     LEARNER = CalibratedLearner
 
     SigmoidCalibration, IsotonicCalibration, NoCalibration = range(3)
-    CalibrationOptions = ("Sigmoid calibration",
-                          "Isotonic calibration",
-                          "No calibration")
-    CalibrationShort = ("Sigmoid", "Isotonic", "")
+    CalibrationOptions = ("Sigmoid校准",
+                          "等渗校准",
+                          "无校准")
+    CalibrationShort = ("Sigmoid", "等渗", "")
     CalibrationMap = {
         SigmoidCalibration: CalibratedLearner.Sigmoid,
         IsotonicCalibration: CalibratedLearner.Isotonic}
 
     OptimizeCA, OptimizeF1, NoThresholdOptimization = range(3)
-    ThresholdOptions = ("Optimize classification accuracy",
-                        "Optimize F1 score",
-                        "No threshold optimization")
-    ThresholdShort = ("CA", "F1", "")
+    ThresholdOptions = ("优化分类准确率",
+                        "优化F1分数",
+                        "无阈值优化")
+    ThresholdShort = ("分类准确率", "F1", "")
     ThresholdMap = {
         OptimizeCA: ThresholdLearner.OptimizeCA,
         OptimizeF1: ThresholdLearner.OptimizeF1}
@@ -42,7 +42,7 @@ class OWCalibratedLearner(OWBaseLearner):
     threshold = Setting(OptimizeCA)
 
     class Inputs(OWBaseLearner.Inputs):
-        base_learner = Input("Base Learner", Learner)
+        base_learner = Input("基学习器", Learner)
 
     def __init__(self):
         super().__init__()
@@ -51,11 +51,11 @@ class OWCalibratedLearner(OWBaseLearner):
     def add_main_layout(self):
         gui.radioButtons(
             self.controlArea, self, "calibration", self.CalibrationOptions,
-            box="Probability calibration",
+            box="概率校准",
             callback=self.calibration_options_changed)
         gui.radioButtons(
             self.controlArea, self, "threshold", self.ThresholdOptions,
-            box="Decision threshold optimization",
+            box="决策阈值优化",
             callback=self.calibration_options_changed)
 
     @Inputs.base_learner
@@ -100,9 +100,9 @@ class OWCalibratedLearner(OWBaseLearner):
         return learner
 
     def get_learner_parameters(self):
-        return (("Calibrate probabilities",
+        return (("校准概率",
                  self.CalibrationOptions[self.calibration]),
-                ("Threshold optimization",
+                ("阈值优化",
                  self.ThresholdOptions[self.threshold]))
 
 

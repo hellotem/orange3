@@ -16,16 +16,16 @@ class OUserSettingsDialog(UserSettingsDialog):
         w = self.widget(0)  # 'General' tab
         layout = w.layout()
         assert isinstance(layout, QFormLayout)
-        cb = QCheckBox(self.tr("Automatically check for updates"))
+        cb = QCheckBox(self.tr("自动检查更新"))
         cb.setAttribute(Qt.WA_LayoutUsesWidgetRect)
 
-        layout.addRow("Updates", cb)
+        layout.addRow("更新", cb)
         self.bind(cb, "checked", "startup/check-updates")
 
         # Reporting Tab
         tab = QWidget()
-        self.addTab(tab, self.tr("Reporting"),
-                    toolTip="Settings related to reporting")
+        self.addTab(tab, self.tr("报告"),
+                    toolTip="与报告相关的设置")
 
         form = FormLayout()
         line_edit_mid = QLineEdit()
@@ -36,18 +36,18 @@ class OUserSettingsDialog(UserSettingsDialog):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         cb1 = QCheckBox(
-            self.tr("Share"),
+            self.tr("分享"),
             toolTip=self.tr(
-                "Share anonymous usage statistics to improve Orange")
+                "分享匿名使用统计数据以改进Orange")
         )
         self.bind(cb1, "checked", "reporting/send-statistics")
         cb1.clicked.connect(UsageStatistics.set_enabled)
         layout.addWidget(cb1)
         box.setLayout(layout)
-        form.addRow(self.tr("Anonymous Statistics"), box)
+        form.addRow(self.tr("匿名统计"), box)
         label = QLabel("<a "
                        "href=\"https://orange.biolab.si/statistics-more-info\">"
-                       "More info..."
+                       "更多信息..."
                        "</a>")
         label.setOpenExternalLinks(True)
         form.addRow(self.tr(""), label)
@@ -56,8 +56,8 @@ class OUserSettingsDialog(UserSettingsDialog):
 
         # Notifications Tab
         tab = QWidget()
-        self.addTab(tab, self.tr("Notifications"),
-                    toolTip="Settings related to notifications")
+        self.addTab(tab, self.tr("通知"),
+                    toolTip="与通知相关的设置")
 
         form = FormLayout()
 
@@ -65,31 +65,31 @@ class OUserSettingsDialog(UserSettingsDialog):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         cb = QCheckBox(
-            self.tr("Enable notifications"), self,
-            toolTip="Pull and display a notification feed."
+            self.tr("启用通知"), self,
+            toolTip="拉取和显示通知源。"
         )
         self.bind(cb, "checked", "notifications/check-notifications")
 
         layout.addWidget(cb)
         box.setLayout(layout)
-        form.addRow(self.tr("On startup"), box)
+        form.addRow(self.tr("启动时"), box)
 
         notifs = QWidget(self, objectName="notifications-group")
         notifs.setLayout(QVBoxLayout())
         notifs.layout().setContentsMargins(0, 0, 0, 0)
 
-        cb1 = QCheckBox(self.tr("Announcements"), self,
-                        toolTip="Show notifications about Biolab announcements.\n"
-                                "This entails events and courses hosted by the developers of "
-                                "Orange.")
+        cb1 = QCheckBox(self.tr("公告"), self,
+                        toolTip="显示有关Biolab公告的通知。\n"
+                                "这包括由Orange的开发者举办的"
+                                "活动和课程。")
 
-        cb2 = QCheckBox(self.tr("Blog posts"), self,
-                        toolTip="Show notifications about blog posts.\n"
-                                "We'll only send you the highlights.")
-        cb3 = QCheckBox(self.tr("New features"), self,
-                        toolTip="Show notifications about new features in Orange when a new "
-                                "version is downloaded and installed,\n"
-                                "should the new version entail notable updates.")
+        cb2 = QCheckBox(self.tr("博客文章"), self,
+                        toolTip="显示有关博客文章的通知。\n"
+                                "我们只会发送精华内容。")
+        cb3 = QCheckBox(self.tr("新功能"), self,
+                        toolTip="当新版本下载并安装后,"
+                                "显示有关Orange新功能的通知,\n"
+                                "如果新版本包含显著更新。")
 
         self.bind(cb1, "checked", "notifications/announcements")
         self.bind(cb2, "checked", "notifications/blog")
@@ -99,7 +99,7 @@ class OUserSettingsDialog(UserSettingsDialog):
         notifs.layout().addWidget(cb2)
         notifs.layout().addWidget(cb3)
 
-        form.addRow(self.tr("Show notifications about"), notifs)
+        form.addRow(self.tr("显示通知内容:"), notifs)
         tab.setLayout(form)
 
 
@@ -115,7 +115,7 @@ class MainWindow(OWCanvasMainWindow):
     def open_canvas_settings(self):
         # type: () -> None
         """Reimplemented."""
-        dlg = OUserSettingsDialog(self, windowTitle=self.tr("Preferences"))
+        dlg = OUserSettingsDialog(self, windowTitle=self.tr("首选项"))
         dlg.show()
         status = dlg.exec()
         if status == 0:

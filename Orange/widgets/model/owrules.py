@@ -23,17 +23,17 @@ class CustomRuleClassifier(_RuleClassifier):
         super().__init__(domain, rule_list)
         assert params is not None
 
-        self.rule_ordering = params["Rule ordering"]
-        self.covering_algorithm = params["Covering algorithm"]
+        self.rule_ordering = params["规则排序"]
+        self.covering_algorithm = params["覆盖算法"]
         self.params = params
 
     def predict(self, X):
-        if (self.rule_ordering == "ordered" and
-                self.covering_algorithm == "exclusive"):
+        if (self.rule_ordering == "有序" and
+                self.covering_algorithm == "独占"):
             return self.ordered_predict(X)
 
-        if (self.rule_ordering == "unordered" or
-                self.covering_algorithm == "weighted"):
+        if (self.rule_ordering == "无序" or
+                self.covering_algorithm == "加权"):
             return self.unordered_predict(X)
 
 
@@ -58,41 +58,41 @@ class CustomRuleLearner(_RuleLearner):
         self.params = params
 
         # top-level control procedure (rule ordering)
-        self.rule_ordering = params["Rule ordering"]
+        self.rule_ordering = params["规则排序"]
 
         # top-level control procedure (covering algorithm)
-        self.covering_algorithm = params["Covering algorithm"]
-        if self.covering_algorithm == "exclusive":
+        self.covering_algorithm = params["覆盖算法"]
+        if self.covering_algorithm == "独占":
             self.cover_and_remove = self.exclusive_cover_and_remove
-        elif self.covering_algorithm == "weighted":
+        elif self.covering_algorithm == "加权":
             self.gamma = params["Gamma"]
             self.cover_and_remove = self.weighted_cover_and_remove
 
         # bottom-level search procedure (search algorithm)
-        self.rule_finder.search_algorithm.beam_width = params["Beam width"]
+        self.rule_finder.search_algorithm.beam_width = params["束宽"]
 
         # bottom-level search procedure (search strategy)
         self.rule_finder.search_strategy.constrain_continuous = True
 
         # bottom-level search procedure (search heuristics)
-        evaluation_measure = params["Evaluation measure"]
-        if evaluation_measure == "entropy":
+        evaluation_measure = params["评估指标"]
+        if evaluation_measure == "熵":
             evaluator = EntropyEvaluator()
-        elif evaluation_measure == "laplace":
+        elif evaluation_measure == "拉普拉斯":
             evaluator = LaplaceAccuracyEvaluator()
-        elif evaluation_measure == "wracc":
+        elif evaluation_measure == "wraccc":
             evaluator = WeightedRelativeAccuracyEvaluator()
         self.rule_finder.quality_evaluator = evaluator
 
         # bottom-level search procedure (over-fitting avoidance heuristics)
-        min_rule_cov = params["Minimum rule coverage"]
-        max_rule_length = params["Maximum rule length"]
+        min_rule_cov = params["最小规则覆盖率"]
+        max_rule_length = params["最大规则长度"]
         self.rule_finder.general_validator.min_covered_examples = min_rule_cov
         self.rule_finder.general_validator.max_rule_length = max_rule_length
 
         # bottom-level search procedure (over-fitting avoidance heuristics)
-        default_alpha = params["Default alpha"]
-        parent_alpha = params["Parent alpha"]
+        default_alpha = params["默认 alpha"]
+        parent_alpha = params["父 alpha"]
         self.rule_finder.significance_validator.default_alpha = default_alpha
         self.rule_finder.significance_validator.parent_alpha = parent_alpha
 
@@ -184,17 +184,17 @@ class CustomRuleLearner(_RuleLearner):
         rule_list = []
         X, Y, W = data.X, data.Y, data.W if data.has_weights() else None
         Y = Y.astype(dtype=int)
-        if self.rule_ordering == "ordered":
+        if self.rule_ordering == "有序":
             rule_list = self.find_rules_and_measure_progress(
                 X, Y, np.copy(W) if W is not None else None, None,
                 self.base_rules, data.domain, progress_amount=1)
             # add the default rule, if required
             if (not rule_list or rule_list and rule_list[-1].length > 0 or
-                    self.covering_algorithm == "weighted"):
+                    self.covering_algorithm == "加权"):
                 rule_list.append(
                     self.generate_default_rule(X, Y, W, data.domain))
 
-        elif self.rule_ordering == "unordered":
+        elif self.rule_ordering == "无序":
             for curr_class in range(len(data.domain.class_var.values)):
                 rule_list.extend(self.find_rules_and_measure_progress(
                     X, Y, np.copy(W) if W is not None else None,
@@ -208,8 +208,8 @@ class CustomRuleLearner(_RuleLearner):
 
 
 class OWRuleLearner(OWBaseLearner):
-    name = "CN2 Rule Induction"
-    description = "Induce rules from data using CN2 algorithm."
+    name = "CN2 规则归纳  CN2 Rule Induction"
+    description = "使用 CN2 算法从数据中归纳规则。"
     icon = "icons/CN2RuleInduction.svg"
     replaces = [
         "Orange.widgets.classify.owrules.OWRuleLearner",
@@ -220,9 +220,9 @@ class OWRuleLearner(OWBaseLearner):
     LEARNER = CustomRuleLearner
     supports_sparse = False
 
-    storage_orders = ["ordered", "unordered"]
-    storage_covers = ["exclusive", "weighted"]
-    storage_measures = ["entropy", "laplace", "wracc"]
+    storage_orders = ["有序", "无序"]
+    storage_covers = ["独占", "加权"]
+    storage_measures = ["熵", "拉普拉斯", "wracc"]
 
     # default parameter values
     rule_ordering = Setting(0)
@@ -245,19 +245,19 @@ class OWRuleLearner(OWBaseLearner):
         # top-level control procedure
         top_box = gui.hBox(widget=self.controlArea, box=None)
 
-        rule_ordering_box = gui.hBox(widget=top_box, box="Rule ordering")
+        rule_ordering_box = gui.hBox(widget=top_box, box="规则排序")
         rule_ordering_rbs = gui.radioButtons(
             widget=rule_ordering_box, master=self, value="rule_ordering",
-            callback=self.settings_changed, btnLabels=("Ordered", "Unordered"))
+            callback=self.settings_changed, btnLabels=("有序", "无序"))
         rule_ordering_rbs.layout().setSpacing(7)
 
         covering_algorithm_box = gui.hBox(
-            widget=top_box, box="Covering algorithm")
+            widget=top_box, box="覆盖算法")
         covering_algorithm_rbs = gui.radioButtons(
             widget=covering_algorithm_box, master=self,
             value="covering_algorithm",
             callback=self.settings_changed,
-            btnLabels=("Exclusive", "Weighted"))
+            btnLabels=("独占", "加权"))
         covering_algorithm_rbs.layout().setSpacing(7)
 
         insert_gamma_box = gui.vBox(widget=covering_algorithm_box, box=None)
@@ -269,12 +269,12 @@ class OWRuleLearner(OWBaseLearner):
             enabled=self.covering_algorithm == 1)
 
         # bottom-level search procedure (search bias)
-        middle_box = gui.vBox(widget=self.controlArea, box="Rule search")
+        middle_box = gui.vBox(widget=self.controlArea, box="规则搜索")
 
         gui.comboBox(
             widget=middle_box, master=self, value="evaluation_measure",
             label="Evaluation measure:", orientation=Qt.Horizontal,
-            items=("Entropy", "Laplace accuracy", "WRAcc"),
+            items=("熵", "拉普拉斯精度", "WRAcc"),
             callback=self.settings_changed, contentsLength=3)
 
         gui.spin(
@@ -284,7 +284,7 @@ class OWRuleLearner(OWBaseLearner):
             controlWidth=80)
 
         # bottom-level search procedure (over-fitting avoidance bias)
-        bottom_box = gui.vBox(widget=self.controlArea, box="Rule filtering")
+        bottom_box = gui.vBox(widget=self.controlArea, box="规则过滤")
 
         gui.spin(
             widget=bottom_box, master=self, value="min_covered_examples", minv=1,
@@ -345,16 +345,16 @@ class OWRuleLearner(OWBaseLearner):
 
     def get_learner_parameters(self):
         return OrderedDict([
-            ("Rule ordering", self.storage_orders[self.rule_ordering]),
-            ("Covering algorithm", self.storage_covers[self.covering_algorithm]),
+            ("规则排序", self.storage_orders[self.rule_ordering]),
+            ("覆盖算法", self.storage_covers[self.covering_algorithm]),
             ("Gamma", self.gamma),
-            ("Evaluation measure", self.storage_measures[self.evaluation_measure]),
-            ("Beam width", self.beam_width),
-            ("Minimum rule coverage", self.min_covered_examples),
-            ("Maximum rule length", self.max_rule_length),
-            ("Default alpha", (1.0 if not self.checked_default_alpha
+            ("评估指标", self.storage_measures[self.evaluation_measure]),
+            ("束宽", self.beam_width),
+            ("最小规则覆盖率", self.min_covered_examples),
+            ("最大规则长度", self.max_rule_length),
+            ("默认 alpha", (1.0 if not self.checked_default_alpha
                                else self.default_alpha)),
-            ("Parent alpha", (1.0 if not self.checked_parent_alpha
+            ("父 alpha", (1.0 if not self.checked_parent_alpha
                               else self.parent_alpha))
         ])
 

@@ -24,7 +24,7 @@ class ThresholdClassifier(Model):
     def __init__(self, base_model, threshold):
         if not base_model.domain.class_var.is_discrete \
                 or len(base_model.domain.class_var.values) != 2:
-            raise ValueError("ThresholdClassifier requires a binary class")
+            raise ValueError("ThresholdClassifier需要二进制类")
 
         super().__init__(base_model.domain, base_model.original_domain)
         self.name = f"{base_model.name}, thresh={threshold:.2f}"
@@ -72,7 +72,7 @@ class ThresholdLearner(Learner):
         """
         if not data.domain.class_var.is_discrete \
                 or len(data.domain.class_var.values) != 2:
-            raise ValueError("ThresholdLearner requires a binary class")
+            raise ValueError("ThresholdLearner需要二进制类")
 
         res = TestOnTrainingData(store_models=True)(data, [self.base_learner])
         model = res.models[0, 0]
@@ -97,7 +97,7 @@ class CalibratedClassifier(Model):
     """
     def __init__(self, base_model, calibrators):
         if not base_model.domain.class_var.is_discrete:
-            raise ValueError("CalibratedClassifier requires a discrete target")
+            raise ValueError("CalibratedClassifier需要离散目标")
 
         super().__init__(base_model.domain, base_model.original_domain)
         self.base_model = base_model

@@ -84,19 +84,19 @@ def format_time_diff(start, end, round_up_after=2):
 
     # Check which resolution is most appropriate
     if years >= round_up_after:
-        return f'~{years} years'
+        return f'~{years} 年'
     elif months >= round_up_after:
-        return f'~{months} months'
+        return f'~{months} 月'
     elif weeks >= round_up_after:
-        return f'~{weeks} weeks'
+        return f'~{weeks} 周'
     elif days >= round_up_after:
-        return f'~{days} days'
+        return f'~{days} 天'
     elif hours >= round_up_after:
-        return f'~{hours} hours'
+        return f'~{hours} 小时'
     elif minutes >= round_up_after:
-        return f'~{minutes} minutes'
+        return f'~{minutes} 分钟'
     else:
-        return f'{seconds} seconds'
+        return f'{seconds} 秒'
 
 
 class FeatureStatisticsTableModel(AbstractSortTableModel):
@@ -116,15 +116,15 @@ class FeatureStatisticsTableModel(AbstractSortTableModel):
         @property
         def name(self):
             return {self.ICON: '',
-                    self.NAME: 'Name',
-                    self.DISTRIBUTION: 'Distribution',
-                    self.CENTER: 'Mean',
-                    self.MODE: 'Mode',
-                    self.MEDIAN: 'Median',
-                    self.DISPERSION: 'Dispersion',
-                    self.MIN: 'Min.',
-                    self.MAX: 'Max.',
-                    self.MISSING: 'Missing',
+                    self.NAME: '名称',
+                    self.DISTRIBUTION: '分布',
+                    self.CENTER: '平均值',
+                    self.MODE: '模式',
+                    self.MEDIAN: '中位数',
+                    self.DISPERSION: '离散',
+                    self.MIN: '最小值',
+                    self.MAX: '最大值',
+                    self.MISSING: '缺失值',
                     }[self.value]
 
         @property
@@ -321,17 +321,17 @@ class FeatureStatisticsTableModel(AbstractSortTableModel):
         else:
             x = np.vstack((self._dispersion, self._missing)).T
             attrs = [ContinuousVariable(name)
-                     for name in ("Entropy", self.Columns.MISSING.name)]
+                     for name in ("熵", self.Columns.MISSING.name)]
 
         names = [var.name for var in self.variables]
         modes = [var.str_val(val)
                  for var, val in zip(self.variables, self._mode)]
         metas = np.vstack((names, modes)).T
-        meta_attrs = [StringVariable('Feature'), StringVariable('Mode')]
+        meta_attrs = [StringVariable('特征'), StringVariable('模式')]
 
         domain = Domain(attributes=attrs, metas=meta_attrs)
         statistics = Table.from_numpy(domain, x, metas=metas)
-        statistics.name = f'{self.table.name} (Feature Statistics)'
+        statistics.name = f'{self.table.name} (特征统计)'
         return statistics
 
     def __compute_stat(self, matrices, discrete_f=None, continuous_f=None,
@@ -730,16 +730,16 @@ class DistributionDelegate(NoFocusRectDelegate):
 
 
 class OWFeatureStatistics(widget.OWWidget):
-    name = 'Feature Statistics'
-    description = 'Show basic statistics for data features.'
+    name = '特征统计 Feature Statistics'
+    description = '显示数据特征的基本统计'
     icon = 'icons/FeatureStatistics.svg'
 
     class Inputs:
-        data = Input('Data', Table, default=True)
+        data = Input('数据', Table, default=True)
 
     class Outputs:
-        reduced_data = Output('Reduced Data', Table, default=True)
-        statistics = Output('Statistics', Table)
+        reduced_data = Output('减少的数据', Table, default=True)
+        statistics = Output('统计', Table)
 
     want_main_area = False
 
@@ -775,7 +775,7 @@ class OWFeatureStatistics(widget.OWWidget):
 
         self.color_var_model = DomainModel(
             valid_types=(ContinuousVariable, DiscreteVariable),
-            placeholder='None',
+            placeholder='无',
         )
         self.cb_color_var = gui.comboBox(
             self.buttonsArea, master=self, value='color_var', model=self.color_var_model,

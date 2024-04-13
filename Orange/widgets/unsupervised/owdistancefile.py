@@ -19,21 +19,21 @@ from Orange.widgets.widget import Output
 
 
 class OWDistanceFile(widget.OWWidget, RecentPathsWComboMixin):
-    name = "Distance File"
+    name = "距离文件 Distance File"
     id = "orange.widgets.unsupervised.distancefile"
-    description = "Read distances from a file."
+    description = "从文件读取距离。"
     icon = "icons/DistanceFile.svg"
     priority = 10
     keywords = "distance file, load, read, open"
 
     class Outputs:
-        distances = Output("Distances", DistMatrix, dynamic=False)
+        distances = Output("距离", DistMatrix, dynamic=False)
 
     class Error(widget.OWWidget.Error):
-        invalid_file = Msg("Data was not loaded:{}")
+        invalid_file = Msg("数据未加载:{}")
         non_square_matrix = Msg(
-            "Matrix is not square. "
-            "Reformat the file and use the File widget to read it.")
+            "矩阵不是方阵。"
+            "重新格式化文件并使用文件部件读取。")
 
     want_main_area = False
     resizing_enabled = False
@@ -45,7 +45,7 @@ class OWDistanceFile(widget.OWWidget, RecentPathsWComboMixin):
         RecentPathsWComboMixin.__init__(self)
         self.distances = None
 
-        vbox = gui.vBox(self.controlArea, "Distance File")
+        vbox = gui.vBox(self.controlArea, "距离文件")
         box = gui.hBox(vbox)
         self.file_combo.setMinimumWidth(300)
         box.layout().addWidget(self.file_combo)
@@ -57,22 +57,22 @@ class OWDistanceFile(widget.OWWidget, RecentPathsWComboMixin):
             QSizePolicy.Maximum, QSizePolicy.Fixed)
 
         button = gui.button(
-            box, self, "Reload", callback=self.reload, default=True)
+            box, self, "重新加载", callback=self.reload, default=True)
         button.setIcon(self.style().standardIcon(QStyle.SP_BrowserReload))
         button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        vbox = gui.vBox(self.controlArea, "Options")
+        vbox = gui.vBox(self.controlArea, "选项")
         gui.checkBox(
             vbox, self, "auto_symmetric",
-            "Treat triangular matrices as symmetric",
-            tooltip="If matrix is triangular, this will copy the data to the "
-                    "other triangle",
+            "将三角矩阵视为对称矩阵",
+            tooltip="如果矩阵是三角形的,这将复制数据到"
+                    "另一个三角形",
             callback=self.commit
         )
 
         gui.rubber(self.buttonsArea)
         gui.button(
-            self.buttonsArea, self, "Browse documentation datasets",
+            self.buttonsArea, self, "浏览文档数据集",
             callback=lambda: self.browse_file(True), autoDefault=False)
         gui.rubber(self.buttonsArea)
 
@@ -95,15 +95,15 @@ class OWDistanceFile(widget.OWWidget, RecentPathsWComboMixin):
             start_file = get_sample_datasets_dir()
             if not os.path.exists(start_file):
                 QMessageBox.information(
-                    None, "File",
-                    "Cannot find the directory with documentation datasets")
+                    None, "文件",
+                    "无法找到包含文档数据集的目录")
                 return
         else:
             start_file = self.last_path() or os.path.expanduser("~/")
 
         filename, _ = QFileDialog.getOpenFileName(
-            self, 'Open Distance File', start_file,
-            "Excel File (*.xlsx);;Distance File (*.dst)")
+            self, '打开距离文件', start_file,
+            "Excel 文件 (*.xlsx);;距离文件 (*.dst)")
         if not filename:
             return
         self.add_path(filename)
@@ -117,7 +117,7 @@ class OWDistanceFile(widget.OWWidget, RecentPathsWComboMixin):
             dir_name, basename = os.path.split(fn)
             if os.path.exists(os.path.join(".", basename)):
                 fn = os.path.join(".", basename)
-        if fn and fn != "(none)":
+        if fn and fn != "(无)":
             try:
                 distances = DistMatrix.from_file(fn)
             except Exception as exc:
@@ -144,9 +144,9 @@ class OWDistanceFile(widget.OWWidget, RecentPathsWComboMixin):
 
     def send_report(self):
         if not self.distances:
-            self.report_paragraph("No data was loaded.")
+            self.report_paragraph("未加载任何数据。")
         else:
-            self.report_items([("File name", self.distances.name)])
+            self.report_items([("文件名", self.distances.name)])
 
 
 class OWDistanceFileDropHandler(SingleFileDropHandler):

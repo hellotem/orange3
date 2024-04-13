@@ -50,7 +50,7 @@ class Projector(ReprableWithPreprocessors):
     def __call__(self, data, progress_callback=None):
         if progress_callback is None:
             progress_callback = dummy_callback
-        progress_callback(0, "Preprocessing...")
+        progress_callback(0, "预处理...")
         try:
             cb = wrap_callback(progress_callback, end=0.1)
             data = self.preprocess(data, progress_callback=cb)
@@ -62,7 +62,7 @@ class Projector(ReprableWithPreprocessors):
                           "will result in an error in the future.",
                           OrangeDeprecationWarning, stacklevel=2)
         self.domain = data.domain
-        progress_callback(0.1, "Fitting...")
+        progress_callback(0.1, "拟合...")
         clf = self.fit(data.X, data.Y)
         clf.pre_domain = data.domain
         clf.name = self.name

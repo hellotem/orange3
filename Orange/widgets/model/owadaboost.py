@@ -12,8 +12,8 @@ from Orange.widgets.widget import Msg, Input
 
 class OWAdaBoost(OWBaseLearner):
     name = "AdaBoost"
-    description = "An ensemble meta-algorithm that combines weak learners " \
-                  "and adapts to the 'hardness' of each training sample. "
+    description = "一种集成元算法,结合弱学习器" \
+                  '并适应每个训练样本的"难度"。'
     icon = "icons/AdaBoost.svg"
     replaces = [
         "Orange.widgets.classify.owadaboost.OWAdaBoostClassification",
@@ -25,12 +25,12 @@ class OWAdaBoost(OWBaseLearner):
     LEARNER = SklAdaBoostLearner
 
     class Inputs(OWBaseLearner.Inputs):
-        learner = Input("Learner", Learner)
+        learner = Input("学习器", Learner)
 
     #: Algorithms for classification problems
     algorithms = ["SAMME", "SAMME.R"]
     #: Losses for regression problems
-    losses = ["Linear", "Square", "Exponential"]
+    losses = ["线性", "平方", "指数"]
 
     n_estimators = Setting(50)
     learning_rate = Setting(1.)
@@ -42,14 +42,14 @@ class OWAdaBoost(OWBaseLearner):
     DEFAULT_BASE_ESTIMATOR = SklTreeLearner()
 
     class Error(OWBaseLearner.Error):
-        no_weight_support = Msg('The base learner does not support weights.')
+        no_weight_support = Msg('基学习器不支持权重。')
 
     def add_main_layout(self):
         # this is part of init, pylint: disable=attribute-defined-outside-init
-        box = gui.widgetBox(self.controlArea, "Parameters")
+        box = gui.widgetBox(self.controlArea, "参数")
         self.base_estimator = self.DEFAULT_BASE_ESTIMATOR
         self.base_label = gui.label(
-            box, self, "Base estimator: " + self.base_estimator.name.title())
+            box, self, "基估计器: " + self.base_estimator.name.title())
 
         self.n_estimators_spin = gui.spin(
             box, self, "n_estimators", 1, 10000, label="Number of estimators:",
@@ -66,7 +66,7 @@ class OWAdaBoost(OWBaseLearner):
             checkCallback=self.settings_changed)
 
         # Algorithms
-        box = gui.widgetBox(self.controlArea, "Boosting method")
+        box = gui.widgetBox(self.controlArea, "提升方法")
         self.cls_algorithm_combo = gui.comboBox(
             box, self, "algorithm_index", label="Classification algorithm:",
             items=self.algorithms,
@@ -97,19 +97,19 @@ class OWAdaBoost(OWBaseLearner):
             # Clear the error and reset to default base learner
             self.Error.no_weight_support()
             self.base_estimator = None
-            self.base_label.setText("Base estimator: INVALID")
+            self.base_label.setText("基估计器: 无效")
         else:
             self.base_estimator = learner or self.DEFAULT_BASE_ESTIMATOR
             self.base_label.setText(
-                "Base estimator: %s" % self.base_estimator.name.title())
+                "基估计器: %s" % self.base_estimator.name.title())
         self.learner = self.model = None
 
     def get_learner_parameters(self):
-        return (("Base estimator", self.base_estimator),
-                ("Number of estimators", self.n_estimators),
-                ("Algorithm (classification)", self.algorithms[
+        return (("基估计器", self.base_estimator),
+                ("估计器数量", self.n_estimators),
+                ("算法 (分类)", self.algorithms[
                     self.algorithm_index].capitalize()),
-                ("Loss (regression)", self.losses[
+                ("损失 (回归)", self.losses[
                     self.loss_index].capitalize()))
 
 

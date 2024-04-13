@@ -79,16 +79,16 @@ def default_font_size() -> int:
 class Updater:
     """ Class with helper functions and constants. """
     FONT_FAMILY_LABEL, SIZE_LABEL, IS_ITALIC_LABEL = \
-        "Font family", "Font size", "Italic"
+        "字体族", "字体大小", "斜体"
 
     WIDTH_LABEL, ALPHA_LABEL, STYLE_LABEL, ANTIALIAS_LABEL = \
-        "Width", "Opacity", "Style", "Antialias"
-    LINE_STYLES = {"Solid line": Qt.SolidLine,
-                   "Dash line": Qt.DashLine,
-                   "Dot line": Qt.DotLine,
-                   "Dash dot line": Qt.DashDotLine,
-                   "Dash dot dot line": Qt.DashDotDotLine}
-    DEFAULT_LINE_STYLE = "Solid line"
+        "宽度", "不透明度", "样式", "抗锯齿"
+    LINE_STYLES = {"实线": Qt.SolidLine,
+                   "虚线": Qt.DashLine,
+                   "点线": Qt.DotLine,
+                   "虚点线": Qt.DashDotLine,
+                   "虚点点线": Qt.DashDotDotLine}
+    DEFAULT_LINE_STYLE = "实线"
 
     @staticmethod
     def update_plot_title_text(title_item: pg.LabelItem, text: str):
@@ -242,20 +242,20 @@ class Updater:
 
 class CommonParameterSetter:
     """ Subclass to add 'setter' functionality to a plot. """
-    LABELS_BOX = "Fonts"
-    ANNOT_BOX = "Annotations"
-    PLOT_BOX = "Figure"
+    LABELS_BOX = "字体"
+    ANNOT_BOX = "注释"
+    PLOT_BOX = "图形"
 
-    FONT_FAMILY_LABEL = "Font family"
-    AXIS_TITLE_LABEL = "Axis title"
-    AXIS_TICKS_LABEL = "Axis ticks"
-    LEGEND_LABEL = "Legend"
-    LABEL_LABEL = "Label"
-    LINE_LAB_LABEL = "Line label"
+    FONT_FAMILY_LABEL = "字体族"
+    AXIS_TITLE_LABEL = "轴标题"
+    AXIS_TICKS_LABEL = "轴刻度"
+    LEGEND_LABEL = "图例"
+    LABEL_LABEL = "标签"
+    LINE_LAB_LABEL = "线标签"
     X_AXIS_LABEL = "x-axis title"
     Y_AXIS_LABEL = "y-axis title"
-    TITLE_LABEL = "Title"
-    LINE_LABEL = "Lines"
+    TITLE_LABEL = "标题"
+    LINE_LABEL = "线条"
 
     FONT_FAMILY_SETTING = None  # set in __init__ because it requires a running QApplication
     FONT_SETTING = None  # set in __init__ because it requires a running QApplication

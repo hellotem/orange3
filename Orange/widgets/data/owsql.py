@@ -37,16 +37,16 @@ class BackendModel(PyListModel):
 
 
 class OWSql(OWBaseSql):
-    name = "SQL Table"
+    name = "SQL 表 SQL Table"
     id = "orange.widgets.data.sql"
-    description = "Load dataset from SQL."
+    description = "从 SQL 加载数据集。"
     icon = "icons/SQLTable.svg"
     priority = 30
-    category = "Data"
-    keywords = "sql table, load"
+    category = "数据"
+    keywords = "sql 表,加载"
 
     class Outputs:
-        data = Output("Data", Table, doc="Attribute-valued dataset read from the input file.")
+        data = Output("数据", Table, doc="从输入文件读取的属性值数据集。")
 
     settings_version = 2
 
@@ -62,13 +62,13 @@ class OWSql(OWBaseSql):
     materialize_table_name = Setting("")
 
     class Information(OWBaseSql.Information):
-        data_sampled = Msg("Data description was generated from a sample.")
+        data_sampled = Msg("数据描述是从样本生成的。")
 
     class Warning(OWBaseSql.Warning):
-        missing_extension = Msg("Database is missing extensions: {}")
+        missing_extension = Msg("数据库缺少扩展: {}")
 
     class Error(OWBaseSql.Error):
-        no_backends = Msg("Please install a backend to use this widget.")
+        no_backends = Msg("请安装后端以使用此小部件。")
 
     def __init__(self):
         # Lint
@@ -106,7 +106,7 @@ class OWSql(OWBaseSql):
         self.selected_backend = backend.display_name if backend else None
 
     def _add_tables_controls(self):
-        vbox = gui.vBox(self.controlArea, "Tables")
+        vbox = gui.vBox(self.controlArea, "表")
         box = gui.vBox(vbox)
         self.tables = TableModel()
 
@@ -115,7 +115,7 @@ class OWSql(OWBaseSql):
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon
         )
         self.tablecombo.setModel(self.tables)
-        self.tablecombo.setToolTip('table')
+        self.tablecombo.setToolTip('表')
         self.tablecombo.activated[int].connect(self.select_table)
         box.layout().addWidget(self.tablecombo)
 
@@ -126,21 +126,21 @@ class OWSql(OWBaseSql):
         self.custom_sql.layout().addWidget(self.sqltext)
 
         mt = gui.hBox(self.custom_sql)
-        cb = gui.checkBox(mt, self, 'materialize', 'Materialize to table ')
-        cb.setToolTip('Save results of the query in a table')
+        cb = gui.checkBox(mt, self, 'materialize', '实体化为表 ')
+        cb.setToolTip('将查询结果保存在表中')
         le = gui.lineEdit(mt, self, 'materialize_table_name')
-        le.setToolTip('Save results of the query in a table')
+        le.setToolTip('将查询结果保存在表中')
 
-        gui.button(self.custom_sql, self, 'Execute', callback=self.open_table)
+        gui.button(self.custom_sql, self, '执行', callback=self.open_table)
 
         box.layout().addWidget(self.custom_sql)
 
         gui.checkBox(box, self, "guess_values",
-                     "Auto-discover categorical variables",
+                     "自动发现分类变量",
                      callback=self.open_table)
 
         self.downloadcb = gui.checkBox(box, self, "download",
-                                       "Download data to local memory",
+                                       "下载数据到本地内存",
                                        callback=self.open_table)
 
     def highlight_error(self, text=""):
@@ -185,8 +185,8 @@ class OWSql(OWBaseSql):
             self.data_desc_table = None
             return
 
-        self.tables.append("Select a table")
-        self.tables.append("Custom SQL")
+        self.tables.append("选择一个表")
+        self.tables.append("自定义 SQL")
         self.tables.extend(self.backend.list_tables(self.schema))
         index = self.tablecombo.findText(str(self.table))
         self.tablecombo.setCurrentIndex(index if index != -1 else 0)
@@ -195,13 +195,13 @@ class OWSql(OWBaseSql):
     # Called on tablecombo selection change:
     def select_table(self):
         curIdx = self.tablecombo.currentIndex()
-        if self.tablecombo.itemText(curIdx) != "Custom SQL":
+        if self.tablecombo.itemText(curIdx) != "自定义 SQL":
             self.custom_sql.setVisible(False)
             return self.open_table()
         else:
             self.custom_sql.setVisible(True)
             self.data_desc_table = None
-            self.database_desc["Table"] = "(None)"
+            self.database_desc["表"] = "(无)"
             self.table = None
             if len(str(self.sql)) > 14:
                 return self.open_table()
@@ -211,23 +211,23 @@ class OWSql(OWBaseSql):
         curIdx = self.tablecombo.currentIndex()
         if curIdx <= 0:
             if self.database_desc:
-                self.database_desc["Table"] = "(None)"
+                self.database_desc["Table"] = "(无)"
             self.data_desc_table = None
             return None
 
-        if self.tablecombo.itemText(curIdx) != "Custom SQL":
+        if self.tablecombo.itemText(curIdx) != "自定义 SQL":
             self.table = self.tables[self.tablecombo.currentIndex()]
             self.database_desc["Table"] = self.table
-            if "Query" in self.database_desc:
-                del self.database_desc["Query"]
+            if "查询" in self.database_desc:
+                del self.database_desc["查询"]
             what = self.table
         else:
             what = self.sql = self.sqltext.toPlainText()
-            self.table = "Custom SQL"
+            self.table = "自定义 SQL"
             if self.materialize:
                 if not self.materialize_table_name:
                     self.Error.connection(
-                        "Specify a table name to materialize the query")
+                        "指定一个表名来实体化查询")
                     return None
                 try:
                     with self.backend.execute_sql_query("DROP TABLE IF EXISTS " +
@@ -263,13 +263,13 @@ class OWSql(OWBaseSql):
         if table.approx_len() > LARGE_TABLE and self.guess_values:
             confirm = QMessageBox(self)
             confirm.setIcon(QMessageBox.Warning)
-            confirm.setText("Attribute discovery might take "
-                            "a long time on large tables.\n"
-                            "Do you want to auto discover attributes?")
-            confirm.addButton("Yes", QMessageBox.YesRole)
-            no_button = confirm.addButton("No", QMessageBox.NoRole)
+            confirm.setText("属性发现可能需要 "
+                            "在大表上花费很长时间。\n"
+                            "您要自动发现属性吗?")
+            confirm.addButton("是", QMessageBox.YesRole)
+            no_button = confirm.addButton("否", QMessageBox.NoRole)
             if is_postgres(self.backend):
-                sample_button = confirm.addButton("Yes, on a sample",
+                sample_button = confirm.addButton("是,在样本上",
                                                   QMessageBox.YesRole)
             confirm.exec()
             if confirm.clickedButton() == no_button:
@@ -295,14 +295,14 @@ class OWSql(OWBaseSql):
                 if is_postgres(self.backend):
                     confirm = QMessageBox(self)
                     confirm.setIcon(QMessageBox.Warning)
-                    confirm.setText("Data appears to be big. Do you really "
-                                    "want to download it to local memory?\n"
-                                    "Table length: {:,}. Limit {:,}".format(table.approx_len(), MAX_DL_LIMIT))
+                    confirm.setText("数据似乎很大。你真的 "
+                                    "要下载到本地内存吗?\n"
+                                    "表长度: {:,}。限制 {:,}".format(table.approx_len(), MAX_DL_LIMIT))
 
                     if table.approx_len() <= MAX_DL_LIMIT:
-                        confirm.addButton("Yes", QMessageBox.YesRole)
-                    no_button = confirm.addButton("No", QMessageBox.NoRole)
-                    sample_button = confirm.addButton("Yes, a sample",
+                        confirm.addButton("是", QMessageBox.YesRole)
+                    no_button = confirm.addButton("否", QMessageBox.NoRole)
+                    sample_button = confirm.addButton("是,一个样本",
                                                       QMessageBox.YesRole)
                     confirm.exec()
                     if confirm.clickedButton() == no_button:
@@ -313,16 +313,16 @@ class OWSql(OWBaseSql):
                 else:
                     if table.approx_len() > MAX_DL_LIMIT:
                         QMessageBox.warning(
-                            self, 'Warning',
-                            "Data is too big to download.\n"
-                            "Table length: {:,}. Limit {:,}".format(table.approx_len(), MAX_DL_LIMIT)
+                            self, '警告',
+                            "数据太大,无法下载。\n"
+                            "表长度: {:,}。限制 {:,}".format(table.approx_len(), MAX_DL_LIMIT)
                         )
                         return None
                     else:
                         confirm = QMessageBox.question(
-                            self, 'Question',
-                            "Data appears to be big. Do you really "
-                            "want to download it to local memory?",
+                            self, '问题',
+                            "数据似乎很大。你真的 "
+                            "要下载到本地内存吗?",
                             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                         if confirm == QMessageBox.No:
                             return None

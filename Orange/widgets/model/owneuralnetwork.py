@@ -65,9 +65,9 @@ class CancelTaskException(BaseException):
 
 
 class OWNNLearner(OWBaseLearner):
-    name = "Neural Network"
-    description = "A multi-layer perceptron (MLP) algorithm with " \
-                  "backpropagation."
+    name = "神经网络 Neural Network"
+    description = "一种带有" \
+                  "反向传播的多层感知器 (MLP) 算法。"
     icon = "icons/NN.svg"
     priority = 90
     keywords = "neural network, mlp"
@@ -75,9 +75,9 @@ class OWNNLearner(OWBaseLearner):
     LEARNER = NNLearner
 
     activation = ["identity", "logistic", "tanh", "relu"]
-    act_lbl = ["Identity", "Logistic", "tanh", "ReLu"]
+    act_lbl = ["恒等", "逻辑", "tanh", "整流线性单元"]
     solver = ["lbfgs", "sgd", "adam"]
-    solv_lbl = ["L-BFGS-B", "SGD", "Adam"]
+    solv_lbl = ["L-BFGS-B", "随机梯度下降", "Adam"]
 
     hidden_layers_input = Setting("100,")
     activation_index = Setting(3)
@@ -97,9 +97,9 @@ class OWNNLearner(OWBaseLearner):
                         range(100, 1001, 50)))
 
     class Warning(OWBaseLearner.Warning):
-        no_layers = Msg("ANN without hidden layers is equivalent to logistic "
-                        "regression with worse fitting.\nWe recommend using "
-                        "logistic regression.")
+        no_layers = Msg("没有隐藏层的人工神经网络等同于逻辑"
+                        "回归，但拟合效果更差。\n我们建议使用"
+                        "逻辑回归。")
 
     def add_main_layout(self):
         # this is part of init, pylint: disable=attribute-defined-outside-init
@@ -112,9 +112,9 @@ class OWNNLearner(OWBaseLearner):
             gui.lineEdit(
                 None, self, "hidden_layers_input",
                 orientation=Qt.Horizontal, callback=self.settings_changed,
-                tooltip="A list of integers defining neurons. Length of list "
-                        "defines the number of layers. E.g. 4, 2, 2, 3.",
-                placeholderText="e.g. 10,"))
+                tooltip="定义神经元的整数列表。列表长度"
+                        "定义层数。例如 4, 2, 2, 3。",
+                placeholderText="例如 10,"))
         form.addRow(
             "Activation:",
             gui.comboBox(
@@ -146,7 +146,7 @@ class OWNNLearner(OWBaseLearner):
 
         form.addRow(
             gui.checkBox(
-                None, self, "replicable", label="Replicable training",
+                None, self, "replicable", label="可复制训练",
                 callback=self.settings_changed, attribute=Qt.WA_LayoutUsesWidgetRect)
         )
 
@@ -167,7 +167,7 @@ class OWNNLearner(OWBaseLearner):
         self._executor = ThreadExecutor()
 
         # just a test cancel button
-        b = gui.button(self.apply_button, self, "Cancel",
+        b = gui.button(self.apply_button, self, "取消",
                        callback=self.cancel, addToLayout=False)
         self.apply_button.layout().insertStretch(0, 100)
         self.apply_button.layout().insertWidget(0, b)
@@ -183,12 +183,12 @@ class OWNNLearner(OWBaseLearner):
             preprocessors=self.preprocessors)
 
     def get_learner_parameters(self):
-        return (("Hidden layers", ', '.join(map(str, self.get_hidden_layers()))),
-                ("Activation", self.act_lbl[self.activation_index]),
-                ("Solver", self.solv_lbl[self.solver_index]),
-                ("Alpha", self.alpha),
-                ("Max iterations", self.max_iterations),
-                ("Replicable training", bool_str(self.replicable)))
+        return (("隐藏层", ', '.join(map(str, self.get_hidden_layers()))),
+                ("激活函数", self.act_lbl[self.activation_index]),
+                ("求解器", self.solv_lbl[self.solver_index]),
+                ("α", self.alpha),
+                ("最大迭代次数", self.max_iterations),
+                ("可复制训练", bool_str(self.replicable)))
 
     def get_hidden_layers(self):
         self.Warning.no_layers.clear()

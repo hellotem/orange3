@@ -50,9 +50,9 @@ from Orange.widgets.utils.dendrogram import DendrogramWidget
 __all__ = ["OWHierarchicalClustering"]
 
 
-LINKAGE = ["Single", "Average", "Weighted", "Complete", "Ward"]
+LINKAGE = ["单链接", "平均链接", "加权链接", "完全链接", "沃德法"]
 LINKAGE_ARGS = ["single", "average", "weighted", "complete", "ward"]
-DEFAULT_LINKAGE = "Ward"
+DEFAULT_LINKAGE = "沃德法"
 
 
 def make_pen(brush=Qt.black, width=1, style=Qt.SolidLine,
@@ -175,19 +175,19 @@ class GraphicsView(GraphicsWidgetView, StickyGraphicsView):
 
 
 class OWHierarchicalClustering(widget.OWWidget):
-    name = "Hierarchical Clustering"
-    description = "Display a dendrogram of a hierarchical clustering " \
-                  "constructed from the input distance matrix."
+    name = "层次聚类 Hierarchical Clustering"
+    description = "显示层次聚类的" \
+                  "由输入距离矩阵构建的树状图。"
     icon = "icons/HierarchicalClustering.svg"
     priority = 2100
     keywords = "hierarchical clustering"
 
     class Inputs:
-        distances = Input("Distances", Orange.misc.DistMatrix)
-        subset = Input("Data Subset", Orange.data.Table, explicit=True)
+        distances = Input("距离", Orange.misc.DistMatrix)
+        subset = Input("数据子集", Orange.data.Table, explicit=True)
 
     class Outputs:
-        selected_data = Output("Selected Data", Orange.data.Table, default=True)
+        selected_data = Output("选择的数据", Orange.data.Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Orange.data.Table)
 
     settings_version = 2
@@ -196,11 +196,11 @@ class OWHierarchicalClustering(widget.OWWidget):
     #: Selected linkage
     linkage = settings.Setting(LINKAGE.index(DEFAULT_LINKAGE))
     #: Index of the selected annotation item (variable, ...)
-    annotation = settings.ContextSetting("Enumeration")
+    annotation = settings.ContextSetting("枚举")
     #: Out-of-context setting for the case when the "Name" option is available
-    annotation_if_names = settings.Setting("Name")
+    annotation_if_names = settings.Setting("名称")
     #: Out-of-context setting for the case with just "Enumeration" and "None"
-    annotation_if_enumerate = settings.Setting("Enumeration")
+    annotation_if_enumerate = settings.Setting("枚举")
     #: Selected tree pruning (none/max depth)
     pruning = settings.Setting(0)
     #: Maximum depth when max depth pruning is selected
@@ -224,22 +224,22 @@ class OWHierarchicalClustering(widget.OWWidget):
 
     graph_name = "scene"  # QGraphicsScene
 
-    basic_annotations = [None, "Enumeration"]
+    basic_annotations = [None, "枚举"]
 
     class Error(widget.OWWidget.Error):
-        empty_matrix = Msg("Distance matrix is empty.")
-        not_finite_distances = Msg("Some distances are infinite")
-        not_symmetric = widget.Msg("Distance matrix is not symmetric.")
+        empty_matrix = Msg("距离矩阵为空。")
+        not_finite_distances = Msg("存在无穷大距离")
+        not_symmetric = widget.Msg("距离矩阵不对称")
 
     class Warning(widget.OWWidget.Warning):
         subset_on_no_table = \
-            Msg("Unused data subset: distances do not refer to data instances")
+            Msg("未使用数据子集:距离不指代数据实例")
         subset_not_subset = \
-            Msg("Some data from the subset does not appear in distance matrix")
+            Msg("子集中的某些数据不在距离矩阵中")
         subset_wrong = \
-            Msg("Subset data refers to a different table")
+            Msg("子集数据指代了不同的表")
         pruning_disables_colors = \
-            Msg("Pruned cluster doesn't show colors and indicate subset")
+            Msg("剪枝后的簇没有显示颜色和指示子集")
 
     #: Stored (manual) selection state (from a saved workflow) to restore.
     __pending_selection_restore = None  # type: Optional[SelectionState]
@@ -258,14 +258,14 @@ class OWHierarchicalClustering(widget.OWWidget):
 
         spin_width = QFontMetrics(self.font()).horizontalAdvance("M" * 7)
         gui.comboBox(
-            self.controlArea, self, "linkage", items=LINKAGE, box="Linkage",
+            self.controlArea, self, "linkage", items=LINKAGE, box="链接方法",
             callback=self._invalidate_clustering)
 
-        model = itemmodels.VariableListModel(placeholder="None")
+        model = itemmodels.VariableListModel(placeholder="无")
         model[:] = self.basic_annotations
 
         grid = QGridLayout()
-        gui.widgetBox(self.controlArea, "Annotations", orientation=grid)
+        gui.widgetBox(self.controlArea, "注释", orientation=grid)
         self.label_cb = cb = combobox.ComboBoxSearch(
             minimumContentsLength=14,
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon
@@ -286,14 +286,14 @@ class OWHierarchicalClustering(widget.OWWidget):
         grid.addWidget(self.label_cb, 0, 0, 1, 2)
 
         cb = gui.checkBox(
-            None, self, "label_only_subset", "Show labels only for subset",
+            None, self, "label_only_subset", "仅为子集显示标签",
             disabled=True,
             callback=self._update_labels, stateWhenDisabled=False)
         grid.addWidget(cb, 1, 0, 1, 2)
 
         model = itemmodels.DomainModel(
             valid_types=(DiscreteVariable, ContinuousVariable),
-            placeholder="None")
+            placeholder="无")
         cb = gui.comboBox(
             None, self, "color_by", orientation=Qt.Horizontal,
             model=model, callback=self._update_labels,
@@ -304,12 +304,12 @@ class OWHierarchicalClustering(widget.OWWidget):
         grid.addWidget(cb, 2, 1)
 
         box = gui.radioButtons(
-            self.controlArea, self, "pruning", box="Pruning",
+            self.controlArea, self, "pruning", box="剪枝",
             callback=self._invalidate_pruning)
         grid = QGridLayout()
         box.layout().addLayout(grid)
         grid.addWidget(
-            gui.appendRadioButton(box, "None", addToLayout=False),
+            gui.appendRadioButton(box, "无", addToLayout=False),
             0, 0
         )
         self.max_depth_spin = gui.spin(
@@ -328,14 +328,14 @@ class OWHierarchicalClustering(widget.OWWidget):
 
         self.selection_box = gui.radioButtons(
             self.controlArea, self, "selection_method",
-            box="Selection",
+            box="选择",
             callback=self._selection_method_changed)
 
         grid = QGridLayout()
         self.selection_box.layout().addLayout(grid)
         grid.addWidget(
             gui.appendRadioButton(
-                self.selection_box, "Manual", addToLayout=False),
+                self.selection_box, "手动", addToLayout=False),
             0, 0
         )
         grid.addWidget(
@@ -349,7 +349,7 @@ class OWHierarchicalClustering(widget.OWWidget):
             spinType=float, callback=self._cut_ratio_changed,
             addToLayout=False
         )
-        self.cut_ratio_spin.setSuffix(" %")
+        self.cut_ratio_spin.setSuffix("%")
         self.cut_ratio_spin.lineEdit().returnPressed.connect(
             self._cut_ratio_return)
 
@@ -368,20 +368,20 @@ class OWHierarchicalClustering(widget.OWWidget):
         grid.addWidget(self.top_n_spin, 2, 1)
 
         self.zoom_slider = gui.hSlider(
-            self.controlArea, self, "zoom_factor", box="Zoom",
+            self.controlArea, self, "zoom_factor", box="缩放",
             minValue=-6, maxValue=3, step=1, ticks=True, createLabel=False,
             callback=self.__update_font_scale)
 
         zoom_in = QAction(
-            "Zoom in", self, shortcut=QKeySequence.ZoomIn,
+            "放大", self, shortcut=QKeySequence.ZoomIn,
             triggered=self.__zoom_in
         )
         zoom_out = QAction(
-            "Zoom out", self, shortcut=QKeySequence.ZoomOut,
+            "缩小", self, shortcut=QKeySequence.ZoomOut,
             triggered=self.__zoom_out
         )
         zoom_reset = QAction(
-            "Reset zoom", self,
+            "重置缩放", self,
             shortcut=QKeySequence(Qt.ControlModifier | Qt.Key_0),
             triggered=self.__zoom_reset
         )
@@ -529,7 +529,7 @@ class OWHierarchicalClustering(widget.OWWidget):
         color_model.set_domain(None)
         self.color_by = None
         if len(model) == 2 and model[0] is None:
-            if model[1] == "Name":
+            if model[1] == "名称":
                 self.annotation_if_names = self.annotation
             if model[1] == self.basic_annotations[1]:
                 self.annotation_if_enumerate = self.annotation
@@ -567,7 +567,7 @@ class OWHierarchicalClustering(widget.OWWidget):
                 or (isinstance(items, list) and \
                     all(isinstance(var, Orange.data.Variable)
                         for var in items)):
-            model[:] = (None, "Name")
+            model[:] = (None, "名称")
             self.annotation = self.annotation_if_names
         else:
             model[:] = self.basic_annotations
@@ -637,9 +637,9 @@ class OWHierarchicalClustering(widget.OWWidget):
                     labels = [""] * len(indices)
                 else:
                     labels = []
-            elif self.annotation == "Enumeration":
+            elif self.annotation == "枚举":
                 labels = [str(i+1) for i in indices]
-            elif self.annotation == "Name":
+            elif self.annotation == "名称":
                 attr = self.matrix.row_items.domain.attributes
                 labels = [str(attr[i]) for i in indices]
             elif isinstance(self.annotation, Orange.data.Variable):
@@ -655,7 +655,7 @@ class OWHierarchicalClustering(widget.OWWidget):
 
             if labels and self._displayed_root is not self.root:
                 joined = leaves(self._displayed_root)
-                labels = [", ".join(labels[leaf.value.first: leaf.value.last])
+                labels = [",".join(labels[leaf.value.first: leaf.value.last])
                           for leaf in joined]
 
         self.label_model[:] = labels
@@ -798,7 +798,7 @@ class OWHierarchicalClustering(widget.OWWidget):
             for i, indices in enumerate(maps):
                 c[indices] = i
 
-            clust_name = get_unique_names(domain, "Cluster")
+            clust_name = get_unique_names(domain, "簇")
             values = [f"C{i + 1}" for i in range(len(maps))]
 
             sel_clust_var = Orange.data.DiscreteVariable(
@@ -810,7 +810,7 @@ class OWHierarchicalClustering(widget.OWWidget):
                 domain=sel_domain, length=len(selected_indices))
 
             ann_clust_var = Orange.data.DiscreteVariable(
-                name=clust_name, values=values + ["Other"]
+                name=clust_name, values=values + ["其他"]
             )
             ann_domain = add_columns(
                 domain_with_annotation_column(data)[0], metas=(ann_clust_var, ))
@@ -830,7 +830,7 @@ class OWHierarchicalClustering(widget.OWWidget):
                                         [(0, unselected_indices)]):
                 for i in indices:
                     attr = items.domain[i].copy()
-                    attr.attributes["cluster"] = clust
+                    attr.attributes["簇"] = clust
                     attrs.append(attr)
             all_domain = Orange.data.Domain(
                 # len(unselected_indices) can be 0
@@ -1047,17 +1047,17 @@ class OWHierarchicalClustering(widget.OWWidget):
         if isinstance(self.annotation, str):
             annot = annot.lower()
         if self.selection_method == 0:
-            sel = "manual"
+            sel = "手动"
         elif self.selection_method == 1:
-            sel = "at {:.1f} of height".format(self.cut_ratio)
+            sel = "高度为 {:.1f}".format(self.cut_ratio)
         else:
-            sel = f"top {self.top_n} {pl(self.top_n, 'cluster')}"
+            sel = f"前 {self.top_n} 个{pl(self.top_n, '簇')}"
         self.report_items((
-            ("Linkage", LINKAGE[self.linkage]),
-            ("Annotation", annot),
-            ("Pruning",
-             self.pruning != 0 and "{} levels".format(self.max_depth)),
-            ("Selection", sel),
+            ("链接方法", LINKAGE[self.linkage]),
+            ("注释 ", annot),
+            ("剪枝",
+             self.pruning != 0 and "{} 层".format(self.max_depth)),
+            ("选择", sel),
         ))
         self.report_plot()
 

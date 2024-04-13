@@ -36,19 +36,19 @@ class GraphicsWidgetView(QGraphicsView):
         self.__zoomFactor = 100
 
         zoomin = QAction(
-            "Zoom in", self, objectName="zoom-in-action",
+            "放大", self, objectName="zoom-in-action",
             shortcut=QKeySequence.ZoomIn,
         )
         zoomout = QAction(
-            "Zoom out", self, objectName="zoom-out-action",
+            "缩小", self, objectName="zoom-out-action",
             shortcut=QKeySequence.ZoomOut,
         )
         zoomreset = QAction(
-            "Actual Size", self, objectName="zoom-reset-action",
+            "实际大小", self, objectName="zoom-reset-action",
             shortcut=QKeySequence(Qt.ControlModifier | Qt.Key_0),
         )
         fit = QAction(
-            "Zoom to fit", self, objectName="zoom-to-fit-action",
+            "适合大小", self, objectName="zoom-to-fit-action",
             shortcut=QKeySequence(Qt.ControlModifier | Qt.Key_9),
             checkable=True,
         )

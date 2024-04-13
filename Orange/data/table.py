@@ -460,7 +460,7 @@ class Table(Sequence, Storage):
     explicit deactivation (False) that some add-ons might need. """
 
     __file__ = None
-    name = "untitled"
+    name = "无标题"
 
     domain = Domain([])
     _X = _Y = _metas = _W = np.zeros((0, 0))  # pylint: disable=invalid-name
@@ -1363,7 +1363,7 @@ class Table(Sequence, Storage):
         for table in reversed(tables):
             conc.attributes.update(table.attributes)
 
-        names = [table.name for table in tables if table.name != "untitled"]
+        names = [table.name for table in tables if table.name != "无标题"]
         if names:
             conc.name = names[0]
         return conc
@@ -2213,7 +2213,7 @@ class Table(Sequence, Storage):
 
     @classmethod
     def transpose(cls, table, feature_names_column="",
-                  meta_attr_name="Feature name", feature_name="Feature",
+                  meta_attr_name="特征名", feature_name="Feature",
                   remove_redundant_inst=False, progress_callback=None):
         """
         Transpose the table.

@@ -246,28 +246,28 @@ class ElidedAxisNoUnits(ElidedLabelsAxis):
 
 
 class OWDistributions(OWWidget):
-    name = "Distributions"
-    description = "Display value distributions of a data feature in a graph."
+    name = "分布 Distributions"
+    description = "图形显示数据特征的值分布"
     icon = "icons/Distribution.svg"
     priority = 120
-    keywords = "distributions, histogram"
+    keywords = "分布，直方图"
 
     class Inputs:
-        data = Input("Data", Table, doc="Set the input dataset")
+        data = Input("数据", Table, doc="设置输入数据集")
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选择的数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
-        histogram_data = Output("Histogram Data", Table)
+        histogram_data = Output("直方图数据", Table)
 
     class Error(OWWidget.Error):
         no_defined_values_var = \
-            Msg("Variable '{}' does not have any defined values")
+            Msg("变量 '{}' 没有定义的值")
         no_defined_values_pair = \
-            Msg("No data instances with '{}' and '{}' defined")
+            Msg("没有同时定义 '{}' 和 '{}' 的数据实例")
 
     class Warning(OWWidget.Warning):
-        ignored_nans = Msg("Data instances with missing values are ignored")
+        ignored_nans = Msg("忽略缺失值的数据实例")
 
     settingsHandler = settings.DomainContextHandler()
     settings_version = 2
@@ -291,15 +291,15 @@ class OWDistributions(OWWidget):
     graph_name = "plot"  # pg.GraphicsItem (pg.ViewBox)
 
     Fitters = (
-        ("None", None, (), ()),
-        ("Normal", norm, ("loc", "scale"), ("μ", "σ")),
-        ("Beta", beta, ("a", "b", "loc", "scale"),
+        ("无", None, (), ()),
+        ("正态", norm, ("loc", "scale"), ("μ", "σ")),
+        ("贝塔", beta, ("a", "b", "loc", "scale"),
          ("α", "β", "-loc", "-scale")),
-        ("Gamma", gamma, ("a", "loc", "scale"), ("α", "β", "-loc", "-scale")),
-        ("Rayleigh", rayleigh, ("loc", "scale"), ("-loc", "σ")),
-        ("Pareto", pareto, ("b", "loc", "scale"), ("α", "-loc", "-scale")),
-        ("Exponential", expon, ("loc", "scale"), ("-loc", "λ")),
-        ("Kernel density", AshCurve, ("a",), ("",))
+        ("伽马", gamma, ("a", "loc", "scale"), ("α", "β", "-loc", "-scale")),
+        ("瑞利", rayleigh, ("loc", "scale"), ("-loc", "σ")),
+        ("帕累托", pareto, ("b", "loc", "scale"), ("α", "-loc", "-scale")),
+        ("指数", expon, ("loc", "scale"), ("-loc", "λ")),
+        ("核密度", AshCurve, ("a",), ("",))
     )
 
     DragNone, DragAdd, DragRemove = range(3)
@@ -320,24 +320,24 @@ class OWDistributions(OWWidget):
         self._user_var_bins = {}
 
         varview = gui.listView(
-            self.controlArea, self, "var", box="Variable",
+            self.controlArea, self, "var", box="变量",
             model=DomainModel(valid_types=DomainModel.PRIMITIVE,
                               separators=False),
             callback=self._on_var_changed,
             viewType=ListViewSearch
         )
         gui.checkBox(
-            varview.box, self, "sort_by_freq", "Sort categories by frequency",
+            varview.box, self, "sort_by_freq", "按频率排序类别",
             callback=self._on_sort_by_freq, stateWhenDisabled=False)
 
-        box = self.continuous_box = gui.vBox(self.controlArea, "Distribution")
+        box = self.continuous_box = gui.vBox(self.controlArea, "分布")
         gui.comboBox(
-            box, self, "fitted_distribution", label="Fitted distribution",
+            box, self, "fitted_distribution", label="拟合分布",
             orientation=Qt.Horizontal, items=(name[0] for name in self.Fitters),
             callback=self._on_fitted_dist_changed)
         slider = gui.hSlider(
             box, self, "number_of_bins",
-            label="Bin width", orientation=Qt.Horizontal,
+            label="箱宽", orientation=Qt.Horizontal,
             minValue=0, maxValue=max(1, len(self.binnings) - 1),
             createLabel=False, callback=self._on_bins_changed)
         self.bin_width_label = gui.widgetLabel(slider.box)
@@ -346,28 +346,28 @@ class OWDistributions(OWWidget):
         slider.sliderReleased.connect(self._on_bin_slider_released)
         self.smoothing_box = gui.hSlider(
             box, self, "kde_smoothing",
-            label="Smoothing", orientation=Qt.Horizontal,
+            label="平滑", orientation=Qt.Horizontal,
             minValue=2, maxValue=20, callback=self.replot, disabled=True)
         gui.checkBox(
-            box, self, "hide_bars", "Hide bars", stateWhenDisabled=False,
+            box, self, "hide_bars", "隐藏条形", stateWhenDisabled=False,
             callback=self._on_hide_bars_changed,
             disabled=not self.fitted_distribution)
 
-        box = gui.vBox(self.controlArea, "Columns")
+        box = gui.vBox(self.controlArea, "列")
         gui.comboBox(
-            box, self, "cvar", label="Split by", orientation=Qt.Horizontal,
+            box, self, "cvar", label="拆分依据", orientation=Qt.Horizontal,
             searchable=True,
-            model=DomainModel(placeholder="(None)",
+            model=DomainModel(placeholder="(无)",
                               valid_types=(DiscreteVariable), ),
             callback=self._on_cvar_changed, contentsLength=18)
         gui.checkBox(
-            box, self, "stacked_columns", "Stack columns",
+            box, self, "stacked_columns", "堆叠列",
             callback=self.replot)
         gui.checkBox(
-            box, self, "show_probs", "Show probabilities",
+            box, self, "show_probs", "显示概率",
             callback=self._on_show_probabilities_changed)
         gui.checkBox(
-            box, self, "cumulative_distr", "Show cumulative distribution",
+            box, self, "cumulative_distr", "显示累积分布",
             callback=self._on_show_cumulative)
 
         gui.auto_apply(self.buttonsArea, self, commit=self.apply)
@@ -518,11 +518,11 @@ class OWDistributions(OWWidget):
     def _on_show_probabilities_changed(self):
         label = self.controls.fitted_distribution.label
         if self.show_probs:
-            label.setText("Fitted probability")
+            label.setText("拟合概率")
             label.setToolTip(
-                "Chosen distribution is used to compute Bayesian probabilities")
+                "选择的分布用于计算贝叶斯概率")
         else:
-            label.setText("Fitted distribution")
+            label.setText("拟合分布")
             label.setToolTip("")
         self.replot()
 
@@ -590,9 +590,9 @@ class OWDistributions(OWWidget):
         leftaxis = self.ploti.getAxis("left")
         if self.show_probs and self.cvar:
             leftaxis.setLabel(
-                f"Probability of '{self.cvar.name}' at given '{self.var.name}'")
+                f"给定 '{self.var.name}' 时 '{self.cvar.name}' 的概率")
         else:
-            leftaxis.setLabel("Frequency")
+            leftaxis.setLabel("频率")
         leftaxis.resizeEvent()
 
     def _update_controls_state(self):
@@ -1188,7 +1188,7 @@ class OWDistributions(OWWidget):
             if self.var.is_continuous:  # annotate with bins
                 hist_indices, hist_values = self._get_histogram_indices()
                 annotated_data = create_groups_table(
-                    annotated_data, hist_indices, var_name="Bin", values=hist_values)
+                    annotated_data, hist_indices, var_name="箱", values=hist_values)
             histogram_data = self._get_histogram_table()
 
         self.Outputs.selected_data.send(selected_data)
@@ -1229,8 +1229,8 @@ class OWDistributions(OWWidget):
 
     def _get_histogram_table(self):
         # bar is OK; pylint: disable=disallowed-name
-        var_bin = DiscreteVariable("Bin", [bar.desc for bar in self.bar_items])
-        var_freq = ContinuousVariable("Count")
+        var_bin = DiscreteVariable("箱", [bar.desc for bar in self.bar_items])
+        var_freq = ContinuousVariable("计数")
         X = []
         if self.cvar:
             domain = Domain([var_bin, self.cvar, var_freq])
@@ -1276,11 +1276,11 @@ class OWDistributions(OWWidget):
             return
         self.report_plot()
         if self.cumulative_distr:
-            text = f"Cummulative distribution of '{self.var.name}'"
+            text = f"累积分布'{self.var.name}' "
         else:
-            text = f"Distribution of '{self.var.name}'"
+            text = f"分布'{self.var.name}' "
         if self.cvar:
-            text += f" with columns split by '{self.cvar.name}'"
+            text += f" 按 '{self.cvar.name}' 拆分列"
         self.report_caption(text)
 
 

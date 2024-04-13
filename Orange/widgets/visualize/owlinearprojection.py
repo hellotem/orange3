@@ -177,16 +177,16 @@ Placement = Enum("Placement", dict(Circular=0, LDA=1, PCA=2), type=int,
 
 class OWLinearProjection(OWAnchorProjectionWidget,
                          VizRankMixin(LinearProjectionVizRank)):
-    name = "Linear Projection"
-    description = "A multi-axis projection of data onto " \
-                  "a two-dimensional plane."
+    name = "线性投影 Linear Projection"
+    description = "将数据投影到 " \
+                  "二维平面上的多轴投影。"
     icon = "icons/LinearProjection.svg"
     priority = 240
-    keywords = "linear projection"
+    keywords = "线性投影"
 
-    Projection_name = {Placement.Circular: "Circular Placement",
-                       Placement.LDA: "Linear Discriminant Analysis",
-                       Placement.PCA: "Principal Component Analysis"}
+    Projection_name = {Placement.Circular: "环形布局",
+                       Placement.LDA: "线性判别分析",
+                       Placement.PCA: "主成分分析"}
 
     settings_version = 6
 
@@ -197,13 +197,13 @@ class OWLinearProjection(OWAnchorProjectionWidget,
     n_attrs_vizrank = Setting(3)
 
     class Error(OWAnchorProjectionWidget.Error):
-        no_cont_features = Msg("Plotting requires numeric features")
+        no_cont_features = Msg("绘图需要数值特征")
 
     class Information(OWAnchorProjectionWidget.Information):
-        no_lda = Msg("LDA placement is disabled due to unsuitable target.\n{}")
+        no_lda = Msg("由于目标不合适,LDA布局被禁用。\n{}")
 
     def _add_controls(self):
-        box = gui.vBox(self.controlArea, box="Features")
+        box = gui.vBox(self.controlArea, box="特征")
         self._add_controls_variables(box)
         self._add_controls_placement(box)
         super()._add_controls()
@@ -218,7 +218,7 @@ class OWLinearProjection(OWAnchorProjectionWidget,
         variables_selection(box, self, self.model_selected)
         self.model_selected.selection_changed.connect(
             self.__model_selected_changed)
-        self.btn_vizrank = self.vizrank_button("Suggest Features")
+        self.btn_vizrank = self.vizrank_button("建议特征")
         self.vizrankSelectionChanged.connect(self.vizrank_set_attrs)
         self.vizrankRunStateChanged.connect(self.store_vizrank_n_attrs)
         box.layout().addWidget(self.btn_vizrank)
@@ -303,17 +303,17 @@ class OWLinearProjection(OWAnchorProjectionWidget,
         problem = None
         if self.data is not None:
             if (class_var := self.data.domain.class_var) is None:
-                problem = "Current data has no target variable"
+                problem = "当前数据没有目标变量"
             elif not class_var.is_discrete:
-                problem = f"{class_var.name} is not categorical"
+                problem = f"{class_var.name} 不是分类的"
             elif (nclasses := len(distinct := np.unique(self.data.Y))) == 0:
-                problem = f"Data has no defined values for {class_var.name}"
+                problem = f"数据没有为 {class_var.name} 定义值"
             elif nclasses < 3:
                 vals = " and ".join(f"'{class_var.values[int(i)]}'" for i in distinct)
                 problem = \
-                    f"Data contains just {['one', 'two'][nclasses - 1]} distinct " \
-                    f"{pl(nclasses, 'value')} ({vals}) for '{class_var.name}'; " \
-                    "at least three are required."
+                    f"数据只包含 {['一个', '两个'][nclasses - 1]} 不同的 " \
+                    f"{pl(nclasses, '值')} ({vals}) 用于 '{class_var.name}'; " \
+                    "至少需要三个。"
         if problem is None:
             self.Information.no_lda.clear()
         else:
@@ -393,12 +393,12 @@ class OWLinearProjection(OWAnchorProjectionWidget,
             return self.Projection_name[self.placement]
 
         return report.render_items_vert((
-            ("Projection", projection_name()),
-            ("Color", self._get_caption_var_name(self.attr_color)),
-            ("Label", self._get_caption_var_name(self.attr_label)),
-            ("Shape", self._get_caption_var_name(self.attr_shape)),
-            ("Size", self._get_caption_var_name(self.attr_size)),
-            ("Jittering", self.graph.jitter_size != 0 and
+            ("投影", projection_name()),
+            ("颜色", self._get_caption_var_name(self.attr_color)),
+            ("标签", self._get_caption_var_name(self.attr_label)),
+            ("形状", self._get_caption_var_name(self.attr_shape)),
+            ("大小", self._get_caption_var_name(self.attr_size)),
+            ("抖动", self.graph.jitter_size != 0 and
              "{} %".format(self.graph.jitter_size))))
 
     @classmethod

@@ -471,29 +471,29 @@ class VariableItemModel(QStandardItemModel):
 
 
 class OWCreateInstance(OWWidget):
-    name = "Create Instance"
-    description = "Interactively create a data instance from sample dataset."
+    name = "创建实例 Create Instance"
+    description = "从示例数据集中交互式创建数据实例。"
     icon = "icons/CreateInstance.svg"
-    category = "Transform"
-    keywords = "create instance, simulator"
+    category = "变换"
+    keywords = "创建实例，模拟器"
     priority = 2310
 
     class Inputs:
-        data = Input("Data", Table)
-        reference = Input("Reference", Table)
+        data = Input("数据", Table)
+        reference = Input("参考", Table)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数据", Table)
 
     class Information(OWWidget.Information):
-        nans_removed = Msg("Variables with only missing values were "
-                           "removed from the list.")
+        nans_removed = Msg("仅有缺失值的变量已"
+                           "从列表中移除。")
 
     want_main_area = False
-    BUTTONS = ["Median", "Mean", "Random", "Input"]
+    BUTTONS = ["中值", "均值", "随机", "输入"]
     ACTIONS = ["median", "mean", "random", "input"]
-    HEADER = [["name", "Variable"],
-              ["variable", "Value"]]
+    HEADER = [["name", "变量"],
+              ["variable", "值"]]
     Header = namedtuple(
         "header", [tag for tag, _ in HEADER]
     )(*range(len(HEADER)))
@@ -508,7 +508,7 @@ class OWCreateInstance(OWWidget):
         self.reference: Optional[Table] = None
 
         self.filter_edit = QLineEdit(textChanged=self.__filter_edit_changed,
-                                     placeholderText="Filter...")
+                                     placeholderText="过滤...")
         self.view = QTableView(sortingEnabled=True,
                                contextMenuPolicy=Qt.CustomContextMenu,
                                selectionMode=QTableView.NoSelection)
@@ -545,7 +545,7 @@ class OWCreateInstance(OWWidget):
         gui.rubber(box)
 
         gui.checkBox(self.buttonsArea, self, "append_to_data",
-                     "Append this instance to input data",
+                     "将此实例附加到输入数据",
                      callback=self.commit.deferred)
         gui.rubber(self.buttonsArea)
         gui.auto_apply(self.buttonsArea, self, "auto_commit")
@@ -653,7 +653,7 @@ class OWCreateInstance(OWWidget):
     def _create_data_from_values(self) -> Table:
         data = Table.from_domain(self.data.domain, 1)
         with data.unlocked():
-            data.name = "created"
+            data.name = "已创建"
             if data.X.size:
                 data.X[:] = np.nan
             if data.Y.size:
@@ -682,7 +682,7 @@ class OWCreateInstance(OWWidget):
                             part[-1, idx] = 1
                             return data
 
-        name = get_unique_names(self.data.domain, "Source ID")
+        name = get_unique_names(self.data.domain, "源 ID")
         var = DiscreteVariable(name, values=(self.data.name, instance.name))
         var.attributes[source_label] = OWCreateInstance
         domain = Domain(domain.attributes, domain.class_vars,
@@ -704,8 +704,8 @@ class OWCreateInstance(OWWidget):
     def send_report(self):
         if not self.data:
             return
-        self.report_domain("Input", self.data.domain)
-        self.report_domain("Output", self.data.domain)
+        self.report_domain("输入", self.data.domain)
+        self.report_domain("输出", self.data.domain)
         items = []
         values: Dict = self._get_values()
         for var in self.data.domain.variables + self.data.domain.metas:
@@ -713,7 +713,7 @@ class OWCreateInstance(OWWidget):
             if var.is_primitive():
                 val = var.repr_val(val)
             items.append([f"{var.name}:", val])
-        self.report_table("Values", items)
+        self.report_table("值", items)
 
     @staticmethod
     def sizeHint():

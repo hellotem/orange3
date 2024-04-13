@@ -45,34 +45,34 @@ DiscreteOptions: Dict[int, MethodDesc] = {
     method.id_: method
     for method in (
         MethodDesc(
-            Continuize.Default, "Use preset", "preset",
-            "Treat the variable as defined in preset"),
+            Continuize.Default, "使用预设", "预设",
+            "按预设处理该变量"),
         MethodDesc(
-            Continuize.Leave, "Keep categorical", "keep as is",
-            "Keep the variable discrete"),
+            Continuize.Leave, "保持分类型", "保持原状",
+            "保持变量离散"),
         MethodDesc(
-            Continuize.FirstAsBase, "First value as base", "first as base",
-            "One indicator variable for each value except the first"),
+            Continuize.FirstAsBase, "第一个值为基准", "第一个为基准",
+            "除第一个值外,每个值一个指示变量"),
         MethodDesc(
-            Continuize.FrequentAsBase, "Most frequent as base", "frequent as base",
-            "One indicator variable for each value except the most frequent",
+            Continuize.FrequentAsBase, "最频繁值为基准", "最频繁为基准  ",
+            "除最频繁值外,每个值一个指示变量",
             False),
         MethodDesc(
-            Continuize.Indicators, "One-hot encoding", "one-hot",
-            "One indicator variable for each value",
+            Continuize.Indicators, "单热编码", "单热",
+            "每个值一个指示变量",
             False),
         MethodDesc(
-            Continuize.RemoveMultinomial, "Remove if more than 2 values", "remove if >2",
-            "Remove variables with more than two values; indicator otherwise"),
+            Continuize.RemoveMultinomial, "如果值超过2个则移除", "值>2则移除",
+            "移除值超过两个的变量;否则指示"),
         MethodDesc(
-            Continuize.Remove, "Remove", "remove",
-            "Remove variable"),
+            Continuize.Remove, "移除", "移除",
+            "移除变量"),
         MethodDesc(
-            Continuize.AsOrdinal, "Treat as ordinal", "as ordinal",
-            "Each value gets a consecutive number from 0 to number of values - 1"),
+            Continuize.AsOrdinal, "作为有序变量处理", "作为有序",
+            "每个值获得从0到值数-1的连续数字"),
         MethodDesc(
-            Continuize.AsNormalizedOrdinal, "Treat as normalized ordinal", "as norm. ordinal",
-            "Same as above, but scaled to [0, 1]")
+            Continuize.AsNormalizedOrdinal, "作为标准化的有序变量处理", "作为标准化的有序",
+            "同上,但缩放到[0, 1]")
     )}
 
 ContinuizationDefault = Continuize.FirstAsBase
@@ -86,29 +86,29 @@ ContinuousOptions: Dict[int, MethodDesc] = {
     method.id_: method
     for method in (
         MethodDesc(
-            Normalize.Default, "Use preset", "preset",
-            "Treat the variable as defined in 'default setting'"),
+            Normalize.Default, "使用预设", "预设",
+            '按"默认设置"处理该变量'),
         MethodDesc(
-            Normalize.Leave, "Keep as it is", "no change",
-            "Keep the variable as it is"),
+            Normalize.Leave, "保持原样", "不改变",
+            "保持变量原样"),
         MethodDesc(
-            Normalize.Standardize, "Standardize to μ=0, σ²=1", "standardize",
-            "Subtract the mean and divide by standard deviation",
+            Normalize.Standardize, "标准化到 μ=0, σ²=1", "标准化",
+            "减去均值并除以标准差",
             False),
         MethodDesc(
-            Normalize.Center, "Center to μ=0", "center",
-            "Subtract the mean",
+            Normalize.Center, "居中到 μ=0", "居中",
+            "减去均值",
             False),
         MethodDesc(
-            Normalize.Scale, "Scale to σ²=1", "scale",
-            "Divide by standard deviation"),
+            Normalize.Scale, "缩放到 σ²=1", "缩放",
+            "除以标准差"),
         MethodDesc(
-            Normalize.Normalize11, "Normalize to interval [-1, 1]", "to [-1, 1]",
-            "Linear transformation into interval [-1, 1]",
+            Normalize.Normalize11, "标准化到区间 [-1, 1]", "到 [-1, 1]",
+            "线性变换到区间 [-1, 1] ",
             False),
         MethodDesc(
-            Normalize.Normalize01, "Normalize to interval [0, 1]", "to [0, 1]",
-            "Linear transformation into interval [0, 1]",
+            Normalize.Normalize01, "标准化到区间 [0, 1]", "到 [0, 1]",
+            "线性变换到区间 [0, 1]",
             False),
     )}
 
@@ -122,8 +122,8 @@ class ContDomainModel(DomainModel):
     def __init__(self, valid_type):
         super().__init__(
             order=(DomainModel.ATTRIBUTES,
-                   LabelledSeparator("Meta attributes"), DomainModel.METAS,
-                   LabelledSeparator("Targets"), DomainModel.CLASSES),
+                   LabelledSeparator("元数据"), DomainModel.METAS,
+                   LabelledSeparator("目标"), DomainModel.CLASSES),
             valid_types=(valid_type, ), strict_type=True)
 
     def data(self, index, role=Qt.DisplayRole):
@@ -166,11 +166,11 @@ class DefaultContModel(QAbstractListModel):
 
     def data(self, _, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
-            return f"Preset: {self.method}"
+            return f"预设: {self.method}"
         elif role == Qt.DecorationRole:
             return self.icon
         elif role == Qt.ToolTipRole:
-            return "Default for variables without specific settings"
+            return "未特别设置的变量的默认值"
         return None
 
     def setMethod(self, method):
@@ -280,23 +280,23 @@ class OWContinuize(widget.OWWidget):
     # Many false positives for `hints`; pylint ignores type annotations
     # pylint: disable=unsubscriptable-object,unsupported-assignment-operation
     # pylint: disable=unsupported-membership-test, unsupported-delete-operation
-    name = "Continuize"
-    description = ("Transform categorical attributes into numeric and, " +
-                   "optionally, scale numeric values.")
+    name = "连续化 Continuize"
+    description = ("将分类属性转换为数值型," +
+                   "并可选择缩放数值。")
     icon = "icons/Continuize.svg"
-    category = "Transform"
-    keywords = "continuize, encode, dummy, numeric, one-hot, binary, treatment, contrast"
+    category = "变换"
+    keywords = "连续化、编码、哑变量、数值型、一热、二值、处理、对比"
     priority = 2120
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数", Table)
 
     class Error(widget.OWWidget.Error):
         unsupported_sparse = \
-            widget.Msg("Some chosen methods do not support sparse data: {}")
+            widget.Msg("部分所选方法不支持稀疏数据")
 
     want_control_area = False
 
@@ -337,13 +337,13 @@ class OWContinuize(widget.OWWidget):
 
         box = gui.vBox(self.mainArea, True, spacing=8)
         self.disc_box, self.disc_view, self.disc_radios, self.disc_group = \
-            create("Categorical Variables", DiscreteVariable, DiscreteOptions)
+            create("类别变量", DiscreteVariable, DiscreteOptions)
         self.disc_view.set_default_method(
             DiscreteOptions[self.disc_var_hints[DefaultKey]].short_desc)
         self.disc_view.select_default()
 
         self.cont_box, self.cont_view, self.cont_radios, self.cont_group = \
-            create("Numeric Variables", ContinuousVariable, ContinuousOptions)
+            create("数值变量", ContinuousVariable, ContinuousOptions)
         self.cont_view.set_default_method(
             ContinuousOptions[self.cont_var_hints[DefaultKey]].short_desc)
         self.cont_view.select_default()
@@ -355,7 +355,7 @@ class OWContinuize(widget.OWWidget):
 
         box = gui.hBox(self.mainArea)
         gui.button(
-            box, self, "Reset All", callback=self._on_reset_hints,
+            box, self, "全部重置", callback=self._on_reset_hints,
             autoDefault=False)
         gui.rubber(box)
         gui.auto_apply(box, self, "autosend")
@@ -691,27 +691,27 @@ class OWContinuize(widget.OWWidget):
                       and ContinuousOptions[self.cont_var_hints[DefaultKey]].label.lower()
         if single_disc and single_cont:
             self.report_items(
-                (("Categorical variables", single_disc),
-                 ("Numeric variables", single_cont))
+                (("类别变量", single_disc),
+                 ("数值变量", single_cont))
             )
         else:
             if single_disc:
-                self.report_paragraph("Categorical variables", single_disc)
+                self.report_paragraph("类别变量", single_disc)
             elif len(self.disc_view.model()) > 0:
                 self.report_items(
-                    "Categorical variables",
-                    [("Preset" if name == DefaultKey else name,
+                    "类别变量",
+                    [("预设" if name == DefaultKey else name,
                       DiscreteOptions[id_].label.lower())
                      for name, id_ in self.disc_var_hints.items()])
             if single_cont:
-                self.report_paragraph("Numeric variables", single_cont)
+                self.report_paragraph("数值变量", single_cont)
             elif len(self.cont_view.model()) > 0:
                 self.report_items(
-                    "Numeric variables",
-                    [("Preset" if name == DefaultKey else name,
+                    "数值变量",
+                    [("预设" if name == DefaultKey else name,
                       ContinuousOptions[id_].label.lower())
                      for name, id_ in self.cont_var_hints.items()])
-            self.report_paragraph("Unlisted",
+            self.report_paragraph("未列出",
                 "Any unlisted attributes default to preset option, and "
                 "unlisted meta attributes and target variables are kept "
                 "as they are")

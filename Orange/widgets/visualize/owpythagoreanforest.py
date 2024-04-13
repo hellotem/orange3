@@ -205,19 +205,19 @@ class ClickToClearSelectionListView(QListView):
 
 
 class OWPythagoreanForest(OWWidget):
-    name = "Pythagorean Forest"
-    description = 'Pythagorean forest for visualising random forests.'
+    name = "勾股森林 Pythagorean Forest"
+    description = '用于可视化随机森林的勾股森林。'
     icon = 'icons/PythagoreanForest.svg'
     settings_version = 2
-    keywords = "pythagorean forest, fractal"
+    keywords = "勾股森林,分形"
 
     priority = 1001
 
     class Inputs:
-        random_forest = Input("Random Forest", RandomForestModel, replaces=["Random forest"])
+        random_forest = Input("随机森林", RandomForestModel, replaces=["随机森林"])
 
     class Outputs:
-        tree = Output("Tree", TreeModel)
+        tree = Output("树", TreeModel)
 
     # Settings
     settingsHandler = settings.ClassValuesContextHandler()
@@ -230,9 +230,9 @@ class OWPythagoreanForest(OWWidget):
     selected_index = settings.ContextSetting(None)
 
     SIZE_CALCULATION = [
-        ('Normal', lambda x: x),
-        ('Square root', lambda x: sqrt(x)),
-        ('Logarithmic', lambda x: log(x + 1)),
+        ('正常', lambda x: x),
+        ('平方根', lambda x: sqrt(x)),
+        ('对数', lambda x: log(x + 1)),
     ]
 
     @classmethod
@@ -254,29 +254,29 @@ class OWPythagoreanForest(OWWidget):
 
         # CONTROL AREA
         # Tree info area
-        box_info = gui.widgetBox(self.controlArea, 'Forest')
+        box_info = gui.widgetBox(self.controlArea, '森林')
         self.ui_info = gui.widgetLabel(box_info)
 
         # Display controls area
-        box_display = gui.widgetBox(self.controlArea, 'Display')
+        box_display = gui.widgetBox(self.controlArea, '显示')
         # maxValue is set to a wide three-digit number to probably ensure the
         # proper label width. The maximum is later set to match the tree depth
         self.ui_depth_slider = gui.hSlider(
-            box_display, self, 'depth_limit', label='Depth', ticks=False,
+            box_display, self, 'depth_limit', label='深度', ticks=False,
             maxValue=900
         )  # type: QSlider
         self.ui_target_class_combo = gui.comboBox(
-            box_display, self, 'target_class_index', label='Target class',
+            box_display, self, 'target_class_index', label='目标类',
             orientation=Qt.Horizontal, items=[], contentsLength=8,
             searchable=True
         )
         self.ui_size_calc_combo = gui.comboBox(
-            box_display, self, 'size_calc_idx', label='Size',
+            box_display, self, 'size_calc_idx', label='大小',
             orientation=Qt.Horizontal,
             items=list(zip(*self.SIZE_CALCULATION))[0], contentsLength=8,
         )
         self.ui_zoom_slider = gui.hSlider(
-            box_display, self, 'zoom', label='Zoom', ticks=False, minValue=100,
+            box_display, self, 'zoom', label='缩放', ticks=False, minValue=100,
             maxValue=400, createLabel=False, intOnly=False,
         )  # type: QSlider
 
@@ -353,7 +353,7 @@ class OWPythagoreanForest(OWWidget):
         self._clear_depth_slider()
 
     def _update_info_box(self):
-        self.ui_info.setText('Trees: {}'.format(len(self.forest.trees)))
+        self.ui_info.setText('树: {}'.format(len(self.forest.trees)))
 
     def _update_depth_slider(self):
         self.depth_limit = self._get_max_depth()
@@ -368,11 +368,11 @@ class OWPythagoreanForest(OWWidget):
                  if isinstance(x, QLabel)][0]
 
         if self.instances.domain.has_discrete_class:
-            label_text = 'Target class'
+            label_text = '目标类'
             values = [c.title() for c in self.instances.domain.class_vars[0].values]
-            values.insert(0, 'None')
+            values.insert(0, '无')
         else:
-            label_text = 'Node color'
+            label_text = '节点颜色'
             values = list(ContinuousTreeNode.COLOR_METHODS.keys())
         label.setText(label_text)
         self.ui_target_class_combo.addItems(values)
@@ -380,7 +380,7 @@ class OWPythagoreanForest(OWWidget):
         self.target_class_index = 0
 
     def _clear_info_box(self):
-        self.ui_info.setText('No forest on input.')
+        self.ui_info.setText('输入中没有森林。')
 
     def _clear_target_class_combo(self):
         self.ui_target_class_combo.clear()

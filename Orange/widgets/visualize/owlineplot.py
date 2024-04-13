@@ -193,13 +193,13 @@ class LinePlotViewBox(ViewBox):
 
 
 class ParameterSetter(CommonParameterSetter):
-    MEAN_LABEL = "Mean"
-    LINE_LABEL = "Lines"
-    MISSING_LINE_LABEL = "Lines (missing value)"
-    SEL_LINE_LABEL = "Selected lines"
-    SEL_MISSING_LINE_LABEL = "Selected lines (missing value)"
-    RANGE_LABEL = "Range"
-    SEL_RANGE_LABEL = "Selected range"
+    MEAN_LABEL = "均值"
+    LINE_LABEL = "线条"
+    MISSING_LINE_LABEL = "线条(缺失值)"
+    SEL_LINE_LABEL = "选定线条"
+    SEL_MISSING_LINE_LABEL = "选定线条(缺失值)"
+    RANGE_LABEL = "范围"
+    SEL_RANGE_LABEL = "选定范围"
 
     def __init__(self, master):
         super().__init__()
@@ -219,7 +219,7 @@ class ParameterSetter(CommonParameterSetter):
         self.missing_line_settings = {
             Updater.WIDTH_LABEL: LinePlotStyle.UNSELECTED_LINE_WIDTH,
             Updater.ALPHA_LABEL: LinePlotStyle.UNSELECTED_LINE_ALPHA,
-            Updater.STYLE_LABEL: "Dash line",
+            Updater.STYLE_LABEL: "虚线",
             Updater.ANTIALIAS_LABEL: True,
         }
         self.sel_line_settings = {
@@ -231,7 +231,7 @@ class ParameterSetter(CommonParameterSetter):
         self.sel_missing_line_settings = {
             Updater.WIDTH_LABEL: LinePlotStyle.SELECTED_LINE_WIDTH,
             Updater.ALPHA_LABEL: LinePlotStyle.SELECTED_LINE_ALPHA,
-            Updater.STYLE_LABEL: "Dash line",
+            Updater.STYLE_LABEL: "虚线",
             Updater.ANTIALIAS_LABEL: False,
         }
         self.range_settings = {
@@ -273,7 +273,7 @@ class ParameterSetter(CommonParameterSetter):
                     Updater.WIDTH_LABEL: (range(1, 15),
                                           LinePlotStyle.UNSELECTED_LINE_WIDTH),
                     Updater.STYLE_LABEL: (list(Updater.LINE_STYLES),
-                                          "Dash line"),
+                                          "虚线"),
                     Updater.ALPHA_LABEL: (range(0, 255, 5),
                                           LinePlotStyle.UNSELECTED_LINE_ALPHA),
                     Updater.ANTIALIAS_LABEL: (None, True),
@@ -291,7 +291,7 @@ class ParameterSetter(CommonParameterSetter):
                     Updater.WIDTH_LABEL: (range(1, 15),
                                           LinePlotStyle.SELECTED_LINE_WIDTH),
                     Updater.STYLE_LABEL: (list(Updater.LINE_STYLES),
-                                          "Dash line"),
+                                          "虚线"),
                     Updater.ALPHA_LABEL: (range(0, 255, 5),
                                           LinePlotStyle.SELECTED_LINE_ALPHA),
                     Updater.ANTIALIAS_LABEL: (None, True),
@@ -709,21 +709,21 @@ SEL_MAX_INSTANCES = 10000
 
 
 class OWLinePlot(OWWidget):
-    name = "Line Plot"
-    description = "Visualization of data profiles (e.g., time series)."
+    name = "线形图 Line Plot"
+    description = "数据概况的可视化(如时间序列)。"
     icon = "icons/LinePlot.svg"
     priority = 180
-    keywords = "line plot"
+    keywords = "线形图"
 
     buttons_area_orientation = Qt.Vertical
     enable_selection = Signal(bool)
 
     class Inputs:
-        data = Input("Data", Table, default=True)
-        data_subset = Input("Data Subset", Table)
+        data = Input("数据", Table, default=True)
+        data_subset = Input("数据子集", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     settingsHandler = DomainContextHandler()
@@ -739,14 +739,14 @@ class OWLinePlot(OWWidget):
     graph_name = "graph.plotItem"  # QGraphicsScene (pg.PlotWidget -> LinePlotGraph)
 
     class Error(OWWidget.Error):
-        not_enough_attrs = Msg("Need at least one numeric feature.")
+        not_enough_attrs = Msg("需要至少一个数值特征。")
 
     class Warning(OWWidget.Warning):
-        no_display_option = Msg("No display option is selected.")
+        no_display_option = Msg("未选择显示选项。")
 
     class Information(OWWidget.Information):
-        too_many_features = Msg("Data has too many features. Only first {}"
-                                " are shown.".format(MAX_FEATURES))
+        too_many_features = Msg("数据特征过多。只显示前 {}"
+                                " 个。".format(MAX_FEATURES))
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -775,24 +775,24 @@ class OWLinePlot(OWWidget):
         box.layout().addWidget(self.graph)
 
     def _add_controls(self):
-        displaybox = gui.widgetBox(self.controlArea, "Display")
-        gui.checkBox(displaybox, self, "show_profiles", "Lines",
+        displaybox = gui.widgetBox(self.controlArea, "显示")
+        gui.checkBox(displaybox, self, "show_profiles", "线条",
                      callback=self.__show_profiles_changed,
-                     tooltip="Plot lines")
-        gui.checkBox(displaybox, self, "show_range", "Range",
+                     tooltip="绘制线条")
+        gui.checkBox(displaybox, self, "show_range", "范围",
                      callback=self.__show_range_changed,
-                     tooltip="Plot range between 10th and 90th percentile")
-        gui.checkBox(displaybox, self, "show_mean", "Mean",
+                     tooltip="绘制10至90百分位之间的范围")
+        gui.checkBox(displaybox, self, "show_mean", "均值",
                      callback=self.__show_mean_changed,
-                     tooltip="Plot mean curve")
-        gui.checkBox(displaybox, self, "show_error", "Error bars",
+                     tooltip="绘制均值曲线")
+        gui.checkBox(displaybox, self, "show_error", "误差棒",
                      callback=self.__show_error_changed,
-                     tooltip="Show standard deviation")
+                     tooltip="显示标准差")
 
         self.group_vars = DomainModel(
-            placeholder="None", separators=False, valid_types=DiscreteVariable)
+            placeholder="无", separators=False, valid_types=DiscreteVariable)
         self.group_view = gui.listView(
-            self.controlArea, self, "group_var", box="Group by",
+            self.controlArea, self, "group_var", box="按组",
             model=self.group_vars, callback=self.__group_var_changed,
             sizeHint=QSize(30, 100), viewType=ListViewSearch,
             sizePolicy=(QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -1030,7 +1030,7 @@ class OWLinePlot(OWWidget):
         if self.data is None:
             return
 
-        caption = report.render_items_vert((("Group by", self.group_var),))
+        caption = report.render_items_vert((("按组", self.group_var),))
         self.report_plot()
         if caption:
             self.report_caption(caption)

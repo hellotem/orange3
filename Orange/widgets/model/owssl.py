@@ -9,15 +9,15 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 
 class OWKNNLearner(OWBaseLearner):
-    name = "k近邻 kNN"
-    description = "根据最近的训练实例进行预测。 "
-    icon = "icons/KNN.svg"
+    name = "半监督学习 Semisupervised Learning"
+    description = "利用较少的标记样本实现分类。 "
+    icon = "icons/SSL.svg"
     replaces = [
         "Orange.widgets.classify.owknn.OWKNNLearner",
         "Orange.widgets.regression.owknnregression.OWKNNRegression",
     ]
     priority = 20
-    keywords = "knn、k最近、knearest、邻居、邻居"
+    keywords = "ssl、半监督学习、图论、邻居"
 
     LEARNER = KNNLearner
 
@@ -35,16 +35,16 @@ class OWKNNLearner(OWBaseLearner):
         # this is part of init, pylint: disable=attribute-defined-outside-init
         box = gui.vBox(self.controlArea, "邻居")
         self.n_neighbors_spin = gui.spin(
-            box, self, "n_neighbors", 1, 100, label="Number of neighbors:",
+            box, self, "n_neighbors", 1, 100, label="邻居数量:",
             alignment=Qt.AlignRight, callback=self.settings_changed,
             controlWidth=80)
         self.metrics_combo = gui.comboBox(
             box, self, "metric_index", orientation=Qt.Horizontal,
-            label="Metric:", items=self.metrics_options,
+            label="度量：", items=self.metrics_options,
             callback=self.settings_changed)
         self.weights_combo = gui.comboBox(
             box, self, "weight_index", orientation=Qt.Horizontal,
-            label="Weight:", items=self.weights_options,
+            label="加权：", items=self.weights_options,
             callback=self.settings_changed)
 
     def create_learner(self):

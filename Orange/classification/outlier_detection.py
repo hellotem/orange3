@@ -50,7 +50,7 @@ class _OutlierModel(SklModel):
         domain = self.new_domain(data)
         if progress_callback is None:
             progress_callback = dummy_callback
-        progress_callback(0, "Predicting...")
+        progress_callback(0, "预测...")
         new_table = data.transform(domain)
         progress_callback(1)
         return new_table
@@ -67,8 +67,8 @@ class _OutlierLearner(SklLearner):
         transformer = _Transformer(model)
         names = [v.name for v in domain.variables + domain.metas]
         variable = DiscreteVariable(
-            get_unique_names(names, "Outlier"),
-            values=("Yes", "No"),
+            get_unique_names(names, "异常值"),
+            values=("是", "否"),
             compute_value=transformer
         )
 
@@ -86,7 +86,7 @@ class _Transformer(SharedComputeValue):
 
 
 class OneClassSVMLearner(_OutlierLearner):
-    name = "One class SVM"
+    name = "单类SVM"
     __wraps__ = OneClassSVM
     preprocessors = SklLearner.preprocessors + [AdaptiveNormalize()]
     supports_weights = True
@@ -100,7 +100,7 @@ class OneClassSVMLearner(_OutlierLearner):
 
 class LocalOutlierFactorLearner(_OutlierLearner):
     __wraps__ = LocalOutlierFactor
-    name = "Local Outlier Factor"
+    name = "局部异常因子"
     supports_weights = False
 
     def __init__(self, n_neighbors=20, algorithm="auto", leaf_size=30,
@@ -113,7 +113,7 @@ class LocalOutlierFactorLearner(_OutlierLearner):
 
 class IsolationForestLearner(_OutlierLearner):
     __wraps__ = IsolationForest
-    name = "Isolation Forest"
+    name = "隔离森林"
     supports_weights = True
 
     def __init__(self, n_estimators=100, max_samples='auto',
@@ -158,7 +158,7 @@ class _TransformerMahalanobis(_Transformer):
 class EllipticEnvelopeLearner(_OutlierLearner):
     __wraps__ = EllipticEnvelope
     __returns__ = EllipticEnvelopeClassifier
-    name = "Covariance Estimator"
+    name = "协方差估计器"
     supports_weights = False
 
     def __init__(self, store_precision=True, assume_centered=False,

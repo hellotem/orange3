@@ -39,18 +39,18 @@ from Orange.widgets.widget import OWWidget
 
 
 class OWPythagorasTree(OWWidget):
-    name = "Pythagorean Tree"
-    description = 'Pythagorean Tree visualization for tree like-structures.'
+    name = "勾股树 Pythagorean Tree"
+    description = '用于树状结构的勾股树可视化。'
     icon = 'icons/PythagoreanTree.svg'
-    keywords = "pythagorean tree, fractal"
+    keywords = "勾股树,分形"
 
     priority = 1000
 
     class Inputs:
-        tree = Input("Tree", TreeModel)
+        tree = Input("树", TreeModel)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     # Enable the save as feature
@@ -84,50 +84,50 @@ class OWPythagorasTree(OWWidget):
 
         # Different methods to calculate the size of squares
         self.SIZE_CALCULATION = [
-            ('Normal', lambda x: x),
-            ('Square root', lambda x: sqrt(x)),
-            ('Logarithmic', lambda x: log(x * self.size_log_scale + 1)),
+            ('正常', lambda x: x),
+            ('平方根', lambda x: sqrt(x)),
+            ('对数', lambda x: log(x * self.size_log_scale + 1)),
         ]
 
         # CONTROL AREA
         # Tree info area
-        box_info = gui.widgetBox(self.controlArea, 'Tree Info')
+        box_info = gui.widgetBox(self.controlArea, '树信息')
         self.infolabel = gui.widgetLabel(box_info)
 
         # Display settings area
-        box_display = gui.widgetBox(self.controlArea, 'Display Settings')
+        box_display = gui.widgetBox(self.controlArea, '显示设置')
         # maxValue is set to a wide three-digit number to probably ensure the
         # proper label width. The maximum is later set to match the tree depth
         self.depth_slider = gui.hSlider(
-            box_display, self, 'depth_limit', label='Depth', ticks=False,
+            box_display, self, 'depth_limit', label='深度', ticks=False,
             maxValue=900, callback=self.update_depth)
         self.target_class_combo = gui.comboBox(
-            box_display, self, 'target_class_index', label='Target class',
+            box_display, self, 'target_class_index', label='目标类',
             orientation=Qt.Horizontal, items=[], contentsLength=8,
             searchable=True,
             callback=self.update_colors)
         self.size_calc_combo = gui.comboBox(
-            box_display, self, 'size_calc_idx', label='Size',
+            box_display, self, 'size_calc_idx', label='大小',
             orientation=Qt.Horizontal,
             items=list(zip(*self.SIZE_CALCULATION))[0], contentsLength=8,
             callback=self.update_size_calc)
         self.log_scale_box = gui.hSlider(
             box_display, self, 'size_log_scale',
-            label='Log scale factor', minValue=1, maxValue=100, ticks=False,
+            label='对数刻度因子', minValue=1, maxValue=100, ticks=False,
             callback=self.invalidate_tree)
 
         # Plot properties area
-        box_plot = gui.widgetBox(self.controlArea, 'Plot Properties')
+        box_plot = gui.widgetBox(self.controlArea, '绘图属性')
         self.cb_show_tooltips = gui.checkBox(
-            box_plot, self, 'tooltips_enabled', label='Enable tooltips',
+            box_plot, self, 'tooltips_enabled', label='启用工具提示',
             callback=self.update_tooltip_enabled)
         self.cb_show_legend = gui.checkBox(
-            box_plot, self, 'show_legend', label='Show legend',
+            box_plot, self, 'show_legend', label='显示图例',
             callback=self.update_show_legend)
 
         gui.rubber(self.controlArea)
 
-        gui.button(self.buttonsArea, self, label="Redraw", callback=self.redraw)
+        gui.button(self.buttonsArea, self, label="重新绘制", callback=self.redraw)
 
         self.controlArea.setSizePolicy(
             QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -253,7 +253,7 @@ class OWPythagorasTree(OWWidget):
         self._update_legend_visibility()
 
     def _update_info_box(self):
-        self.infolabel.setText('Nodes: {}\nDepth: {}'.format(
+        self.infolabel.setText('节点: {}\n深度: {}'.format(
             self.tree_adapter.num_nodes,
             self.tree_adapter.max_depth
         ))
@@ -270,10 +270,10 @@ class OWPythagorasTree(OWWidget):
     def _update_log_scale_slider(self):
         """On calc method combo box changed."""
         self.log_scale_box.parent().setEnabled(
-            self.SIZE_CALCULATION[self.size_calc_idx][0] == 'Logarithmic')
+            self.SIZE_CALCULATION[self.size_calc_idx][0] == '对数')
 
     def _clear_info_box(self):
-        self.infolabel.setText('No tree on input')
+        self.infolabel.setText('输入中没有树')
 
     def _clear_depth_slider(self):
         self.depth_slider.parent().setEnabled(False)
@@ -335,11 +335,11 @@ class OWPythagorasTree(OWWidget):
                  if isinstance(x, QLabel)][0]
 
         if self.data.domain.has_discrete_class:
-            label_text = 'Target class'
+            label_text = '目标类'
             values = [c.title() for c in self.data.domain.class_vars[0].values]
-            values.insert(0, 'None')
+            values.insert(0, '无')
         else:
-            label_text = 'Node color'
+            label_text = '节点颜色'
             values = list(ContinuousTreeNode.COLOR_METHODS.keys())
         label.setText(label_text)
         self.target_class_combo.addItems(values)

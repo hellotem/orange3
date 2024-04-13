@@ -341,8 +341,8 @@ class AxisItem(AxisItem):
 
 
 class ScatterBaseParameterSetter(CommonParameterSetter):
-    CAT_LEGEND_LABEL = "Categorical legend"
-    NUM_LEGEND_LABEL = "Numerical legend"
+    CAT_LEGEND_LABEL = "分类图例"
+    NUM_LEGEND_LABEL = "数值图例"
     NUM_LEGEND_SETTING = {
         Updater.SIZE_LABEL: (range(4, 50), 11),
         Updater.IS_ITALIC_LABEL: (None, False),
@@ -584,10 +584,10 @@ class OWScatterPlotBase(gui.OWComponent, QObject):
     def _create_drag_tooltip(self):
         tip_parts = [
             (Qt.ControlModifier,
-             "{}: Append to group".
+             "{}: 添加到组".
              format("Cmd" if sys.platform == "darwin" else "Ctrl")),
-            (Qt.ShiftModifier, "Shift: Add group"),
-            (Qt.AltModifier, "Alt: Remove")
+            (Qt.ShiftModifier, "Shift: 添加组"),
+            (Qt.AltModifier, "Alt: 移除")
         ]
         all_parts = "<center>" + \
                     ", ".join(part for _, part in tip_parts) + \

@@ -31,38 +31,38 @@ class MetricDef(NamedTuple):
 
 MetricDefs: Dict[int, MetricDef] = {
     metric.id: metric for metric in (
-        MetricDef(EuclideanNormalized, "Euclidean (normalized)",
-                  "Square root of summed difference between normalized values",
+        MetricDef(EuclideanNormalized, "欧氏距离 (归一化)",
+                  "归一化值差的平方和的平方根",
                   distance.Euclidean, normalize=True),
-        MetricDef(Euclidean, "Euclidean",
-                  "Square root of summed difference between values",
+        MetricDef(Euclidean, "欧氏距离",
+                  "值差的平方和的平方根",
                   distance.Euclidean),
-        MetricDef(ManhattanNormalized, "Manhattan (normalized)",
-                  "Sum of absolute differences between normalized values",
+        MetricDef(ManhattanNormalized, "曼哈顿距离 (归一化) ",
+                  "归一化值绝对差之和",
                   distance.Manhattan, normalize=True),
-        MetricDef(Manhattan, "Manhattan",
-                  "Sum of absolute differences between values",
+        MetricDef(Manhattan, "曼哈顿距离",
+                  "值绝对差之和",
                   distance.Manhattan),
-        MetricDef(Mahalanobis, "Mahalanobis",
-                  "Mahalanobis distance",
+        MetricDef(Mahalanobis, "马哈拉诺比斯距离",
+                  "马哈拉诺比斯距离",
                   distance.Mahalanobis),
-        MetricDef(Hamming, "Hamming", "Hamming distance",
+        MetricDef(Hamming, "汉明距离", "汉明距离",
                   distance.Hamming),
-        MetricDef(Cosine, "Cosine", "Cosine distance",
+        MetricDef(Cosine, "余弦", "余弦距离",
                   distance.Cosine),
-        MetricDef(Pearson, "Pearson",
-                  "Pearson correlation; distance = 1 - ρ/2",
+        MetricDef(Pearson, "皮尔逊相关系数",
+                  "皮尔逊相关系数;距离 = 1 - ρ/2",
                   distance.PearsonR),
-        MetricDef(PearsonAbsolute, "Pearson (absolute)",
-                  "Absolute value of Pearson correlation; distance = 1 - |ρ|",
+        MetricDef(PearsonAbsolute, "绝对皮尔逊相关系数",
+                  "皮尔逊相关系数的绝对值;距离 = 1 - |ρ|",
                   distance.PearsonRAbsolute),
-        MetricDef(Spearman, "Spearman",
-                  "Pearson correlation; distance = 1 - ρ/2",
+        MetricDef(Spearman, "斯皮尔曼相关系数",
+                  "皮尔逊相关系数;距离 = 1 - ρ/2",
                   distance.PearsonR),
-        MetricDef(SpearmanAbsolute, "Spearman (absolute)",
-                  "Absolute value of Pearson correlation; distance = 1 - |ρ|",
+        MetricDef(SpearmanAbsolute, "绝对斯皮尔曼相关系数",
+                  "皮尔逊相关系数的绝对值;距离 = 1 - |ρ|",
                   distance.SpearmanRAbsolute),
-        MetricDef(Jaccard, "Jaccard", "Jaccard distance",
+        MetricDef(Jaccard, "杰卡德距离", "杰卡德距离",
                   distance.Jaccard)
     )
 }
@@ -84,7 +84,7 @@ class DistanceRunner:
             if state.is_interruption_requested():
                 raise InterruptException
 
-        state.set_status("Calculating...")
+        state.set_status("计算中...")
         kwargs = {"axis": 1 - axis, "impute": True, "callback": callback}
         if metric.supports_normalization and normalized_dist:
             kwargs["normalize"] = True
@@ -92,16 +92,16 @@ class DistanceRunner:
 
 
 class OWDistances(OWWidget, ConcurrentWidgetMixin):
-    name = "Distances"
-    description = "Compute a matrix of pairwise distances."
+    name = "距离 Distances"
+    description = "计算成对距离矩阵。"
     icon = "icons/Distance.svg"
     keywords = "distances"
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
+        data = Input("数据", Orange.data.Table)
 
     class Outputs:
-        distances = Output("Distances", Orange.misc.DistMatrix, dynamic=False)
+        distances = Output("距离", Orange.misc.DistMatrix, dynamic=False)
 
     settings_version = 4
 
@@ -113,20 +113,20 @@ class OWDistances(OWWidget, ConcurrentWidgetMixin):
     resizing_enabled = False
 
     class Error(OWWidget.Error):
-        no_continuous_features = Msg("No numeric features")
-        no_binary_features = Msg("No binary features")
-        dense_metric_sparse_data = Msg("{} requires dense data.")
-        distances_memory_error = Msg("Not enough memory")
-        distances_value_error = Msg("Problem in calculation:\n{}")
+        no_continuous_features = Msg("无数值特征")
+        no_binary_features = Msg("无二值特征")
+        dense_metric_sparse_data = Msg("{} 需要密集数据")
+        distances_memory_error = Msg("内存不足")
+        distances_value_error = Msg("计算出现问题:\n{}")
         data_too_large_for_mahalanobis = Msg(
             "Mahalanobis handles up to 1000 {}.")
 
     class Warning(OWWidget.Warning):
-        ignoring_discrete = Msg("Ignoring categorical features")
-        ignoring_nonbinary = Msg("Ignoring non-binary features")
-        unsupported_sparse = Msg("Some metrics don't support sparse data\n"
-                                 "and were disabled: {}")
-        imputing_data = Msg("Missing values were imputed")
+        ignoring_discrete = Msg("忽略分类特征")
+        ignoring_nonbinary = Msg("忽略非二值特征")
+        unsupported_sparse = Msg("有些度量不支持稀疏数据\n"
+                                 "并已被禁用: {}")
+        imputing_data = Msg("缺失值已被估算")
 
     def __init__(self):
         OWWidget.__init__(self)
@@ -135,10 +135,10 @@ class OWDistances(OWWidget, ConcurrentWidgetMixin):
         self.data = None
 
         gui.radioButtons(
-            self.controlArea, self, "axis", ["Rows", "Columns"],
-            box="Compare", orientation=Qt.Horizontal, callback=self._invalidate
+            self.controlArea, self, "axis", ["行", "列"],
+            box="对比", orientation=Qt.Horizontal, callback=self._invalidate
         )
-        box = gui.hBox(self.controlArea, "Distance Metric")
+        box = gui.hBox(self.controlArea, "距离度量")
         self.metric_buttons = QButtonGroup()
         width = 0
         for i, metric in enumerate(MetricDefs.values()):
@@ -234,11 +234,11 @@ class OWDistances(OWWidget, ConcurrentWidgetMixin):
                 if self.axis == 0:
                     # when computing distances by columns, we want < 1000 rows
                     if len(data) > 1000:
-                        self.Error.data_too_large_for_mahalanobis("rows")
+                        self.Error.data_too_large_for_mahalanobis("行")
                         return False
                 else:
                     if len(data.domain.attributes) > 1000:
-                        self.Error.data_too_large_for_mahalanobis("columns")
+                        self.Error.data_too_large_for_mahalanobis("列")
                         return False
             return True
 
@@ -282,8 +282,8 @@ class OWDistances(OWWidget, ConcurrentWidgetMixin):
     def send_report(self):
         # pylint: disable=invalid-sequence-index
         self.report_items((
-            ("Distances Between", ["Rows", "Columns"][self.axis]),
-            ("Metric", MetricDefs[self.metric_id].name)
+            ("距离对象", ["行", "列 "][self.axis]),
+            ("度量", MetricDefs[self.metric_id].name)
         ))
 
     @classmethod

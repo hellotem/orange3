@@ -69,4 +69,4 @@ class EvaluateTest(WidgetTest):
         ]
         res = evaluation.CrossValidation(k=2, store_data=True)(data, learners)
         # this is a mixin; pylint: disable=no-member
-        self.send_signal("Evaluation Results", res)
+        self.send_signal("评估结果", res)

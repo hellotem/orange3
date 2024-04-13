@@ -118,7 +118,7 @@ def torgerson(distances, n_components=2, eigen_solver="auto"):
 
 class MDS(SklProjector):
     __wraps__ = skl_manifold.MDS
-    name = 'MDS'
+    name = '多维缩放'
 
     def __init__(self, n_components=2, metric=True, n_init=4, max_iter=300,
                  eps=0.001, n_jobs=1, random_state=None,
@@ -166,7 +166,7 @@ class MDS(SklProjector):
 
 class Isomap(SklProjector):
     __wraps__ = skl_manifold.Isomap
-    name = 'Isomap'
+    name = '等距映射'
 
     def __init__(self, n_neighbors=5, n_components=2, eigen_solver='auto',
                  tol=0, max_iter=None, path_method='auto',
@@ -178,7 +178,7 @@ class Isomap(SklProjector):
 
 class LocallyLinearEmbedding(SklProjector):
     __wraps__ = skl_manifold.LocallyLinearEmbedding
-    name = 'Locally Linear Embedding'
+    name = '局部线性嵌入'
 
     def __init__(self, n_neighbors=5, n_components=2, reg=0.001,
                  eigen_solver='auto', tol=1e-06, max_iter=100,
@@ -192,7 +192,7 @@ class LocallyLinearEmbedding(SklProjector):
 
 class SpectralEmbedding(SklProjector):
     __wraps__ = skl_manifold.SpectralEmbedding
-    name = 'Spectral Embedding'
+    name = '谱嵌入'
 
     def __init__(self, n_components=2, affinity='nearest_neighbors', gamma=None,
                  random_state=None, eigen_solver=None, n_neighbors=None, n_jobs=1,

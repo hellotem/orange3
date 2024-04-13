@@ -83,29 +83,29 @@ class BorderedItemDelegate(QStyledItemDelegate):
 class OWConfusionMatrix(widget.OWWidget):
     """Confusion matrix widget"""
 
-    name = "Confusion Matrix"
-    description = "Display a confusion matrix constructed from " \
-                  "the results of classifier evaluations."
+    name = "混淆矩阵 Confusion Matrix"
+    description = "显示由 " \
+                  "分类器评估结果构建的混淆矩阵。"
     icon = "icons/ConfusionMatrix.svg"
     priority = 1001
-    keywords = "confusion matrix"
+    keywords = "混淆矩阵"
 
     class Inputs:
-        evaluation_results = Input("Evaluation Results", Orange.evaluation.Results)
+        evaluation_results = Input("评估结果", Orange.evaluation.Results)
 
     class Outputs:
-        selected_data = Output("Selected Data", Orange.data.Table, default=True)
+        selected_data = Output("选中的数据", Orange.data.Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Orange.data.Table)
 
-    quantities = ["Number of instances",
-                  "Proportion of predicted",
-                  "Proportion of actual",
-                  "Sum of probabilities"]
-    qu_tooltips = ["Number of correctly and incorrectly classified instances",
-                   "Proportion of predicted",
-                   "Proportion of actual",
-                   "Number of instances, distributed across columns "
-                   "according to predicted probabilities"]
+    quantities = ["实例数量",
+                  "预测的比例",
+                  "实际的比例",
+                  "概率之和"]
+    qu_tooltips = ["正确和错误分类的实例数量",
+                   "预测的比例",
+                   "实际的比例",
+                   "实例数量,跨列 "
+                   "按预测概率分布"]
 
     settings_version = 1
     settingsHandler = ClassValuesContextHandler()
@@ -119,14 +119,14 @@ class OWConfusionMatrix(widget.OWWidget):
 
     UserAdviceMessages = [
         widget.Message(
-            "Clicking on cells or in headers outputs the corresponding "
-            "data instances",
+            "单击单元格或标头输出相应 "
+            "数据实例",
             "click_cell")]
 
     class Error(widget.OWWidget.Error):
-        no_regression = Msg("Confusion Matrix cannot show regression results.")
-        invalid_values = Msg("Evaluation Results input contains invalid values")
-        empty_input = widget.Msg("Empty result on input. Nothing to display.")
+        no_regression = Msg("混淆矩阵无法显示回归结果。")
+        invalid_values = Msg("评估结果输入包含无效值")
+        empty_input = widget.Msg("输入结果为空。无需显示。")
 
     def __init__(self):
         super().__init__()
@@ -137,16 +137,16 @@ class OWConfusionMatrix(widget.OWWidget):
         self.headers = []
 
         self.learners_box = gui.listBox(
-            self.controlArea, self, "selected_learner", "learners", box='Learners',
+            self.controlArea, self, "selected_learner", "learners", box='学习器',
             callback=self._learner_changed
         )
 
         self.outputbox = gui.vBox(self.buttonsArea)
-        box = gui.vBox(self.outputbox, box="Output")
+        box = gui.vBox(self.outputbox, box="输出")
         gui.checkBox(box, self, "append_predictions",
-                     "Predictions", callback=self._invalidate)
+                     "预测", callback=self._invalidate)
         gui.checkBox(box, self, "append_probabilities",
-                     "Probabilities",
+                     "概率",
                      callback=self._invalidate)
 
         gui.auto_apply(self.outputbox, self, "autocommit", box=False)
@@ -155,7 +155,7 @@ class OWConfusionMatrix(widget.OWWidget):
 
         sbox = gui.hBox(box)
         gui.rubber(sbox)
-        gui.comboBox(sbox, self, "selected_quantity", label="Show: ",
+        gui.comboBox(sbox, self, "selected_quantity", label="显示: ",
                      items=self.quantities, tooltips=self.qu_tooltips,
                      orientation=Qt.Horizontal, callback=self._update)
 
@@ -175,11 +175,11 @@ class OWConfusionMatrix(widget.OWWidget):
         box.layout().addWidget(view)
 
         selbox = gui.hBox(box)
-        gui.button(selbox, self, "Select Correct",
+        gui.button(selbox, self, "选择正确",
                    callback=self.select_correct, autoDefault=False)
-        gui.button(selbox, self, "Select Misclassified",
+        gui.button(selbox, self, "选择错分类",
                    callback=self.select_wrong, autoDefault=False)
-        gui.button(selbox, self, "Clear Selection",
+        gui.button(selbox, self, "清除选择",
                    callback=self.select_none, autoDefault=False)
 
     @staticmethod
@@ -195,13 +195,13 @@ class OWConfusionMatrix(widget.OWWidget):
 
     def _init_table(self, nclasses):
         item = self._item(0, 2)
-        item.setData("Predicted", Qt.DisplayRole)
+        item.setData("预测", Qt.DisplayRole)
         item.setTextAlignment(Qt.AlignCenter)
         item.setFlags(Qt.NoItemFlags)
 
         self._set_item(0, 2, item)
         item = self._item(2, 0)
-        item.setData("Actual", Qt.DisplayRole)
+        item.setData("实际", Qt.DisplayRole)
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignBottom)
         item.setFlags(Qt.NoItemFlags)
         self.tableview.setItemDelegateForColumn(0, gui.VerticalItemDelegate())
@@ -294,7 +294,7 @@ class OWConfusionMatrix(widget.OWWidget):
         # NOTE: The 'learner_names' is set in 'Test Learners' widget.
         self.learners = getattr(
             results, "learner_names",
-            [f"Learner #{i + 1}" for i in range(nmodels)])
+            [f"学习器 #{i + 1}" for i in range(nmodels)])
 
         self._init_table(len(class_values))
         self.openContext(data.domain.class_var)
@@ -500,7 +500,7 @@ class OWConfusionMatrix(widget.OWWidget):
                     col_val = colors[i, j]
                     item = self._item(i + 2, j + 2)
                     item.setData(
-                        "NA" if _isinvalid(val) else formatstr.format(val),
+                        "无" if _isinvalid(val) else formatstr.format(val),
                         Qt.DisplayRole)
                     bkcolor = QColor.fromHsl(
                         [0, 240][i == j], 160,
@@ -509,7 +509,7 @@ class OWConfusionMatrix(widget.OWWidget):
                     # bkcolor is light-ish so use a black text
                     item.setData(QBrush(Qt.black), Qt.ForegroundRole)
                     item.setData("trbl", BorderRole)
-                    item.setToolTip("actual: {}\npredicted: {}".format(
+                    item.setToolTip("实际: {}\n预测: {}".format(
                         self.headers[i], self.headers[j]))
                     item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
@@ -538,7 +538,7 @@ class OWConfusionMatrix(widget.OWWidget):
         """Send report"""
         if self.results is not None and self.selected_learner:
             self.report_table(
-                "Confusion matrix for {} (showing {})".
+                "{} 的混淆矩阵(显示 {})".
                 format(self.learners[self.selected_learner[0]],
                        self.quantities[self.selected_quantity].lower()),
                 self.tableview)

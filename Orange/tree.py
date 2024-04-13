@@ -95,7 +95,7 @@ class MappedDiscreteNode(Node):
             child.condition = in_brnch
         vals = [attr.values[j] for j in sorted(child.condition)]
         if not vals:
-            child.description = "(unreachable)"
+            child.description = "(不可达)"
         else:
             child.description = vals[0] if len(vals) == 1 else \
                 "{} or {}".format(", ".join(vals[:-1]), vals[-1])

@@ -226,20 +226,20 @@ class SelectAttributesDomainContextHandler(DomainContextHandler):
 
 class OWSelectAttributes(widget.OWWidget):
     # pylint: disable=too-many-instance-attributes
-    name = "Select Columns"
-    description = "Select columns from the data table and assign them to " \
-                  "data features, classes or meta variables."
-    category = "Transform"
+    name = "选择列 Select Columns"
+    description = "从数据表中选择列,并将它们分配到 " \
+                  "数据特征、类或元变量。"
+    category = "变换"
     icon = "icons/SelectColumns.svg"
     priority = 100
-    keywords = "select columns, filter, attributes, target, variable"
+    keywords = "选择列,过滤,属性,目标,变量"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
+        data = Input("数据", Table, default=True)
         features = Input("Features", AttributeList)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数据", Table)
         features = Output("Features", AttributeList, dynamic=False)
 
     want_main_area = False
@@ -252,8 +252,8 @@ class OWSelectAttributes(widget.OWWidget):
     auto_commit = Setting(True)
 
     class Warning(widget.OWWidget.Warning):
-        mismatching_domain = Msg("Features and data domain do not match")
-        multiple_targets = Msg("Most widgets do not support multiple targets")
+        mismatching_domain = Msg("特征和数据域不匹配")
+        multiple_targets = Msg("大多数小部件不支持多个目标")
 
     def __init__(self):
         super().__init__()
@@ -290,7 +290,7 @@ class OWSelectAttributes(widget.OWWidget):
         self.controlArea.setLayout(layout)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        name = "Ignored"
+        name = "忽略"
         box = gui.vBox(self.controlArea, name,
                        addToLayout=False)
 
@@ -315,7 +315,7 @@ class OWSelectAttributes(widget.OWWidget):
         layout.addWidget(box, 0, 0, 3, 1)
 
         # 3rd column
-        name = "Features"
+        name = "特征"
         box = gui.vBox(self.controlArea, name, addToLayout=False)
         self.used_attrs = VariablesListItemModel(primitive=True)
         filter_edit, self.used_attrs_view = variables_filter(
@@ -330,7 +330,7 @@ class OWSelectAttributes(widget.OWWidget):
         self.used_attrs_view.dragDropActionDidComplete.connect(dropcompleted)
         self.use_features_box = gui.auto_commit(
             self.controlArea, self, "use_input_features",
-            "Use input features", "Always use input features",
+            "使用输入特征", "总是使用输入特征",
             box=False, commit=self.__use_features_clicked,
             callback=self.__use_features_changed, addToLayout=False
         )
@@ -342,7 +342,7 @@ class OWSelectAttributes(widget.OWWidget):
         self.view_boxes.append((name, box, self.used_attrs_view))
         filter_edit.textChanged.connect(self.__var_counts_update_timer.start)
 
-        name = "Target"
+        name = "目标"
         box = gui.vBox(self.controlArea, name, addToLayout=False)
         self.class_attrs = VariablesListItemModel(primitive=True)
         self.class_attrs_view = PrimitivesView(
@@ -358,7 +358,7 @@ class OWSelectAttributes(widget.OWWidget):
         layout.addWidget(box, 1, 2, 1, 1)
         self.view_boxes.append((name, box, self.class_attrs_view))
 
-        name = "Metas"
+        name = "元数据"
         box = gui.vBox(self.controlArea, name, addToLayout=False)
         self.meta_attrs = VariablesListItemModel()
         self.meta_attrs_view = SelectedVarsView(
@@ -397,16 +397,16 @@ class OWSelectAttributes(widget.OWWidget):
         layout.addWidget(bbox, 2, 1, 1, 1)
 
         # footer
-        gui.button(self.buttonsArea, self, "Reset", callback=self.reset)
+        gui.button(self.buttonsArea, self, "重置", callback=self.reset)
 
         bbox = gui.vBox(self.buttonsArea)
         gui.checkBox(
             widget=bbox,
             master=self,
             value="ignore_new_features",
-            label="Ignore new variables by default",
-            tooltip="When the widget receives data with additional columns "
-                    "they are added to the available attributes column if "
+            label="默认忽略新变量",
+            tooltip="当小部件接收具有附加列的数据时 "
+                    "如果勾选了 <i>默认忽略新变量</i>,它们将添加到可用属性列中 "
                     "<i>Ignore new variables by default</i> is checked."
         )
 
@@ -744,17 +744,17 @@ class OWSelectAttributes(widget.OWWidget):
         if not self.data or not self.output_data:
             return
         in_domain, out_domain = self.data.domain, self.output_data.domain
-        self.report_domain("Input data", self.data.domain)
+        self.report_domain("输入数据", self.data.domain)
         if (in_domain.attributes, in_domain.class_vars, in_domain.metas) == (
                 out_domain.attributes, out_domain.class_vars, out_domain.metas):
-            self.report_paragraph("Output data", "No changes.")
+            self.report_paragraph("输出数据", "无变化。")
         else:
-            self.report_domain("Output data", self.output_data.domain)
+            self.report_domain("输出数据", self.output_data.domain)
             diff = list(set(in_domain.variables + in_domain.metas) -
                         set(out_domain.variables + out_domain.metas))
             if diff:
                 text = f'{len(diff)} ({", ".join(x.name for x in diff)})'
-                self.report_items((("Removed", text),))
+                self.report_items((("已移除", text),))
 
 
 if __name__ == "__main__":  # pragma: no cover

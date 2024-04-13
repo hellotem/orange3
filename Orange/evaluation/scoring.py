@@ -143,8 +143,8 @@ class RegressionScore(Score, abstract=True):
 # pylint: disable=invalid-name
 class CA(ClassificationScore):
     __wraps__ = skl_metrics.accuracy_score
-    name = "CA"
-    long_name = "Classification accuracy"
+    name = "分类准确率"
+    long_name = "分类准确率 "
     priority = 20
 
 
@@ -194,20 +194,20 @@ class TargetScore(ClassificationScore):
 
 class Precision(TargetScore):
     __wraps__ = skl_metrics.precision_score
-    name = "Prec"
-    long_name = "Precision"
+    name = "精确率"
+    long_name = "精确率"
     priority = 40
 
 
 class Recall(TargetScore):
     __wraps__ = skl_metrics.recall_score
-    name = long_name = "Recall"
+    name = long_name = "召回率"
     priority = 50
 
 
 class F1(TargetScore):
     __wraps__ = skl_metrics.f1_score
-    name = long_name = "F1"
+    name = long_name = "F1值"
     priority = 30
 
 
@@ -227,7 +227,7 @@ class AUC(ClassificationScore):
     separate_folds = True
     is_binary = True
     name = "AUC"
-    long_name = "Area under ROC curve"
+    long_name = "受试者工作特征曲线下面积"
     priority = 10
 
     @staticmethod
@@ -239,7 +239,7 @@ class AUC(ClassificationScore):
         weights = np.array([c * (N - c) for c in class_cases])
         wsum = np.sum(weights)
         if wsum == 0:
-            raise ValueError("Class variable has less than two values")
+            raise ValueError("类变量少于两个值")
         else:
             return weights / wsum
 
@@ -263,7 +263,7 @@ class AUC(ClassificationScore):
         n_classes = len(domain.class_var.values)
 
         if n_classes < 2:
-            raise ValueError("Class variable has less than two values")
+            raise ValueError("类变量少于两个值")
         elif n_classes == 2:
             return self.single_class_auc(results, 1)
         else:
@@ -301,8 +301,8 @@ class LogLoss(ClassificationScore):
     """
     __wraps__ = skl_metrics.log_loss
     priority = 120
-    name = "LogLoss"
-    long_name = "Logistic loss"
+    name = "对数损失"
+    long_name = "对数损失"
     default_visible = False
 
     def compute_score(self, results, eps="auto", normalize=True,
@@ -328,8 +328,8 @@ class LogLoss(ClassificationScore):
 class Specificity(ClassificationScore):
     is_binary = True
     priority = 110
-    name = "Spec"
-    long_name = "Specificity"
+    name = "特异性"
+    long_name = "特异性"
     default_visible = False
 
     @staticmethod
@@ -367,9 +367,9 @@ class Specificity(ClassificationScore):
             elif average == "binary":  # average is binary
                 if n_classes != 2:
                     raise ValueError(
-                        "Binary averaging needs two classes in data: "
-                        "specify target class or use "
-                        "weighted averaging.")
+                        "二进制平均需要数据中有两个类:"
+                        "指定目标类或使用"
+                        "加权平均。")
                 return self.single_class_specificity(results, 1)
             else:
                 raise ValueError(
@@ -382,7 +382,7 @@ class Specificity(ClassificationScore):
 class MatthewsCorrCoefficient(ClassificationScore):
     __wraps__ = skl_metrics.matthews_corrcoef
     name = "MCC"
-    long_name = "Matthews correlation coefficient"
+    long_name = "马修相关系数"
 
 
 # Regression scores
@@ -391,13 +391,13 @@ class MatthewsCorrCoefficient(ClassificationScore):
 class MSE(RegressionScore):
     __wraps__ = skl_metrics.mean_squared_error
     name = "MSE"
-    long_name = "Mean square error"
+    long_name = "均方误差"
     priority = 20
 
 
 class RMSE(RegressionScore):
     name = "RMSE"
-    long_name = "Root mean square error"
+    long_name = "根均方误差"
 
     def compute_score(self, results):
         return np.sqrt(MSE(results))
@@ -407,31 +407,31 @@ class RMSE(RegressionScore):
 class MAE(RegressionScore):
     __wraps__ = skl_metrics.mean_absolute_error
     name = "MAE"
-    long_name = "Mean absolute error"
+    long_name = "平均绝对误差"
     priority = 40
 
 class MAPE(RegressionScore):
     __wraps__ = skl_metrics.mean_absolute_percentage_error
     name = "MAPE"
-    long_name = "Mean absolute percentage error"
+    long_name = "平均绝对百分比误差"
     priority = 45
 
 # pylint: disable=invalid-name
 class R2(RegressionScore):
     __wraps__ = skl_metrics.r2_score
     name = "R2"
-    long_name = "Coefficient of determination"
+    long_name = "决定系数"
     priority = 50
 
 
 class CVRMSE(RegressionScore):
     name = "CVRMSE"
-    long_name = "Coefficient of variation of the RMSE"
+    long_name = "RMSE的变异系数"
     priority = 110
     default_visible = False
 
     def compute_score(self, results):
         mean = np.nanmean(results.actual)
         if mean < 1e-10:
-            raise ValueError("Mean value is too small")
+            raise ValueError("均值太小")
         return RMSE(results) / mean * 100

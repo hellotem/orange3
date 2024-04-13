@@ -18,9 +18,9 @@ from Orange.widgets.settings import ContextHandler, Setting, ContextSetting
 from Orange.widgets.utils import itemmodels
 
 
-DEFAULT_ITEM_NAME = "item"
-DEFAULT_VALUE_NAME = "value"
-DEFAULT_NAME_FOR_ROW = "row"
+DEFAULT_ITEM_NAME = "项目"
+DEFAULT_VALUE_NAME = "值"
+DEFAULT_NAME_FOR_ROW = "行"
 
 
 class MeltContextHandler(ContextHandler):
@@ -58,23 +58,23 @@ class MeltContextHandler(ContextHandler):
 
 
 class OWMelt(widget.OWWidget):
-    name = "Melt"
-    description = "Convert wide data to narrow data, a list of item-value pairs"
-    category = "Transform"
+    name = "拆分 Melt"
+    description = "将宽数据转换为窄数据，即项目-值对列表"
+    category = "变换"
     icon = "icons/Melt.svg"
-    keywords = "melt, shopping list, wide, narrow"
+    keywords = "拆分，购物清单，宽数据，窄数据"
     priority = 2230
 
     class Inputs:
-        data = widget.Input("Data", Table)
+        data = widget.Input("数据", Table)
 
     class Outputs:
-        data = widget.Output("Data", Table)
+        data = widget.Output("数据", Table)
 
     class Information(widget.OWWidget.Information):
         no_suitable_features = Msg(
-            "No columns with unique values\n"
-            "Only columns with unique valules are useful for row identifiers.")
+            "没有具有唯一值的列\n"
+            "只有具有唯一值的列对于行识别符有用")
 
     want_main_area = False
     resizing_enabled = False
@@ -93,26 +93,26 @@ class OWMelt(widget.OWWidget):
         self.data: Optional[Table] = None
         self._output_desc: Optional[Dict[str, str]] = None
 
-        box = gui.widgetBox(self.controlArea, "Unique Row Identifier")
+        box = gui.widgetBox(self.controlArea, "唯一行识别符")
         self.idvar_model = itemmodels.VariableListModel(
-            [None], placeholder="Row number")
+            [None], placeholder="行号")
         self.var_cb = gui.comboBox(
             box, self, "idvar", model=self.idvar_model,
             callback=self._invalidate, minimumContentsLength=16,
-            tooltip="A column with identifier, like customer's id")
+            tooltip="包含标识符的列，如客户ID")
 
-        box = gui.widgetBox(self.controlArea, "Filter")
+        box = gui.widgetBox(self.controlArea, "过滤器")
         gui.checkBox(
-            box, self, "only_numeric", "Ignore non-numeric features",
+            box, self, "only_numeric", "忽略非数值特征",
             callback=self._invalidate)
         gui.checkBox(
-            box, self, "exclude_zeros", "Exclude zero values",
+            box, self, "exclude_zeros", "排除零值",
             callback=self._invalidate,
-            tooltip="Besides missing values, also omit items with zero values")
+            tooltip="除了缺失值，还忽略零值项目")
 
         form = QFormLayout()
         gui.widgetBox(
-            self.controlArea, "Names for generated features", orientation=form)
+            self.controlArea, "生成特征的名称", orientation=form)
         form.addRow("Item:",
                     gui.lineEdit(
                         None, self, "item_var_name",
@@ -176,19 +176,19 @@ class OWMelt(widget.OWWidget):
             self._output_desc = None
 
     def send_report(self):
-        self.report_items("Settings", (
-            ("Row identifier", self.controls.idvar.currentText()),
-            ("Ignore non-numeric features", bool_str(self.only_numeric)),
-            ("Exclude zero values", bool_str(self.exclude_zeros))
+        self.report_items("设置", (
+            ("行识别符", self.controls.idvar.currentText()),
+            ("忽略非数值特征", bool_str(self.only_numeric)),
+            ("排除零值", bool_str(self.exclude_zeros))
         ))
         if self._output_desc:
-            self.report_items("Output", self._output_desc)
+            self.report_items("输出", self._output_desc)
 
     def _store_output_desc(self, output):
         self._output_desc = {
-            "Item column": output.domain.attributes[1].name,
-            "Value column": output.domain.class_var.name,
-            "Number of items": len(output)
+            "项目列": output.domain.attributes[1].name,
+            "值列": output.domain.class_var.name,
+            "项目数": len(output)
         }
 
     def _reshape_to_long(self):

@@ -139,22 +139,22 @@ class SortProxyModel(QSortFilterProxyModel):
 
 
 class OWBoxPlot(widget.OWWidget):
-    name = "Box Plot"
-    description = "Visualize the distribution of feature values in a box plot."
+    name = "箱线图 Box Plot"
+    description = "以箱线图形式可视化特征值分布"
     icon = "icons/BoxPlot.svg"
     priority = 100
     keywords = "box plot, whisker"
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
+        data = Input("数据", Orange.data.Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Orange.data.Table, default=True)
+        selected_data = Output("选择的数据", Orange.data.Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Orange.data.Table)
 
     class Warning(widget.OWWidget.Warning):
         no_vars = widget.Msg(
-            "Data contains no categorical or numeric variables")
+            "数据不包含分类或数值变量")
 
     buttons_area_orientation = None
 
@@ -224,7 +224,7 @@ class OWBoxPlot(widget.OWWidget):
         sorted_model = SortProxyModel(sortRole=Qt.UserRole)
         sorted_model.setSourceModel(self.attrs)
         sorted_model.sort(0)
-        box = gui.vBox(self.controlArea, "Variable")
+        box = gui.vBox(self.controlArea, "变量")
         view = self.attr_list = ListViewSearch()
         view.setModel(sorted_model)
         view.setSelectionMode(view.SingleSelection)
@@ -237,16 +237,16 @@ class OWBoxPlot(widget.OWWidget):
         box.layout().addWidget(view)
         gui.checkBox(
             box, self, "order_by_importance",
-            "Order by relevance to subgroups",
-            tooltip="Order by 𝜒² or ANOVA over the subgroups",
+            "按与子组相关性排序",
+            tooltip="按子组 𝜒² 或 ANOVA 排序",
             callback=self.apply_attr_sorting)
 
-        self.group_vars = VariableListModel(placeholder="None")
+        self.group_vars = VariableListModel(placeholder="无 ")
         sorted_model = SortProxyModel(sortRole=Qt.UserRole)
         sorted_model.setSourceModel(self.group_vars)
         sorted_model.sort(0)
 
-        box = gui.vBox(self.controlArea, "Subgroups")
+        box = gui.vBox(self.controlArea, "子组")
         view = self.group_list = ListViewSearch()
         view.setModel(sorted_model)
         view.selectionModel().selectionChanged.connect(self.grouping_changed)
@@ -256,37 +256,37 @@ class OWBoxPlot(widget.OWWidget):
         box.layout().addWidget(view)
         gui.checkBox(
             box, self, "order_grouping_by_importance",
-            "Order by relevance to variable",
-            tooltip="Order by 𝜒² or ANOVA over the variable values",
+            "按与变量相关性排序",
+            tooltip="按变量值 𝜒² 或 ANOVA 排序",
             callback=self.apply_group_sorting)
 
         # TODO: move Compare median/mean to grouping box
         # The vertical size policy is needed to let only the list views expand
         self.display_box = gui.vBox(
-            self.controlArea, "Display",
+            self.controlArea, "显示",
             sizePolicy=(QSizePolicy.Minimum, QSizePolicy.Maximum))
 
-        gui.checkBox(self.display_box, self, "show_annotations", "Annotate",
+        gui.checkBox(self.display_box, self, "show_annotations", "注释",
                      callback=self.update_graph)
         self.compare_rb = gui.radioButtonsInBox(
             self.display_box, self, 'compare',
-            btnLabels=["No comparison", "Compare medians", "Compare means"],
+            btnLabels=["无比较", "比较中位数", "比较均值"],
             callback=self.update_graph)
 
         # The vertical size policy is needed to let only the list views expand
         self.stretching_box = box = gui.vBox(
-            self.controlArea, box="Display",
+            self.controlArea, box="显示",
             sizePolicy=(QSizePolicy.Minimum, QSizePolicy.Fixed))
         self.stretching_box.sizeHint = self.display_box.sizeHint
         gui.checkBox(
-            box, self, 'stretched', "Stretch bars",
+            box, self, 'stretched', "拉伸条形",
             callback=self.update_graph,
             stateWhenDisabled=False)
         gui.checkBox(
-            box, self, 'show_labels', "Show box labels",
+            box, self, 'show_labels', "显示框标签",
             callback=self.update_graph)
         self.sort_cb = gui.checkBox(
-            box, self, 'sort_freqs', "Sort by subgroup frequencies",
+            box, self, 'sort_freqs', "按子组频率排序",
             callback=self.update_graph,
             stateWhenDisabled=False)
 
@@ -564,7 +564,7 @@ class OWBoxPlot(widget.OWWidget):
             return
         if self.group_var:
             self.dist = None
-            missing_val_str = f"missing '{self.group_var.name}'"
+            missing_val_str = f"缺少 '{self.group_var.name}'"
             group_var_labels = self.group_var.values + ("",)
             if self.attribute.is_continuous:
                 stats, label_texts = [], []
@@ -849,8 +849,8 @@ class OWBoxPlot(widget.OWWidget):
         if self.compare == OWBoxPlot.CompareNone or len(self.stats) < 2:
             t = ""
         elif any(s.n <= 1 for s in self.stats):
-            t = "At least one group has just one instance, " \
-                "cannot compute significance"
+            t = "至少一组只有一个实例," \
+                "无法计算显著性"
         elif len(self.stats) == 2:
             if self.compare == OWBoxPlot.CompareMedians:
                 t = ""
@@ -859,7 +859,7 @@ class OWBoxPlot(widget.OWWidget):
                 # t = "Mann-Whitney's z: %.1f (p=%.3f)" % (z, p)
             else:
                 t, p = stat_ttest()
-                t = "" if np.isnan(t) else f"Student's t: {t:.3f} (p={p:.3f}, N={n})"
+                t = "" if np.isnan(t) else f"学生 t 检验: {t:.3f} (p={p:.3f}, N={n})"
         else:
             if self.compare == OWBoxPlot.CompareMedians:
                 t = ""
@@ -878,7 +878,7 @@ class OWBoxPlot(widget.OWWidget):
             if np.isnan(p):
                 self.stat_test = ""
             else:
-                self.stat_test = f"χ²: {chi:.2f} (p={p:.3f}, dof={dof})"
+                self.stat_test = f"χ²: {chi:.2f} (p={p:.3f}, 自由度={dof})"
 
     def mean_label(self, stat, attr, val_name):
         label = QGraphicsItemGroup()
@@ -1130,7 +1130,7 @@ class OWBoxPlot(widget.OWWidget):
             cond = DiscDataRange(None, group_val)
             box.append(FilterGraphicsRectItem(cond, 0, -10, 1, 10))
         cum = 0
-        missing_val_str = f"missing '{attr.name}'"
+        missing_val_str = f"缺少 '{attr.name}'"
         values = attr.values + ("",)
         colors = attr.palette.qcolors_w_nan
         total = sum(dist)
@@ -1270,9 +1270,9 @@ class OWBoxPlot(widget.OWWidget):
         self.report_plot()
         text = ""
         if self.attribute:
-            text += f"Box plot for attribute '{self.attribute.name}' "
+            text += f"箱线图显示属性 '{self.attribute.name}' "
         if self.group_var:
-            text += f"grouped by '{self.group_var.name}'"
+            text += f"按 '{self.group_var.name}' 分组"
         if text:
             self.report_caption(text)
 

@@ -233,7 +233,7 @@ class Distance:
             n_vals (list of int): number of attributes values, 0 for continuous
         """
         if any(n_vals):
-            raise ValueError("columns with discrete values are incommensurable")
+            raise ValueError("离散值列不可共度")
 
 
 class DistanceModel:
@@ -287,7 +287,7 @@ class DistanceModel:
             if e2 is e1:
                 e2 = None
             else:
-                raise ValueError("Two tables cannot be compared by columns")
+                raise ValueError("两个表无法按列进行比较")
 
         x1 = _orange_to_numpy(e1)
         x2 = _orange_to_numpy(e2)

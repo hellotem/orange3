@@ -12,25 +12,25 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 
 class OWUnique(widget.OWWidget):
-    name = 'Unique'
+    name = '唯一 Unique'
     icon = 'icons/Unique.svg'
-    description = 'Filter instances unique by specified key attribute(s).'
-    category = "Transform"
+    description = '通过指定的关键属性过滤唯一实例。'
+    category = "变换"
     priority = 1120
 
     class Inputs:
-        data = widget.Input("Data", Table)
+        data = widget.Input("数据", Table)
 
     class Outputs:
-        data = widget.Output("Data", Table)
+        data = widget.Output("数据", Table)
 
     want_main_area = False
 
-    TIEBREAKERS = {'Last instance': itemgetter(-1),
-                   'First instance': itemgetter(0),
-                   'Middle instance': lambda seq: seq[len(seq) // 2],
-                   'Random instance': np.random.choice,
-                   'Discard non-unique instances':
+    TIEBREAKERS = {'最后一个实例': itemgetter(-1),
+                   '第一个实例  ': itemgetter(0),
+                   '中间实例': lambda seq: seq[len(seq) // 2],
+                   '随机实例': np.random.choice,
+                   '丢弃非唯一实例':
                    lambda seq: seq[0] if len(seq) == 1 else None}
 
     settingsHandler = settings.DomainContextHandler()
@@ -46,7 +46,7 @@ class OWUnique(widget.OWWidget):
 
         self.var_model = DomainModel(parent=self, order=DomainModel.MIXED)
         var_list = gui.listView(
-            self.controlArea, self, "selected_vars", box="Group by",
+            self.controlArea, self, "selected_vars", box="分组依据",
             model=self.var_model, callback=self.commit.deferred,
             viewType=ListViewFilter
         )
@@ -58,7 +58,7 @@ class OWUnique(widget.OWWidget):
             items=tuple(self.TIEBREAKERS),
             callback=self.commit.deferred, sendSelectedValue=True)
         gui.auto_commit(
-            self.controlArea, self, 'autocommit', 'Commit',
+            self.controlArea, self, 'autocommit', '提交',
             orientation=Qt.Horizontal)
 
     @Inputs.data

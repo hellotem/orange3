@@ -21,23 +21,23 @@ from Orange.widgets.widget import Input, Output
 
 # Maximum number of PCA components that we can set in the widget
 MAX_COMPONENTS = 100
-LINE_NAMES = ["component variance", "cumulative variance"]
+LINE_NAMES = ["成分方差", "累积方差"]
 
 
 class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
-    name = "PCA"
-    description = "Principal component analysis with a scree-diagram."
+    name = "主成份分析 PCA"
+    description = "主成分分析及路径图"
     icon = "icons/PCA.svg"
     priority = 3050
     keywords = "pca, principal component analysis, linear transformation"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        transformed_data = Output("Transformed Data", Table, replaces=["Transformed data"])
-        data = Output("Data", Table, default=True)
-        components = Output("Components", Table)
+        transformed_data = Output("转换后的数据", Table, replaces=["转换后的数据"])
+        data = Output("数据", Table, default=True)
+        components = Output("成分", Table)
         pca = Output("PCA", PCA, dynamic=False)
 
     ncomponents = Setting(2)
@@ -51,12 +51,12 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
 
     class Warning(widget.OWWidget.Warning):
         trivial_components = widget.Msg(
-            "All components of the PCA are trivial (explain 0 variance). "
-            "Input data is constant (or near constant).")
+            "PCA 的所有成分都是微小的(方差为 0)。"
+            "输入数据是常数(或接近常数)")
 
     class Error(widget.OWWidget.Error):
-        no_features = widget.Msg("At least 1 feature is required")
-        no_instances = widget.Msg("At least 1 data instance is required")
+        no_features = widget.Msg("至少需要 1 个特征")
+        no_instances = widget.Msg("至少需要 1 个数据实例")
 
     def __init__(self):
         super().__init__()
@@ -70,7 +70,7 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
 
         # Components Selection
         form = QFormLayout()
-        box = gui.widgetBox(self.controlArea, "Components Selection",
+        box = gui.widgetBox(self.controlArea, "成分选择",
                             orientation=form)
 
         self.components_spin = gui.spin(
@@ -78,7 +78,7 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
             callback=self._update_selection_component_spin,
             keyboardTracking=False, addToLayout=False
         )
-        self.components_spin.setSpecialValueText("All")
+        self.components_spin.setSpecialValueText("全部")
 
         self.variance_spin = gui.spin(
             box, self, "variance_covered", 1, 100,
@@ -91,16 +91,16 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
         form.addRow("Explained variance:", self.variance_spin)
 
         # Options
-        self.options_box = gui.vBox(self.controlArea, "Options")
+        self.options_box = gui.vBox(self.controlArea, "选项")
         self.normalize_box = gui.checkBox(
             self.options_box, self, "normalize",
-            "Normalize variables", callback=self._update_normalize,
+            "标准化变量", callback=self._update_normalize,
             attribute=Qt.WA_LayoutUsesWidgetRect
         )
 
         self.maxp_spin = gui.spin(
             self.options_box, self, "maxp", 1, MAX_COMPONENTS,
-            label="Show only first", callback=self._setup_plot,
+            label="仅显示前", callback=self._setup_plot,
             keyboardTracking=False
         )
 
@@ -109,7 +109,7 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
         gui.auto_apply(self.buttonsArea, self, "auto_commit")
 
         self.plot = SliderGraph(
-            "Principal Components", "Proportion of variance",
+            "主成分", "方差比例",
             self._on_cut_changed)
 
         self.mainArea.layout().addWidget(self.plot)
@@ -128,7 +128,7 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
             if data.approx_len() < AUTO_DL_LIMIT:
                 data = Table(data)
             else:
-                self.information("Data has been sampled")
+                self.information("数据已被采样")
                 data_sample = data.sample_time(1, no_cache=True)
                 data_sample.download_data(2000, partial=True)
                 data = Table(data_sample)
@@ -332,7 +332,7 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
 
             # prevent caching new features by defining compute_value
             proposed = [a.name for a in self._pca.orig_domain.attributes]
-            meta_name = get_unique_names(proposed, 'components')
+            meta_name = get_unique_names(proposed, '成分')
             meta_vars = [StringVariable(name=meta_name)]
             metas = numpy.array(
                 [[f"PC{i + 1}"for i in range(self.ncomponents)]], dtype=object
@@ -350,7 +350,7 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
                 metas=meta_vars)
             components = Table(dom, self._pca.components_[:self.ncomponents],
                                metas=metas)
-            components.name = 'components'
+            components.name = '成分'
 
             data_dom = add_columns(self.data.domain, metas=domain.attributes)
             data = self.data.transform(data_dom)
@@ -364,9 +364,9 @@ class OWPCA(widget.OWWidget, ConcurrentWidgetMixin):
         if self.data is None:
             return
         self.report_items((
-            ("Normalize data", bool_str(self.normalize)),
-            ("Selected components", self.ncomponents),
-            ("Explained variance", f"{self.variance_covered:.3f} %")
+            ("标准化数据", bool_str(self.normalize)),
+            ("选择的成分", self.ncomponents),
+            ("解释的方差", f"{self.variance_covered:.3f} %")
         ))
         self.report_plot()
 

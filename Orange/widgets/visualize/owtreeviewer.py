@@ -166,18 +166,18 @@ class TreeNode(GraphicsNode):
 class OWTreeGraph(OWTreeViewer2D):
     """Graphical visualization of tree models"""
 
-    name = "Tree Viewer"
+    name = "树查看器 Tree Viewer"
     icon = "icons/TreeViewer.svg"
     priority = 35
-    keywords = "tree viewer"
+    keywords = "树查看器"
 
     class Inputs:
         # Had different input names before merging from
         # Classification/Regression tree variants
-        tree = Input("Tree", TreeModel, replaces=["Classification Tree", "Regression Tree"])
+        tree = Input("树", TreeModel, replaces=["Classification Tree", "Regression Tree"])
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True, id="selected-data")
+        selected_data = Output("选定数据", Table, default=True, id="selected-data")
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table, id="annotated-data")
 
     settingsHandler = ClassValuesContextHandler()
@@ -190,7 +190,7 @@ class OWTreeGraph(OWTreeViewer2D):
         "Orange.widgets.classify.owregressiontreegraph.OWRegressionTreeGraph"
     ]
 
-    COL_OPTIONS = ["Default", "Number of instances", "Mean value", "Variance"]
+    COL_OPTIONS = ["默认", "实例数", "均值", "方差"]
     COL_DEFAULT, COL_INSTANCE, COL_MEAN, COL_VARIANCE = range(4)
 
     def __init__(self):
@@ -200,7 +200,7 @@ class OWTreeGraph(OWTreeViewer2D):
         self.clf_dataset = None
         self.tree_adapter = None
 
-        self.color_label = QLabel("Target class: ")
+        self.color_label = QLabel("目标类: ")
         combo = self.color_combo = ComboBoxSearch()
         combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         combo.setSizeAdjustPolicy(
@@ -212,7 +212,7 @@ class OWTreeGraph(OWTreeViewer2D):
         box = gui.hBox(None)
         gui.rubber(box)
         gui.checkBox(box, self, "show_intermediate",
-                     "Show details in non-leaves",
+                     "在非叶节点显示详情",
                      callback=self.set_node_info)
         self.display_box.layout().addRow(box)
 
@@ -282,7 +282,7 @@ class OWTreeGraph(OWTreeViewer2D):
         self.model = model
         self.target_class_index = 0
         if model is None:
-            self.infolabel.setText('No tree.')
+            self.infolabel.setText('没有树。')
             self.root_node = None
             self.dataset = None
             self.tree_adapter = None
@@ -297,12 +297,12 @@ class OWTreeGraph(OWTreeViewer2D):
             class_var = self.domain.class_var
             self.scene.colors = class_var.palette
             if class_var.is_discrete:
-                self.color_label.setText("Target class: ")
-                self.color_combo.addItem("None")
+                self.color_label.setText("目标类: ")
+                self.color_combo.addItem("无")
                 self.color_combo.addItems(self.domain.class_vars[0].values)
                 self.color_combo.setCurrentIndex(self.target_class_index)
             else:
-                self.color_label.setText("Color by: ")
+                self.color_label.setText("颜色标记: ")
                 self.color_combo.addItems(self.COL_OPTIONS)
                 self.color_combo.setCurrentIndex(self.regression_colors)
             self.openContext(self.domain.class_var)
@@ -310,7 +310,7 @@ class OWTreeGraph(OWTreeViewer2D):
             self.root_node = self.walkcreate(self.tree_adapter.root)
             nodes = self.tree_adapter.num_nodes
             leaves = len(self.tree_adapter.leaves(self.tree_adapter.root))
-            self.infolabel.setText(f'{nodes} {pl(nodes, "node")}, {leaves} {pl(leaves, "leaf|leaves")}')
+            self.infolabel.setText(f'{nodes} {pl(nodes, "节点")}, {leaves} {pl(leaves, "叶节点|叶节点")}')
         self.setup_scene()
         self.Outputs.selected_data.send(None)
         self.Outputs.annotated_data.send(create_annotated_table(self.dataset, []))
@@ -336,7 +336,7 @@ class OWTreeGraph(OWTreeViewer2D):
         rule = "<br/>".join(f"{indent}– {to_html(str(rule))}"
                             for rule in self.tree_adapter.rules(node.node_inst))
         if rule:
-            rule = f"<p><b>Selection</b></p><p>{rule}</p>"
+            rule = f"<p><b>选择</b></p><p>{rule}</p>"
 
         distr = self.tree_adapter.get_distribution(node.node_inst)[0]
         class_var = self.domain.class_var
@@ -344,7 +344,7 @@ class OWTreeGraph(OWTreeViewer2D):
         if self.domain.class_var.is_discrete:
             total = float(sum(distr)) or 1
             show_all = len(distr) <= 2
-            content = f"{nbp}<b>Distribution of</b> '{name}'</p><p>" \
+            content = f"{nbp}<b>'{name}'的分布</b></p><p> " \
                 + "<table>" + "".join(
                     "<tr>"
                     f"<td><span style='color: {color_to_hex(color)}'>◼</span> "
@@ -361,11 +361,11 @@ class OWTreeGraph(OWTreeViewer2D):
         else:
             mean, var = distr
             content = f"{nbp}{class_var.name} = {mean:.3g} ± {var:.3g}<br/>" + \
-                f"({self.tree_adapter.num_samples(node.node_inst)} instances)</p>"
+                f"({self.tree_adapter.num_samples(node.node_inst)} 个实例)</p>"
 
         split = self._update_node_info_attr_name(node, "")
         if split:
-            split = f"<p style='white-space:pre'><b>Next split: </b>{split}</p>"
+            split = f"<p style='white-space:pre'><b>下一分裂: </b>{split}</p>"
         return "<hr/>".join(filter(None, (rule, content, split)))
 
     def update_selection(self):
@@ -382,15 +382,15 @@ class OWTreeGraph(OWTreeViewer2D):
     def send_report(self):
         if not self.model:
             return
-        items = [("Tree size", self.infolabel.text()),
-                 ("Edge widths",
-                  ("Fixed", "Relative to root", "Relative to parent")[
+        items = [("树大小", self.infolabel.text()),
+                 ("边宽",
+                  ("固定", "相对于根", "相对于父节点")[
                       # pylint: disable=invalid-sequence-index
                       self.line_width_method])]
         if self.domain.class_var.is_discrete:
-            items.append(("Target class", self.color_combo.currentText()))
+            items.append(("目标类", self.color_combo.currentText()))
         elif self.regression_colors != self.COL_DEFAULT:
-            items.append(("Color by", self.COL_OPTIONS[self.regression_colors]))
+            items.append(("颜色标记", self.COL_OPTIONS[self.regression_colors]))
         self.report_items(items)
         self.report_plot()
 
@@ -431,7 +431,7 @@ class OWTreeGraph(OWTreeViewer2D):
         mean, var = self.tree_adapter.get_distribution(node_inst)[0]
         insts = self.tree_adapter.num_samples(node_inst)
         text = f"<b>{mean:.1f}</b> ± {var:.1f}<br/>"
-        text += f"{insts} instances"
+        text += f"{insts} 个实例"
         return text
 
     def toggle_node_color_cls(self):

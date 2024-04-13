@@ -9,9 +9,9 @@ class LearnerRegression(Learner):
     def incompatibility_reason(self, domain):
         reason = None
         if len(domain.class_vars) > 1 and not self.supports_multiclass:
-            reason = "Too many target variables."
+            reason = "目标变量太多。"
         elif not domain.has_continuous_class:
-            reason = "Numeric target variable expected."
+            reason = "需要数值型目标变量。"
         return reason
 
 

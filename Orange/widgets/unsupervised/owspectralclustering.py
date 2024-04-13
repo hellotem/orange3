@@ -99,12 +99,11 @@ class NotEnoughData(ValueError):
 
 
 class OWKMeans(widget.OWWidget):
-    name = "k-均值 k-Means"
-    description = "基于轮廓的 k-均值" \
-                  "聚类算法的质量估计。"
-    icon = "icons/KMeans.svg"
+    name = "谱聚类 Spectral Clustering"
+    description = "图谱理论的聚类算法"
+    icon = "icons/SpectralClustering.svg"
     priority = 2100
-    keywords = "k-means, kmeans, clustering"
+    keywords = "spectral, graph, clustering"
 
     class Inputs:
         data = Input("数据", Table)

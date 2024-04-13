@@ -46,65 +46,65 @@ PredictorSlot = NamedTuple(
 
 
 NO_ERR, DIFF_ERROR, ABSDIFF_ERROR, REL_ERROR, ABSREL_ERROR = range(5)
-ERROR_OPTS = ["(None)", "Difference", "Absolute difference",
-              "Relative", "Absolute relative"]
+ERROR_OPTS = ["(None)", "差异", "绝对差异",
+              "相对", "绝对相对"]
 ERROR_TOOLTIPS = [
-    "Don't show columns with errors",
-    "Show difference between predicted and actual value",
-    "Show absolute difference between predicted and actual value",
-    "Show relative difference between predicted and actual value",
-    "Show absolute value of relative difference between predicted and actual value"]
+    "不显示有错误的列",
+    "显示预测值和实际值之间的差异",
+    "显示预测值和实际值之间的绝对差异",
+    "显示预测值和实际值之间的相对差异",
+    "显示预测值和实际值之间的相对差异的绝对值"]
 
 
 class OWPredictions(OWWidget):
-    name = "Predictions"
+    name = "预测 Predictions"
     icon = "icons/Predictions.svg"
     priority = 200
-    description = "Display predictions of models for an input dataset."
-    keywords = "predictions"
+    description = "显示模型对输入数据集的预测。"
+    keywords = "预测"
 
     settings_version = 2
 
     want_control_area = False
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
-        predictors = MultiInput("Predictors", Model, filter_none=True)
+        data = Input("数据", Orange.data.Table)
+        predictors = MultiInput("预测器", Model, filter_none=True)
 
     class Outputs:
-        predictions = Output("Predictions", Orange.data.Table)
-        evaluation_results = Output("Evaluation Results", Results)
+        predictions = Output("预测", Orange.data.Table)
+        evaluation_results = Output("评估结果", Results)
 
     class Warning(OWWidget.Warning):
-        empty_data = Msg("Empty dataset")
+        empty_data = Msg("空数据集")
         wrong_targets = Msg(
-            "Some model(s) predict a different target (see more ...)\n{}")
-        missing_targets = Msg("Instances with missing targets "
-                              "are ignored while scoring.")
+            "某些模型预测不同的目标 (查看更多 ...)\n{}")
+        missing_targets = Msg("缺失目标的实例"
+                              "在计算分数时被忽略。")
 
     class Error(OWWidget.Error):
-        predictor_failed = Msg("Some predictor(s) failed (see more ...)\n{}")
-        scorer_failed = Msg("Some scorer(s) failed (see more ...)\n{}")
+        predictor_failed = Msg("某些预测器失败 (查看更多 ...)\n{}")
+        scorer_failed = Msg("某些评分器失败 (查看更多 ...)\n{}")
 
     settingsHandler = settings.ClassValuesContextHandler()
     score_table = settings.SettingProvider(ScoreTable)
 
     #: List of selected class value indices in the `class_values` list
     PROB_OPTS = ["(None)",
-                 "Classes in data", "Classes known to the model", "Classes in data and model"]
-    PROB_TOOLTIPS = ["Don't show probabilities",
-                     "Show probabilities for classes in the data",
-                     "Show probabilities for classes known to the model,\n"
-                     "including those that don't appear in this data",
-                     "Show probabilities for classes in data that are also\n"
-                     "known to the model"
+                 "数据中的类", "模型已知的类", "数据和模型中的类"]
+    PROB_TOOLTIPS = ["不显示概率",
+                     "显示数据中类的概率",
+                     "显示模型已知的类的概率,\n"
+                     "包括在此数据中不出现的类",
+                     "显示数据中已知模型类的概率\n"
+                     "分布"
                      ]
 
     NO_PROBS, DATA_PROBS, MODEL_PROBS, BOTH_PROBS = range(4)
     shown_probs = settings.ContextSetting(NO_PROBS)
     selection = settings.Setting([], schema_only=True)
     show_scores = settings.Setting(True)
-    TARGET_AVERAGE = "(Average over classes)"
+    TARGET_AVERAGE = "(类平均值)"
     target_class = settings.ContextSetting(TARGET_AVERAGE)
     show_probability_errors = settings.ContextSetting(True)
     show_reg_errors = settings.ContextSetting(DIFF_ERROR)
@@ -126,7 +126,7 @@ class OWPredictions(OWWidget):
         predopts = gui.hBox(
             None, sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed))
         self._prob_controls = [
-            gui.widgetLabel(predopts, "Show probabilities for"),
+            gui.widgetLabel(predopts, "显示概率"),
             gui.comboBox(
                 predopts, self, "shown_probs", contentsLength=30,
                 callback=self._update_prediction_delegate),
@@ -135,32 +135,32 @@ class OWPredictions(OWWidget):
         self._cls_error_controls = [
             gui.checkBox(
                 predopts, self, "show_probability_errors",
-                "Show classification errors",
-                tooltip="Show 1 - probability assigned to the correct class",
+                "显示分类错误",
+                tooltip="显示1 - 分配给正确类的概率",
                 callback=self._update_errors_visibility
             )
         ]
 
-        err_label = gui.widgetLabel(predopts, "Shown regression error: ")
+        err_label = gui.widgetLabel(predopts, "显示回归误差: ")
         err_combo = gui.comboBox(
             predopts, self, "show_reg_errors", items=ERROR_OPTS,
             callback=self._reg_error_changed,
-            toolTip="See tooltips for individual options")
+            toolTip="查看各个选项的工具提示")
         self._reg_error_controls = [err_label, err_combo]
         for i, tip in enumerate(ERROR_TOOLTIPS):
             err_combo.setItemData(i, tip, Qt.ToolTipRole)
 
         gui.rubber(predopts)
-        self.reset_button = button = QPushButton("Restore Original Order")
+        self.reset_button = button = QPushButton("恢复原始顺序")
         button.clicked.connect(self._reset_order)
-        button.setToolTip("Show rows in the original order")
+        button.setToolTip("按原始顺序显示行")
         button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         predopts.layout().addWidget(self.reset_button)
 
         self.score_opt_box = scoreopts = gui.hBox(
             None, sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed))
         gui.checkBox(
-            scoreopts, self, "show_scores", "Show perfomance scores",
+            scoreopts, self, "show_scores", "显示性能分数",
             callback=self._update_score_table_visibility
         )
         gui.separator(scoreopts, 32)
@@ -436,7 +436,7 @@ class OWPredictions(OWWidget):
             if not isinstance(results, Results) or results.predicted is None:
                 continue
             row = [QStandardItem(learner_name(pred.predictor)),
-                   QStandardItem("N/A"), QStandardItem("N/A")]
+                   QStandardItem("不适用"), QStandardItem("不适用")]
             actual = results.actual
             predicted = results.predicted
             probabilities = results.probabilities
@@ -453,7 +453,7 @@ class OWPredictions(OWWidget):
                 for scorer in scorers:
                     item = QStandardItem()
                     if no_targets:
-                        item.setText("NA")
+                        item.setText("不适用")
                     else:
                         try:
                             score = scorer_caller(scorer, results,
@@ -517,22 +517,22 @@ class OWPredictions(OWWidget):
             self.Warning.missing_targets.clear()
 
     def _get_details(self):
-        details = "Data:<br>"
+        details = "数据:<br>"
         details += format_summary_details(self.data, format=Qt.RichText)
         details += "<hr>"
         pred_names = [v.name for v in self.predictors]
         n_predictors = len(self.predictors)
         if n_predictors:
             n_valid = len(self._non_errored_predictors())
-            details += f"Model: {n_predictors} {pl(n_predictors, 'model')}"
+            details += f"模型: {n_predictors} {pl(n_predictors, 'model')}"
             if n_valid != n_predictors:
-                details += f" ({n_predictors - n_valid} failed)"
+                details += f"({n_predictors - n_valid} 失败)"
             details += "<ul>"
             for name in pred_names:
                 details += f"<li>{name}</li>"
             details += "</ul>"
         else:
-            details += "Model:<br>No model on input."
+            details += "模型:<br>输入无模型。"
         return details
 
     def _invalidate_predictions(self):
@@ -892,7 +892,7 @@ class OWPredictions(OWWidget):
 
     def _add_error_out_columns(self, slot, newmetas, newcolumns, index):
         if self.shown_errors:
-            name = f"{slot.predictor.name} (error)"
+            name = f"{slot.predictor.name} (错误)"
             newmetas.append(ContinuousVariable(name=name))
             err = self.predictionsview.model().errorColumn(index)
             err[err == 2] = numpy.nan
@@ -933,24 +933,24 @@ class OWPredictions(OWWidget):
         if self.data:
             text = self._get_details().replace('\n', '<br>')
             if self.is_discrete_class and self.shown_probs != self.NO_PROBS:
-                text += '<br>Showing probabilities for '
+                text += '<br>显示概率 '
                 if self.shown_probs == self.MODEL_PROBS:
-                    text += "all classes known to the model."
+                    text += "所有模型已知的类。"
                 elif self.shown_probs == self.DATA_PROBS:
-                    text += "all classes that appear in the data."
+                    text += "所有出现在数据中的类。"
                 elif self.shown_probs == self.BOTH_PROBS:
-                    text += "all classes that appear in the data " \
-                            "and are known to the model."
+                    text += "所有出现在数据中" \
+                            "并且模型已知的类。"
                 else:
                     class_idx = self.shown_probs - len(self.PROB_OPTS)
                     text += f"'{self.class_var.values[class_idx]}.'"
-            self.report_paragraph('Info', text)
-            self.report_table("Data & Predictions", merge_data_with_predictions(),
+            self.report_paragraph('信息', text)
+            self.report_table("数据 & 预测", merge_data_with_predictions(),
                               header_rows=1, header_columns=1)
 
-            self.report_name("Scores")
+            self.report_name("分数")
             if self.is_discrete_class:
-                self.report_items([("Target class", self.target_class)])
+                self.report_items([("目标类", self.target_class)])
             self.report_table(self.score_table.view)
 
     def resizeEvent(self, event):

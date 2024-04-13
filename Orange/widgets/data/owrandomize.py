@@ -12,18 +12,18 @@ from Orange.widgets import gui
 
 
 class OWRandomize(OWWidget):
-    name = "Randomize"
-    description = "Randomize features, class and/or metas in data table."
-    category = "Transform"
+    name = "随机化 Randomize"
+    description = "随机化数据表中的特征、类和/或元数据。"
+    category = "变换"
     icon = "icons/Random.svg"
     priority = 2200
-    keywords = "randomize, random"
+    keywords = "随机化,随机"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数据", Table)
 
     resizing_enabled = False
     want_main_area = False
@@ -40,31 +40,31 @@ class OWRandomize(OWWidget):
         self.data = None
 
         # GUI
-        box = gui.hBox(self.controlArea, "Shuffled columns")
+        box = gui.hBox(self.controlArea, "随机列")
         box.layout().setSpacing(20)
         self.class_check = gui.checkBox(
-            box, self, "shuffle_class", "Classes",
+            box, self, "shuffle_class", "类",
             callback=self._shuffle_check_changed)
         self.attrs_check = gui.checkBox(
-            box, self, "shuffle_attrs", "Features",
+            box, self, "shuffle_attrs", "特征",
             callback=self._shuffle_check_changed)
         self.metas_check = gui.checkBox(
-            box, self, "shuffle_metas", "Metas",
+            box, self, "shuffle_metas", "元数据",
             callback=self._shuffle_check_changed)
 
-        box = gui.vBox(self.controlArea, "Shuffled rows")
+        box = gui.vBox(self.controlArea, "随机行")
         hbox = gui.hBox(box)
-        gui.widgetLabel(hbox, "None")
+        gui.widgetLabel(hbox, "无")
         self.scope_slider = gui.hSlider(
             hbox, self, "scope_prop", minValue=0, maxValue=100, width=140,
             createLabel=False, callback=self._scope_slider_changed)
-        gui.widgetLabel(hbox, "All")
+        gui.widgetLabel(hbox, "全部")
         self.scope_label = gui.widgetLabel(
             box, "", alignment=Qt.AlignCenter,
             sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed))
         self._set_scope_label()
         self.replicable_check = gui.checkBox(
-            box, self, "random_seed", "Replicable shuffling",
+            box, self, "random_seed", "可复制的随机化",
             callback=self._shuffle_check_changed)
 
         gui.auto_apply(self.buttonsArea, self)
@@ -105,15 +105,15 @@ class OWRandomize(OWWidget):
         self.Outputs.data.send(data)
 
     def send_report(self):
-        labels = ["classes", "features", "metas"]
+        labels = ["类", "特征", "元数据"]
         include = [label for label, i in zip(labels, self.parts) if i]
-        text = "none" if not include else \
-            " and ".join(filter(None, (", ".join(include[:-1]), include[-1])))
+        text = "无" if not include else \
+            " 和 ".join(filter(None, (", ".join(include[:-1]), include[-1])))
         self.report_items(
-            "Settings",
-            [("Shuffled columns", text),
-             ("Proportion of shuffled rows", "{}%".format(self.scope_prop)),
-             ("Replicable", "yes" if self.random_seed else "no")])
+            "设置",
+            [("随机列", text),
+             ("随机行的比例", "{}%".format(self.scope_prop)),
+             ("可复制", "是" if self.random_seed else "否")])
 
 
 if __name__ == "__main__":  # pragma: no cover

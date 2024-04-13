@@ -14,9 +14,9 @@ from Orange.widgets.widget import Msg
 
 
 class OWLogisticRegression(OWBaseLearner):
-    name = "Logistic Regression"
-    description = "The logistic regression classification algorithm with " \
-                  "LASSO (L1) or ridge (L2) regularization."
+    name = "逻辑回归 Logistic Regression"
+    description = "具有" \
+                  "LASSO (L1) 或 ridge (L2) 正则化的逻辑回归分类算法。"
     icon = "icons/LogisticRegression.svg"
     replaces = [
         "Orange.widgets.classify.owlogisticregression.OWLogisticRegression",
@@ -27,7 +27,7 @@ class OWLogisticRegression(OWBaseLearner):
     LEARNER = LogisticRegressionLearner
 
     class Outputs(OWBaseLearner.Outputs):
-        coefficients = Output("Coefficients", Table, explicit=True)
+        coefficients = Output("系数", Table, explicit=True)
 
     settings_version = 2
     penalty_type = settings.Setting(1)
@@ -48,28 +48,28 @@ class OWLogisticRegression(OWBaseLearner):
     intercept_scaling = 1.0
     max_iter = 10000
 
-    penalty_types = ("Lasso (L1)", "Ridge (L2)", "None")
+    penalty_types = ("Lasso (L1)", "岭 (L2)", "无")
     penalty_types_short = ["l1", "l2", "none"]
 
     class Warning(OWBaseLearner.Warning):
-        class_weights_used = Msg("Weighting by class may decrease performance.")
+        class_weights_used = Msg("按类加权可能会降低性能。")
 
     def add_main_layout(self):
         # this is part of init, pylint: disable=attribute-defined-outside-init
         box = gui.widgetBox(self.controlArea, box=True)
         self.penalty_combo = gui.comboBox(
-            box, self, "penalty_type", label="Regularization type: ",
+            box, self, "penalty_type", label="正则化类型:",
             items=self.penalty_types, orientation=Qt.Horizontal,
             callback=self._penalty_type_changed)
         self.c_box = box = gui.widgetBox(box)
         gui.widgetLabel(box, "Strength:")
         box2 = gui.hBox(gui.indentedBox(box))
-        gui.widgetLabel(box2, "Weak").setStyleSheet("margin-top:6px")
+        gui.widgetLabel(box2, "弱").setStyleSheet("margin-top:6px")
         self.c_slider = gui.hSlider(
             box2, self, "C_index", minValue=0, maxValue=len(self.C_s) - 1,
             callback=self.set_c, callback_finished=self.settings_changed,
             createLabel=False)
-        gui.widgetLabel(box2, "Strong").setStyleSheet("margin-top:6px")
+        gui.widgetLabel(box2, "强").setStyleSheet("margin-top:6px")
         box2 = gui.hBox(box)
         box2.layout().setAlignment(Qt.AlignCenter)
         self.c_label = gui.widgetLabel(box2)
@@ -78,9 +78,9 @@ class OWLogisticRegression(OWBaseLearner):
         box = gui.widgetBox(self.controlArea, box=True)
         self.weights = gui.checkBox(
             box, self,
-            "class_weight", label="Balance class distribution",
+            "class_weight", label="平衡类别分布",
             callback=self.settings_changed,
-            tooltip="Weigh classes inversely proportional to their frequencies."
+            tooltip="根据类别频率的倒数加权。"
         )
 
     def set_c(self):
@@ -92,7 +92,7 @@ class OWLogisticRegression(OWBaseLearner):
             fmt = "C={}" if self.strength_C >= 1 else "C={:.3f}"
             self.c_label.setText(fmt.format(self.strength_C))
         else:
-            self.c_label.setText("N/A")
+            self.c_label.setText("不适用")
 
     def set_penalty(self, penalty):
         self.penalty_type = self.penalty_types_short.index(penalty)
@@ -135,7 +135,7 @@ class OWLogisticRegression(OWBaseLearner):
         self.Outputs.coefficients.send(coef_table)
 
     def get_learner_parameters(self):
-        return (("Regularization", "{}, C={}, class weights: {}".format(
+        return (("正则化", "{}，C={}，类权重: {}".format(
             self.penalty_types[self.penalty_type], self.C_s[self.C_index],
             bool_str(self.class_weight))),)
 
@@ -148,13 +148,13 @@ def create_coef_table(classifier):
     else:
         values = [classifier.domain.class_var.values[int(classifier.used_vals[0][1])]]
     domain = Domain([ContinuousVariable(value) for value in values],
-                    metas=[StringVariable("name")])
+                    metas=[StringVariable("名称")])
     coefs = np.vstack((i.reshape(1, len(i)), c.T))
     names = [[attr.name] for attr in classifier.domain.attributes]
-    names = [["intercept"]] + names
+    names = [["截距"]] + names
     names = np.array(names, dtype=object)
     coef_table = Table.from_numpy(domain, X=coefs, metas=names)
-    coef_table.name = "coefficients"
+    coef_table.name = "系数"
     return coef_table
 
 

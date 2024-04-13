@@ -141,19 +141,19 @@ Categorical features are passed as strings
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         self.nameedit = QLineEdit(
-            placeholderText="Name...",
+            placeholderText="名称...",
             sizePolicy=QSizePolicy(QSizePolicy.Minimum,
                                    QSizePolicy.Fixed)
         )
 
-        self.metaattributecb = QCheckBox("Meta attribute")
+        self.metaattributecb = QCheckBox("元属性")
 
         self.expressionedit = QLineEdit(
-            placeholderText="Expression...",
+            placeholderText="表达式...",
             toolTip=self.ExpressionTooltip)
 
         self.attrs_model = itemmodels.VariableListModel(
-            ["Select Feature"], parent=self)
+            ["选择特征"], parent=self)
         self.attributescb = ComboBoxSearch(
             minimumContentsLength=16,
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon,
@@ -163,7 +163,7 @@ Categorical features are passed as strings
 
         sorted_funcs = sorted(self.FUNCTIONS)
         self.funcs_model = itemmodels.PyListModelTooltip(
-            chain(["Select Function"], sorted_funcs),
+            chain(["选择函数"], sorted_funcs),
             chain([''], [self.FUNCTIONS[func].__doc__ for func in sorted_funcs])
         )
         self.funcs_model.setParent(self)
@@ -211,7 +211,7 @@ Categorical features are passed as strings
         self.expressionedit.setText(data.expression)
         self.setModified(False)
         self.featureChanged.emit()
-        self.attrs_model[:] = ["Select Feature"]
+        self.attrs_model[:] = ["选择特征"]
         if domain is not None and not domain.empty():
             self.attrs_model[:] += chain(domain.attributes,
                                          domain.class_vars,
@@ -258,7 +258,7 @@ Categorical features are passed as strings
 
 
 class ContinuousFeatureEditor(FeatureEditor):
-    ExpressionTooltip = "A numeric expression\n\n" \
+    ExpressionTooltip = "数值表达式\n\n" \
                         + FeatureEditor.ExpressionTooltip
 
     def editorData(self):
@@ -272,9 +272,9 @@ class ContinuousFeatureEditor(FeatureEditor):
 
 class DateTimeFeatureEditor(FeatureEditor):
     ExpressionTooltip = FeatureEditor.ExpressionTooltip + \
-        "Result must be a string in ISO-8601 format " \
-        "(e.g. 2019-07-30T15:37:27 or a part thereof),\n" \
-        "or a number of seconds since Jan 1, 1970."
+        "结果必须为ISO-8601格式字符串" \
+        "(例如2019-07-30T15:37:27或其部分),\n" \
+        "或者是自1970年1月1日以来的秒数。"
 
     def editorData(self):
         return DateTimeDescriptor(
@@ -286,20 +286,20 @@ class DateTimeFeatureEditor(FeatureEditor):
 
 class DiscreteFeatureEditor(FeatureEditor):
     ExpressionTooltip = FeatureEditor.ExpressionTooltip + \
-        "Result must be a string, if values are not explicitly given\n" \
-        "or a zero-based integer indices into a list of values given below."
+        "如果未明确给出值,结果必须为字符串\n" \
+        "或者是下面给出的值列表的基于0的整数索引。"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         tooltip = \
-            "If values are given, above expression must return zero-based " \
-            "integer indices into that list."
+            "如果给出值,上述表达式必须返回基于0" \
+            "的该列表的整数索引。"
         self.valuesedit = QLineEdit(placeholderText="A, B ...", toolTip=tooltip)
         self.valuesedit.textChanged.connect(self._invalidate)
 
         layout = self.layout()
-        label = QLabel(self.tr("Values (optional)"))
+        label = QLabel(self.tr("值(可选)"))
         label.setToolTip(tooltip)
         layout.addWidget(label, 2, 0)
         layout.addWidget(self.valuesedit, 2, 1, 1, 2)
@@ -324,7 +324,7 @@ class DiscreteFeatureEditor(FeatureEditor):
 
 
 class StringFeatureEditor(FeatureEditor):
-    ExpressionTooltip = "A string expression\n\n" \
+    ExpressionTooltip = "字符串表达式\n\n" \
                         + FeatureEditor.ExpressionTooltip
 
     def __init__(self, *args, **kwargs):
@@ -509,19 +509,19 @@ class FeatureConstructorHandler(DomainContextHandler):
 
 
 class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
-    name = "Formula"
-    description = "Construct new features (data columns) from a set of " \
-                  "existing features in the input dataset."
-    category = "Transform"
+    name = "公式 Formula"
+    description = "从输入数据集中现有特征集(数据列)" \
+                  "构建新特征"
+    category = "变换"
     icon = "icons/FeatureConstructor.svg"
     keywords = "feature constructor, function, lambda, calculation"
     priority = 2240
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
+        data = Input("数据", Orange.data.Table)
 
     class Outputs:
-        data = Output("Data", Orange.data.Table)
+        data = Output("数据", Orange.data.Table)
 
     want_main_area = False
 
@@ -539,13 +539,13 @@ class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
     ]
 
     class Error(OWWidget.Error):
-        more_values_needed = Msg("Categorical feature {} needs more values.")
-        invalid_expressions = Msg("Invalid expressions: {}.")
+        more_values_needed = Msg("分类特征{}需要更多值。")
+        invalid_expressions = Msg("无效表达式:{}.")
         transform_error = Msg("{}")
 
     class Warning(OWWidget.Warning):
-        renamed_var = Msg("Recently added variable has been renamed, "
-                          "to avoid duplicates.\n")
+        renamed_var = Msg("最近添加的变量已重命名,"
+                          "以避免重复。\n")
 
     def __init__(self):
         super().__init__()
@@ -553,7 +553,7 @@ class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
         self.data = None
         self.editors = {}
 
-        box = gui.vBox(self.controlArea, "Variable Definitions")
+        box = gui.vBox(self.controlArea, "变量定义")
 
         toplayout = QHBoxLayout()
         toplayout.setContentsMargins(0, 0, 0, 0)
@@ -576,7 +576,7 @@ class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
         buttonlayout.setContentsMargins(0, 0, 0, 0)
 
         self.addbutton = QPushButton(
-            "New", toolTip="Create a new variable",
+            "新建", toolTip="创建新变量",
             minimumWidth=120,
             shortcut=QKeySequence.New
         )
@@ -589,35 +589,35 @@ class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
             return unique_name(fmt, self.reserved_names())
 
         menu = QMenu(self.addbutton)
-        cont = menu.addAction("Numeric")
+        cont = menu.addAction("数值")
         cont.triggered.connect(
             lambda: self.addFeature(
                 ContinuousDescriptor(generate_newname("X{}"), "", 3, meta=False))
         )
-        disc = menu.addAction("Categorical")
+        disc = menu.addAction("分类")
         disc.triggered.connect(
             lambda: self.addFeature(
                 DiscreteDescriptor(generate_newname("D{}"), "", (), False, meta=False))
         )
-        string = menu.addAction("Text")
+        string = menu.addAction("文本")
         string.triggered.connect(
             lambda: self.addFeature(
                 StringDescriptor(generate_newname("S{}"), "", meta=True))
         )
-        datetime = menu.addAction("Date/Time")
+        datetime = menu.addAction("日期/时间")
         datetime.triggered.connect(
             lambda: self.addFeature(
                 DateTimeDescriptor(generate_newname("T{}"), "", meta=False))
         )
 
         menu.addSeparator()
-        self.duplicateaction = menu.addAction("Duplicate Selected Variable")
+        self.duplicateaction = menu.addAction("复制选中变量")
         self.duplicateaction.triggered.connect(self.duplicateFeature)
         self.duplicateaction.setEnabled(False)
         self.addbutton.setMenu(menu)
 
         self.removebutton = QPushButton(
-            "Remove", toolTip="Remove selected variable",
+            "移除", toolTip="移除选中变量",
             minimumWidth=120,
             shortcut=QKeySequence.Delete
         )
@@ -651,10 +651,10 @@ class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
         box.layout().addLayout(layout, 1)
 
         self.fix_button = gui.button(
-            self.buttonsArea, self, "Upgrade Expressions",
+            self.buttonsArea, self, "升级表达式",
             callback=self.fix_expressions)
         self.fix_button.setHidden(True)
-        gui.button(self.buttonsArea, self, "Send", callback=self.apply, default=True)
+        gui.button(self.buttonsArea, self, "发送", callback=self.apply, default=True)
 
     def setCurrentIndex(self, index):
         index = min(index, len(self.featuremodel) - 1)
@@ -840,34 +840,34 @@ class OWFeatureConstructor(OWWidget, ConcurrentWidgetMixin):
         items = OrderedDict()
         for feature in self.featuremodel:
             if isinstance(feature, DiscreteDescriptor):
-                desc = "categorical"
+                desc = "分类"
                 if feature.values:
-                    desc += " with values " \
+                    desc += "具有值" \
                             + ", ".join(f"'{val}'" for val in feature.values)
                 if feature.ordered:
-                    desc += "; ordered"
+                    desc += ";有序"
             elif isinstance(feature, ContinuousDescriptor):
-                desc = "numeric"
+                desc = "数值"
             elif isinstance(feature, DateTimeDescriptor):
-                desc = "date/time"
+                desc = "日期/时间"
             else:
-                desc = "text"
+                desc = "文本"
             items[feature.name] = f"{feature.expression} ({desc})"
         self.report_items(
-            report.plural("Constructed feature{s}", len(items)), items)
+            report.plural("构建的特征{}", len(items)), items)
 
     def fix_expressions(self):
         dlg = QMessageBox(
             QMessageBox.Question,
-            "Fix Expressions",
-            "This widget's behaviour has changed. Values of categorical "
-            "variables are now inserted as their textual representations "
-            "(strings); previously they appeared as integer numbers, with an "
-            "attribute '.value' that contained the text.\n\n"
-            "The widget currently runs in compatibility mode. After "
-            "expressions are updated, manually check for their correctness.")
-        dlg.addButton("Update", QMessageBox.ApplyRole)
-        dlg.addButton("Cancel", QMessageBox.RejectRole)
+            "修复表达式",
+            "此控件的行为已更改。分类变量的值现在"
+            "插入为文本表示"
+            "(字符串);之前它们显示为整数,并带有"
+            "包含文本的'.value'属性。"
+            "该组件正以兼容模式运行。表达式更新后"
+            "请手动检查他们的正确性。")
+        dlg.addButton("更新", QMessageBox.ApplyRole)
+        dlg.addButton("取消", QMessageBox.RejectRole)
         if dlg.exec() == QMessageBox.RejectRole:
             return
 

@@ -59,18 +59,18 @@ class DistanceMatrixContextHandler(ContextHandler):
 
 
 class OWDistanceMatrix(widget.OWWidget):
-    name = "Distance Matrix"
-    description = "View distance matrix."
+    name = "距离矩阵 Distance Matrix"
+    description = "查看距离矩阵。"
     icon = "icons/DistanceMatrix.svg"
     priority = 200
     keywords = "distance matrix"
 
     class Inputs:
-        distances = Input("Distances", DistMatrix)
+        distances = Input("距离", DistMatrix)
 
     class Outputs:
-        distances = Output("Distances", DistMatrix, dynamic=False)
-        table = Output("Selected Data", Table, replaces=["Table"])
+        distances = Output("距离", DistMatrix, dynamic=False)
+        table = Output("选中的数据", Table, replaces=["表"])
 
     settingsHandler = DistanceMatrixContextHandler()
     settings_version = 2
@@ -93,11 +93,11 @@ class OWDistanceMatrix(widget.OWWidget):
         self.controlArea.layout().addWidget(view)
 
         self.annot_combo = gui.comboBox(
-            self.buttonsArea, self, "annotation_idx", label="Labels: ",
+            self.buttonsArea, self, "annotation_idx", label="标签:",
             orientation=Qt.Horizontal,
             callback=self._invalidate_annotations, contentsLength=12)
         self.annot_combo.setModel(VariableListModel())
-        self.annot_combo.model()[:] = ["None", "Enumeration"]
+        self.annot_combo.model()[:] = ["无", "枚举"]
         gui.rubber(self.buttonsArea)
         acb = gui.auto_send(self.buttonsArea, self, "auto_commit", box=False)
         acb.setFixedWidth(200)
@@ -112,7 +112,7 @@ class OWDistanceMatrix(widget.OWWidget):
         self.tablemodel.set_data(self.distances)
         self.items = None
 
-        annotations = ["None", "Enumerate"]
+        annotations = ["无", "枚举"]
         view = self.tableview
 
         if distances is not None:
@@ -122,18 +122,18 @@ class OWDistanceMatrix(widget.OWWidget):
                 seltype = BlockSelectionModel
                 if distances.row_items is not None \
                         or distances.col_items is not None:
-                    annotations.append("Labels")
+                    annotations.append("标签")
                     pending_idx = 2
             else:
                 seltype = SymmetricSelectionModel
                 self.items = items = distances.row_items
 
                 if items and not distances.axis:
-                    annotations.append("Attribute names")
+                    annotations.append("属性名")
                     pending_idx = 2
                 elif isinstance(items, list) and \
                         all(isinstance(item, Variable) for item in items):
-                    annotations.append("Name")
+                    annotations.append("名称")
                     pending_idx = 2
                 elif isinstance(items, Table):
                     annotations.extend(
@@ -161,7 +161,7 @@ class OWDistanceMatrix(widget.OWWidget):
                     if isinstance(attr, StringVariable)),
                    key=lambda x: len(set(data.get_column(x))),
                    default=None)
-        return attr or data.domain.class_var or "Enumerate"
+        return attr or data.domain.class_var or "枚举"
 
     def _invalidate_annotations(self):
         if self.distances is not None:
@@ -180,12 +180,12 @@ class OWDistanceMatrix(widget.OWWidget):
         elif self.annotation_idx == 1:
             ver_labels, hor_labels = map(enumeration, self.distances.shape)
 
-        elif self.annot_combo.model()[self.annotation_idx] == "Attribute names":
+        elif self.annot_combo.model()[self.annotation_idx] == "属性名":
             attr = self.distances.row_items.domain.attributes
             ver_labels = hor_labels = [
                 str(attr[i]) for i in range(self.distances.shape[0])]
 
-        elif self.annot_combo.model()[self.annotation_idx] == "Labels":
+        elif self.annot_combo.model()[self.annotation_idx] == "标签":
             if self.distances.col_items is not None:
                 hor_labels = [
                     str(x)
@@ -322,7 +322,7 @@ class OWDistanceMatrix(widget.OWWidget):
 
 if __name__ == "__main__":  # pragma: no cover
     import Orange.distance
-    data = Orange.data.Table("zoo")
+    data = Orange.data.Table("动物园")
     dist = Orange.distance.Euclidean(data)
     # dist = DistMatrix([[1, 2, 3], [4, 5, 6]])
     # dist.row_items = DistMatrix._labels_to_tables(["aa", "bb"])

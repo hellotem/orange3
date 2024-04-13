@@ -50,7 +50,7 @@ class DisplayFormatDelegate(QStyledItemDelegate):
 
 
 class AsDefault(impute.BaseImputeMethod):
-    name = "Default (above)"
+    name = "默认（上面）"
     short_name = ""
     format = "{var.name}"
     columns_only = True
@@ -131,27 +131,27 @@ DBL_MAX = np.finfo(float).max
 
 
 class OWImpute(OWWidget):
-    name = "Impute"
-    description = "Impute missing values in the data table."
+    name = "缺值填充 Impute"
+    description = "估算数据表中的缺失值"
     icon = "icons/Impute.svg"
     priority = 2110
-    keywords = "impute, substitute, missing"
-    category = "Transform"
+    keywords = "估算，替换，缺失"
+    category = "变换"
 
     class Inputs:
-        data = Input("Data", Orange.data.Table)
-        learner = Input("Learner", Learner)
+        data = Input("数据", Orange.data.Table)
+        learner = Input("学习器", Learner)
 
     class Outputs:
-        data = Output("Data", Orange.data.Table)
+        data = Output("数据", Orange.data.Table)
 
     class Error(OWWidget.Error):
-        imputation_failed = Msg("Imputation failed for '{}'")
+        imputation_failed = Msg("对'{}' 估算失败")
         model_based_imputer_sparse = \
-            Msg("Model based imputer does not work for sparse data")
+            Msg("基于模型的估算不适用于稀疏数据")
 
     class Warning(OWWidget.Warning):
-        cant_handle_var = Msg("Default method can not handle '{}'")
+        cant_handle_var = Msg("默认方法无法处理 '{}'")
 
     settingsHandler = settings.DomainContextHandler()
 
@@ -177,7 +177,7 @@ class OWImpute(OWWidget):
 
         main_layout = self.controlArea.layout()
 
-        box = gui.vBox(self.controlArea, "Default Method")
+        box = gui.vBox(self.controlArea, "默认方法")
 
         box_layout = QGridLayout()
         box_layout.setSpacing(8)
@@ -241,7 +241,7 @@ class OWImpute(OWWidget):
 
         self.default_button_group = button_group
 
-        box = gui.hBox(self.controlArea, self.tr("Individual Attribute Settings"),
+        box = gui.hBox(self.controlArea, self.tr("单个属性设置"),
                        flat=False)
 
         self.varview = ListViewSearch(
@@ -290,7 +290,7 @@ class OWImpute(OWWidget):
         )
 
         self.reset_button = QPushButton(
-            "Restore All to Default", enabled=False, default=False,
+            "全部恢复为默认", enabled=False, default=False,
             autoDefault=False, clicked=self.reset_variable_state,
         )
 
@@ -554,16 +554,16 @@ class OWImpute(OWWidget):
         for i, var in enumerate(self.varmodel):
             method = self.get_method_for_column(i)
             if not isinstance(method, AsDefault):
-                specific.append("{} ({})".format(var.name, str(method)))
+                specific.append("nulll".format(var.name, str(method)))
 
         default = self.create_imputer(Method.AsAboveSoBelow)
         if specific:
             self.report_items((
-                ("Default method", default.name),
-                ("Specific imputers", ", ".join(specific))
+                ("默认方法", default.name),
+                ("特定估算器", ", ".join(specific))
             ))
         else:
-            self.report_items((("Method", default.name),))
+            self.report_items((("方法", default.name),))
 
     def _on_var_selection_changed(self):
         # Method is well documented, splitting it is not needed for readability,

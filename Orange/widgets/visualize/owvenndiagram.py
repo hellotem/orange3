@@ -41,8 +41,8 @@ from Orange.widgets.widget import MultiInput, Output, Msg
 _InputData = namedtuple("_InputData", ["key", "name", "table"])
 _ItemSet = namedtuple("_ItemSet", ["key", "name", "title", "items"])
 
-IDENTITY_STR = "Instance identity"
-EQUALITY_STR = "Instance equality"
+IDENTITY_STR = "实例身份"
+EQUALITY_STR = "实例相等性"
 
 
 class VennVariableListModel(itemmodels.VariableListModel):
@@ -61,28 +61,28 @@ class VennVariableListModel(itemmodels.VariableListModel):
 
 
 class OWVennDiagram(widget.OWWidget):
-    name = "Venn Diagram"
-    description = "A graphical visualization of the overlap of data instances " \
-                  "from a collection of input datasets."
+    name = "维恩图 Venn Diagram"
+    description = "数据实例重叠的图形可视化 " \
+                  "来自一组输入数据集。"
     icon = "icons/VennDiagram.svg"
     priority = 280
-    keywords = "venn diagram"
+    keywords = "维恩图"
     settings_version = 2
 
     class Inputs:
-        data = MultiInput("Data", Table)
+        data = MultiInput("数据", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     class Error(widget.OWWidget.Error):
-        instances_mismatch = Msg("Data sets do not contain the same instances.")
-        too_many_inputs = Msg("Venn diagram accepts at most five datasets.")
+        instances_mismatch = Msg("数据集不包含相同的实例。")
+        too_many_inputs = Msg("维恩图最多接受五个数据集。")
 
     class Warning(widget.OWWidget.Warning):
-        renamed_vars = Msg("Some variables have been renamed "
-                           "to avoid duplicates.\n{}")
+        renamed_vars = Msg("某些变量已被重命名 "
+                           "以避免重复。\n{}")
 
     selection: list
 
@@ -137,7 +137,7 @@ class OWVennDiagram(widget.OWWidget):
 
         box = gui.radioButtonsInBox(
             self.buttonsArea, self, 'rowwise',
-            ["Columns (features)", "Rows (instances), matched by", ],
+            ["列(特征)", "行(实例),匹配方式", ],
             callback=self._on_matching_changed
         )
         gui.rubber(self.buttonsArea)
@@ -150,9 +150,9 @@ class OWVennDiagram(widget.OWWidget):
             self, "selected_feature",
             model=VennVariableListModel(),
             callback=self._on_inputAttrActivated,
-            tooltip="Instances are identical if originally coming from the "
-                    "same row of the same table.\n"
-                    "Instances can be check for equality only if described by "
+            tooltip="如果实例最初来自同一 "
+                    "表的同一行,则认为相同。\n"
+                    "只有在由相同变量描述时,才能检查实例的相等性: "
                     "the same variables.")
         box.layout().setSpacing(6)
         box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
@@ -163,7 +163,7 @@ class OWVennDiagram(widget.OWWidget):
                                           stretch=0)
         gui.rubber(box)
         self.output_duplicates_cb = gui.checkBox(
-            box, self, "output_duplicates", "Output duplicates",
+            box, self, "output_duplicates", "输出重复项",
             callback=lambda: self.commit(),  # pylint: disable=unnecessary-lambda
             stateWhenDisabled=False,
             attribute=Qt.WA_LayoutUsesWidgetRect)
@@ -352,7 +352,7 @@ class OWVennDiagram(widget.OWWidget):
             cnt = len(set(item.items))
             cnt_all = len(item.items)
             if cnt != cnt_all:
-                fmt = '{} <i>(all: {})</i>'
+                fmt = '{} <i>(全部: {})</i>'
             else:
                 fmt = '{}'
             counts = fmt.format(cnt, cnt_all)
@@ -376,7 +376,7 @@ class OWVennDiagram(widget.OWWidget):
                 # Nothing readable to show when matching by identity or equality
                 tooltip += "<span>" + ", ".join(map(escape, area_items[:32]))
                 if len(area_items) > 32:
-                    tooltip += f"</br>({len(area_items) - 32} items not shown)"
+                    tooltip += f"</br>(未显示{len(area_items) - 32}项)"
                 tooltip += "</span>"
 
             area.setToolTip(tooltip)

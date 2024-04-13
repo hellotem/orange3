@@ -9,9 +9,9 @@ class LearnerClassification(Learner):
     def incompatibility_reason(self, domain):
         reason = None
         if len(domain.class_vars) > 1 and not self.supports_multiclass:
-            reason = "Too many target variables."
+            reason = "目标变量太多。"
         elif not domain.has_discrete_class:
-            reason = "Categorical class variable expected."
+            reason = "期望分类类变量。"
         return reason
 
 

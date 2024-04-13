@@ -26,33 +26,33 @@ class OpDesc(NamedTuple):
 
 
 class OWAggregateColumns(widget.OWWidget):
-    name = "Aggregate Columns"
-    description = "Compute a sum, max, min ... of selected columns."
-    category = "Transform"
+    name = "聚合列 Aggregate Columns"
+    description = "计算选定列的和、最大值、最小值等。"
+    category = "变换"
     icon = "icons/AggregateColumns.svg"
     priority = 1200
-    keywords = "aggregate columns, aggregate, sum, product, max, min, mean, median, variance"
+    keywords = "聚合列、聚合、求和、乘积、最大值、最小值、均值、中位数、方差"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
-        features = Input("Features", AttributeList)
+        data = Input("数据", Table, default=True)
+        features = Input("特征", AttributeList)
 
     class Outputs:
-        data = Output("Data", Table)
+        data = Output("数据", Table)
 
     class Warning(widget.OWWidget.Warning):
-        discrete_features = widget.Msg("Some input features are categorical:\n{}")
-        missing_features = widget.Msg("Some input features are missing:\n{}")
+        discrete_features = widget.Msg("某些输入特征是分类型:\n{}")
+        missing_features = widget.Msg("某些输入特征缺失:\n{}")
 
     want_main_area = False
 
-    Operations = {"Sum": OpDesc("Sum", np.nansum),
-                  "Product": OpDesc("Product", np.nanprod),
-                  "Min": OpDesc("Minimal value", np.nanmin, True),
-                  "Max": OpDesc("Maximal value", np.nanmax, True),
-                  "Mean": OpDesc("Mean value", np.nanmean, True),
-                  "Variance": OpDesc("Variance", np.nanvar),
-                  "Median": OpDesc("Median", np.nanmedian, True)}
+    Operations = {"求和": OpDesc("求和", np.nansum),
+                  "乘积 ": OpDesc("乘积 ", np.nanprod),
+                  "Min": OpDesc("最小值", np.nanmin, True),
+                  "Max": OpDesc("最大值", np.nanmax, True),
+                  "Mean": OpDesc("均值", np.nanmean, True),
+                  "方差": OpDesc("方差", np.nanvar),
+                  "中位数": OpDesc("中位数", np.nanmedian, True)}
     KeyFromDesc = {op.name: key for key, op in Operations.items()}
 
     SelectAll, SelectAllAndMeta, InputFeatures, SelectManually = range(4)
@@ -60,7 +60,7 @@ class OWAggregateColumns(widget.OWWidget):
     settingsHandler = DomainContextHandler()
     variables: List[Variable] = ContextSetting([])
     selection_method: int = Setting(SelectManually, schema_only=True)
-    operation = ContextSetting("Sum")
+    operation = ContextSetting("求和")
     var_name = Setting("agg", schema_only=True)
     auto_apply = Setting(True)
 
@@ -69,12 +69,12 @@ class OWAggregateColumns(widget.OWWidget):
         self.data = None
         self.features = None
 
-        self.selection_box = gui.vBox(self.controlArea, "Variable selection")
+        self.selection_box = gui.vBox(self.controlArea, "变量选择")
         self.selection_group = QButtonGroup(self.selection_box)
-        for i, label in enumerate(("All",
-                                   "All, including meta attributes",
-                                   "Features from separate input signal",
-                                   "Selected variables")):
+        for i, label in enumerate(("全部",
+                                   "全部,包括元数据",
+                                   "来自独立输入信号的特征",
+                                   "选定的变量")):
             button = QRadioButton(label)
             if i == self.selection_method:
                 button.setChecked(True)
@@ -95,7 +95,7 @@ class OWAggregateColumns(widget.OWWidget):
         )
         var_list.setSelectionMode(var_list.ExtendedSelection)
 
-        box = gui.vBox(self.controlArea, box="Operation")
+        box = gui.vBox(self.controlArea, box="操作")
         combo = self.operation_combo = QComboBox()
         combo.addItems([op.name for op in self.Operations.values()])
         combo.textActivated[str].connect(self._on_operation_changed)
@@ -105,7 +105,7 @@ class OWAggregateColumns(widget.OWWidget):
 
         gui.lineEdit(
             box, self, "var_name",
-            label="Output variable name: ", orientation=Qt.Horizontal,
+            label="输出变量名:", orientation=Qt.Horizontal,
             callback=self.commit.deferred
         )
 

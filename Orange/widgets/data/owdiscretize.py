@@ -28,9 +28,9 @@ from Orange.widgets.widget import Input, Output
 from Orange.widgets.data.oweditdomain import FixedSizeButton
 
 re_custom_sep = re.compile(r"\s*,\s*")
-time_units = ["year", "month", "day", "week", "hour", "minute", "second"]
-INVALID_WIDTH = "invalid width"
-TOO_MANY_INTERVALS = "too many intervals"
+time_units = ["年", "月", "日", "周", "小时", "分钟", "秒"]
+INVALID_WIDTH = "无效宽度"
+TOO_MANY_INTERVALS = "间隔过多"
 
 
 def _fixed_width_discretization(
@@ -103,7 +103,7 @@ def _mdl_discretization(
         data: Table,
         var: Union[ContinuousVariable, str, int]) -> Union[DiscreteVariable, str]:
     if not data.domain.has_discrete_class:
-        return "no discrete class"
+        return "没有离散类"
     return disc.EntropyMDL()(data, var)
 
 
@@ -131,7 +131,7 @@ def _custom_discretization(
     if any(x >= y for x, y in zip(cuts, cuts[1:])):
         cuts = []
     if not cuts:
-        return "invalid cuts"
+        return "无效切割"
     return disc.Discretizer.create_discretized_var(var, cuts)
 
 
@@ -158,55 +158,55 @@ Options: Dict[Methods, MethodDesc] = {
     method.id_: method
     for method in (
         MethodDesc(Methods.Default,
-                   "Use default setting", "default",
-                   "Treat the variable as defined in 'default setting'",
+                   "使用默认设置", "默认",
+                   '将变量视作在"默认设置"中定义',
                    None,
                    ()),
         MethodDesc(Methods.Keep,
-                   "Keep numeric", "keep",
-                   "Keep the variable as is",
+                   "保持数字", "保留",
+                   "保留变量原样",
                    lambda data, var: var,
                    ()),
         MethodDesc(Methods.MDL,
-                   "Entropy vs. MDL", "entropy",
-                   "Split values until MDL exceeds the entropy (Fayyad-Irani)\n"
-                   "(requires discrete class variable)",
+                   "熵与MDL", "熵",
+                   "将值分割直至MDL超过熵(Fayyad-Irani)\n"
+                   "(需要离散类变量)",
                    _mdl_discretization,
                    ()),
         MethodDesc(Methods.EqualFreq,
-                   "Equal frequency, intervals: ", "equal freq, k={}",
-                   "Create bins with same number of instances",
+                   "等频,间隔:", "等频,k={}",
+                   "创建具有相同实例数的箱",
                    lambda data, var, k: disc.EqualFreq(k)(data, var),
                    ("freq_spin", )),
         MethodDesc(Methods.EqualWidth,
-                   "Equal width, intervals: ", "equal width, k={}",
-                   "Create bins of the same width",
+                   "等宽,间隔:", "等宽,k={}",
+                   "创建相同宽度的箱",
                    lambda data, var, k: disc.EqualWidth(k)(data, var),
                    ("width_spin", )),
         MethodDesc(Methods.Remove,
-                   "Remove", "remove",
-                   "Remove variable",
+                   "移除", "移除",
+                   "移除变量",
                    lambda *_: None,
                    ()),
         MethodDesc(Methods.Binning,
-                   "Natural binning, desired bins: ", "binning, desired={}",
-                   "Create bins with nice thresholds; "
-                   "try matching desired number of bins",
+                   "自然分箱,期望箱数:", "分箱,期望={}",
+                   "创建具有良好阈值的箱;"
+                   "尝试匹配期望的箱数",
                    lambda data, var, nbins: disc.Binning(nbins)(data, var),
                    ("binning_spin", )),
         MethodDesc(Methods.FixedWidth,
-                   "Fixed width: ", "fixed width {}",
-                   "Create bins with the given width (not for time variables)",
+                   "固定宽度:", "固定宽度{}",
+                   "创建给定宽度的箱(不适用于时间变量)",
                    _fixed_width_discretization,
                    ("width_line", )),
         MethodDesc(Methods.FixedWidthTime,
-                   "Time interval: ", "time interval, {} {}",
-                   "Create bins with the give width (for time variables)",
+                   "时间间隔:", "时间间隔,{}{}",
+                   "为时间变量创建给定宽度的箱",
                    _fixed_time_width_discretization,
                    ("width_time_line", "width_time_unit")),
         MethodDesc(Methods.Custom,
                    "Custom: ", "custom: {}",
-                   "Use manually specified thresholds",
+                   "使用手动指定的阈值",
                    _custom_discretization,
                    ("threshold_line", ))
     )
@@ -312,7 +312,7 @@ def format_desc(hint: VarHint) -> str:
         try:
             width = int(width)
         except ValueError:
-            unit = f"{time_units[unit]}(s)"
+            unit = f"{time_units[unit]}"
         else:
             unit = f"{pl(width, time_units[unit])}"
         return desc.format(width, unit)
@@ -376,11 +376,11 @@ class DefaultDiscModel(QAbstractListModel):
 
     def data(self, _, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
-            return "Default setting: " + format_desc(self.hint)
+            return "默认设置:" + format_desc(self.hint)
         elif role == Qt.DecorationRole:
             return DefaultDiscModel.icon
         elif role == Qt.ToolTipRole:
-            return "Default setting for variables without specific setings"
+            return "未特殊设置的变量的默认设置"
         return None
 
     def setData(self, index, value, role=Qt.DisplayRole):
@@ -404,7 +404,7 @@ class IncreasingNumbersListValidator(QValidator):
         prev = None
         if pos == len(string) >= 2 \
                 and string[-1] == " " and string[-2].isdigit():
-            string = string[:-1] + ", "
+            string = string[:-1] + ","
             pos += 1
         for valuestr in re_custom_sep.split(string.strip()):
             try:
@@ -481,25 +481,25 @@ globals().update(dict(
     MDL=namedtuple("MDL", []),
     EqualFreq=namedtuple("EqualFreq", ["k"]),
     EqualWidth=namedtuple("EqualWidth", ["k"]),
-    Remove=namedtuple("Remove", []),
+    Remove=namedtuple("移除", []),
     Custom=namedtuple("Custom", ["points"])
 ))
 
 
 class OWDiscretize(widget.OWWidget):
     # pylint: disable=too-many-instance-attributes
-    name = "Discretize"
-    description = "Discretize numeric variables"
-    category = "Transform"
+    name = "离散化 Discretize"
+    description = "离散化数值变量"
+    category = "变换"
     icon = "icons/Discretize.svg"
     keywords = "discretize, bin, categorical, nominal, ordinal"
     priority = 2130
 
     class Inputs:
-        data = Input("Data", Table, doc="Input data table")
+        data = Input("数据", Table, doc="输入数据表")
 
     class Outputs:
-        data = Output("Data", Table, doc="Table with categorical features")
+        data = Output("数据", Table, doc="具有分类特征的表格")
 
     settings_version = 3
 
@@ -571,10 +571,10 @@ class OWDiscretize(widget.OWWidget):
         def manual_cut_editline(text="", enabled=True) -> QLineEdit:
             edit = QLineEdit(
                 text=text,
-                placeholderText="e.g. 0.0, 0.5, 1.0",
+                placeholderText="例如 0.0, 0.5, 1.0",
                 toolTip='<p style="white-space:pre">' +
-                        'Enter cut points as a comma-separate list of \n'
-                        'strictly increasing numbers e.g. 0.0, 0.5, 1.0).</p>',
+                        '输入逗号分隔的切割点列表\n'
+                        '严格递增的数字,例如 0.0, 0.5, 1.0).</p>',
                 enabled=enabled,
             )
             edit.setValidator(IncreasingNumbersListValidator())
@@ -660,7 +660,7 @@ class OWDiscretize(widget.OWWidget):
         button(Methods.MDL)
 
         self.copy_to_custom = FixedSizeButton(
-            text="CC", toolTip="Copy the current cut points to manual mode")
+            text="复制当前", toolTip="将当前切割点复制到手动模式")
         self.copy_to_custom.clicked.connect(self._copy_to_manual)
         self.threshold_line = button(Methods.Custom,
                                      manual_cut_editline(),
@@ -819,10 +819,10 @@ class OWDiscretize(widget.OWWidget):
         """
         if isinstance(var, TimeVariable):
             if hint.method_id in (Methods.FixedWidth, Methods.Custom):
-                return ": <keep, time var>", var
+                return ":<保留,时间变量>", var
         else:
             if hint.method_id == Methods.FixedWidthTime:
-                return ": <keep, not time>", var
+                return ":<保留,非时间>", var
 
         function = Options[hint.method_id].function
         dvar = function(self.data, var, *hint.args)
@@ -834,7 +834,7 @@ class OWDiscretize(widget.OWWidget):
             return "", var  # no transformation
         thresholds = dvar.compute_value.points
         if len(thresholds) == 0:
-            return " <removed>", None
+            return "<移除>", None
         return ": " + ", ".join(map(var.repr_val, thresholds)), dvar
 
     def _copy_to_manual(self):
@@ -976,7 +976,7 @@ class OWDiscretize(widget.OWWidget):
             if desc.hint is not None:
                 name = f"{name} ({format_desc(desc.hint)})"
             reported.append((name, ', '.join(desc.values)))
-        self.report_items("Variables", reported)
+        self.report_items("变量", reported)
 
     @classmethod
     def migrate_settings(cls, settings, version):

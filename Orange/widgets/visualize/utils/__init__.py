@@ -100,7 +100,7 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
     selectionChanged = Signal(object)
 
     class Information(WidgetMessagesMixin.Information):
-        nothing_to_rank = Msg("There is nothing to rank.")
+        nothing_to_rank = Msg("没有可排名的内容。")
 
     @deprecated("Orange.widgets.visualize.utils.vizrank.VizRankDialog")
     def __init__(self, master):
@@ -150,7 +150,7 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
         self.layout().addWidget(view)
 
         self.button = gui.button(
-            self, self, "Start", callback=self.toggle, default=True)
+            self, self, "开始", callback=self.toggle, default=True)
 
     @property
     def _has_bars(self):
@@ -231,7 +231,7 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
         self.scores = []
         self._update_model()  # empty queue
         self.rank_model.clear()
-        self.button.setText("Start")
+        self.button.setText("开始")
         self.button.setEnabled(self.check_preconditions())
 
     def filter_changed(self, text):
@@ -327,7 +327,7 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
         self._update()
 
     def on_done(self, result: Result):
-        self.button.setText("Finished")
+        self.button.setText("完成")
         self.button.setEnabled(False)
         self.keep_running = False
         self.saved_state = None
@@ -365,7 +365,7 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
         """Start or pause the computation."""
         self.keep_running = not self.keep_running
         if self.keep_running:
-            self.button.setText("Pause")
+            self.button.setText("暂停")
             self.button.repaint()
             self.progressBarInit()
             self.before_running()
@@ -373,7 +373,7 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
                        self.iterate_states, self.saved_state, self.scores,
                        self.saved_progress, self.state_count())
         else:
-            self.button.setText("Continue")
+            self.button.setText("继续")
             self.button.repaint()
             self.cancel()
             self._stopped()
@@ -390,11 +390,11 @@ class VizRankDialog(QDialog, ProgressBarMixin, WidgetMessagesMixin,
 def run_vizrank(compute_score: Callable, iterate_states: Callable,
                 saved_state: Optional[Iterable], scores: List,
                 progress: int, state_count: int, task: TaskState):
-    task.set_status("Getting combinations...")
+    task.set_status("获取组合...")
     task.set_progress_value(0.1)
     states = iterate_states(saved_state)
 
-    task.set_status("Getting scores...")
+    task.set_status("获取分数...")
     res = Result(queue=Queue(), scores=None)
     scores = scores.copy()
     can_set_partial_result = True

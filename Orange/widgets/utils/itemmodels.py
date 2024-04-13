@@ -416,29 +416,29 @@ class VariableListModel(PyListModel):
             items = [(safe_text(key), safe_text(value))
                      for key, value in var.attributes.items()]
             labels = list(map("%s = %s".__mod__, items))
-            text += "<br/>Variable Labels:<br/>"
+            text += "<br/>变量标签:<br/>"
             text += "<br/>".join(labels)
         return text
 
     def discrete_variable_tooltip(self, var):
-        text = "<b>%s</b><br/>Categorical with %i values: " %\
+        text = "<b>%s</b><br/>分类变量有 %i 个值: " %\
                (safe_text(var.name), len(var.values))
         text += ", ".join("%r" % safe_text(v) for v in var.values)
         text += self.variable_labels_tooltip(var)
         return text
 
     def time_variable_toltip(self, var):
-        text = "<b>%s</b><br/>Time" % safe_text(var.name)
+        text = "<b>%s</b><br/>时间" % safe_text(var.name)
         text += self.variable_labels_tooltip(var)
         return text
 
     def continuous_variable_toltip(self, var):
-        text = "<b>%s</b><br/>Numeric" % safe_text(var.name)
+        text = "<b>%s</b><br/>数值" % safe_text(var.name)
         text += self.variable_labels_tooltip(var)
         return text
 
     def string_variable_tooltip(self, var):
-        text = "<b>%s</b><br/>Text" % safe_text(var.name)
+        text = "<b>%s</b><br/>文本" % safe_text(var.name)
         text += self.variable_labels_tooltip(var)
         return text
 

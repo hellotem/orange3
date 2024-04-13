@@ -222,18 +222,18 @@ class MosaicVizRank(VizRankDialogAttrs):
 
 
 class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
-    name = "Mosaic Display"
-    description = "Display data in a mosaic plot."
+    name = "马赛克图 Mosaic Display"
+    description = "在马赛克图中显示数据。"
     icon = "icons/MosaicDisplay.svg"
     priority = 220
-    keywords = "mosaic display"
+    keywords = "马赛克图"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
-        data_subset = Input("Data Subset", Table)
+        data = Input("数据", Table, default=True)
+        data_subset = Input("数据子集", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     settingsHandler = DomainContextHandler()
@@ -258,10 +258,10 @@ class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
     graph_name = "canvas"  # QGraphicsScene
 
     class Warning(OWWidget.Warning):
-        incompatible_subset = Msg("Data subset is incompatible with Data")
-        no_valid_data = Msg("No valid data")
+        incompatible_subset = Msg("数据子集与数据不兼容")
+        no_valid_data = Msg("无有效数据")
         no_cont_selection_sql = \
-            Msg("Selection of numeric features on SQL is not supported")
+            Msg("不支持在SQL上选择数值特征")
 
     def __init__(self):
         super().__init__()
@@ -290,7 +290,7 @@ class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
             order=DomainModel.MIXED, valid_types=DomainModel.PRIMITIVE)
         self.model_234 = DomainModel(
             order=DomainModel.MIXED, valid_types=DomainModel.PRIMITIVE,
-            placeholder="(None)")
+            placeholder="(无)")
         self.attr_combos = [
             gui.comboBox(
                 box, self, value="variable{}".format(i),
@@ -299,21 +299,21 @@ class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
                 callback=self.attr_changed,
                 model=self.model_1 if i == 1 else self.model_234)
             for i in range(1, 5)]
-        box.layout().addWidget(self.vizrank_button("Find Informative Mosaics"))
+        box.layout().addWidget(self.vizrank_button("查找信息丰富的马赛克图"))
         self.vizrankSelectionChanged.connect(self.set_attr)
         self.vizrankRunStateChanged.connect(self.store_vizrank_attr_range)
 
-        box2 = gui.vBox(self.controlArea, box="Interior Coloring")
+        box2 = gui.vBox(self.controlArea, box="内部着色")
         self.color_model = DomainModel(
             order=DomainModel.MIXED, valid_types=DomainModel.PRIMITIVE,
-            placeholder="(Pearson residuals)")
+            placeholder="(Pearson残差)")
         self.cb_attr_color = gui.comboBox(
             box2, self, value="variable_color",
             orientation=Qt.Horizontal, contentsLength=12, labelWidth=50,
             searchable=True,
             callback=self.set_color_data, model=self.color_model)
         self.bar_button = gui.checkBox(
-            box2, self, 'use_boxes', label='Compare with total',
+            box2, self, 'use_boxes', label='与总计比较',
             callback=self.update_graph)
         gui.rubber(self.controlArea)
 
@@ -722,9 +722,9 @@ class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
                 rect(x0, y0, x1 - x0, y1 - y0, -20, color)
                 outer_rect.setToolTip(
                     condition + "<hr/>" +
-                    "Expected instances: %.1f<br>"
-                    "Actual instances: %d<br>"
-                    "Standardized (Pearson) residual: %.1f" %
+                    "预期实例: %.1f<br>"
+                    "实际实例: %d<br>"
+                    "标准化(Pearson)残差: %.1f" %
                     (expected, conditionaldict[attr_vals], pearson))
             else:
                 cls_values = get_variable_values_sorted(class_var)
@@ -782,14 +782,14 @@ class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
                     apriori = [prior[key] for key in cls_values]
                     n_apriori = sum(apriori)
                     text = "<br/>".join(
-                        "<b>%s</b>: %d / %.1f%% (Expected %.1f / %.1f%%)" %
+                        "<b>%s</b>: %d / %.1f%% (预期 %.1f / %.1f%%)" %
                         (cls, act, 100.0 * act / n_actual,
                          apr / n_apriori * n_actual, 100.0 * apr / n_apriori)
                         for cls, act, apr in zip(cls_values, actual, apriori))
                 else:
                     text = ""
                 outer_rect.setToolTip(
-                    "{}<hr>Instances: {}<br><br>{}".format(
+                    "{}<hr>实例: {}<br><br>{}".format(
                         condition, n_actual, text[:-4]))
 
         def create_legend():
@@ -837,7 +837,7 @@ class OWMosaicDisplay(OWWidget, VizRankMixin(MosaicVizRank)):
         attrs = [attr for attr in attr_list if not attr.values]
         if attrs:
             CanvasText(self.canvas,
-                       "Feature {} has no values".format(attrs[0]),
+                       "特征 {} 没有值".format(attrs[0]),
                        (self.canvas_view.width() - 120) / 2,
                        self.canvas_view.height() / 2)
             return

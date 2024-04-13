@@ -17,9 +17,9 @@ MAXINT = 2 ** 31 - 1
 
 
 class OWSGD(OWBaseLearner):
-    name = 'Stochastic Gradient Descent'
-    description = 'Minimize an objective function using a stochastic ' \
-                  'approximation of gradient descent.'
+    name = '随机梯度下降 Stochastic Gradient Descent'
+    description = '使用随机' \
+                  '梯度下降近似最小化目标函数。'
     icon = "icons/SGD.svg"
     replaces = [
         "Orange.widgets.regression.owsgdregression.OWSGDRegression",
@@ -32,32 +32,32 @@ class OWSGD(OWBaseLearner):
     LEARNER = SGDLearner
 
     class Outputs(OWBaseLearner.Outputs):
-        coefficients = Output("Coefficients", Table, explicit=True)
+        coefficients = Output("系数", Table, explicit=True)
 
     reg_losses = (
-        ('Squared Loss', 'squared_error'),
+        ('平方损失', 'squared_error'),
         ('Huber', 'huber'),
-        ('ε insensitive', 'epsilon_insensitive'),
-        ('Squared ε insensitive', 'squared_epsilon_insensitive'))
+        ('ε 不敏感', 'epsilon_insensitive'),
+        ('平方 ε 不敏感', 'squared_epsilon_insensitive'))
 
     cls_losses = (
-        ('Hinge', 'hinge'),
-        ('Logistic regression', 'log'),
-        ('Modified Huber', 'modified_huber'),
-        ('Squared Hinge', 'squared_hinge'),
-        ('Perceptron', 'perceptron')) + reg_losses
+        ('合页', 'hinge'),
+        ('逻辑回归', 'log'),
+        ('修正 Huber', 'modified_huber'),
+        ('平方合页', 'squared_hinge'),
+        ('感知机', 'perceptron')) + reg_losses
 
     #: Regularization methods
     penalties = (
-        ('None', 'none'),
+        ('无', 'none'),
         ('Lasso (L1)', 'l1'),
-        ('Ridge (L2)', 'l2'),
-        ('Elastic Net', 'elasticnet'))
+        ('岭 (L2)', 'l2'),
+        ('弹性网络', 'elasticnet'))
 
     learning_rates = (
-        ('Constant', 'constant'),
-        ('Optimal', 'optimal'),
-        ('Inverse scaling', 'invscaling'))
+        ('常数', 'constant'),
+        ('最优', 'optimal'),
+        ('逆缩放', 'invscaling'))
 
     #: Loss function index for classification problems
     cls_loss_function_index = Setting(0)
@@ -105,7 +105,7 @@ class OWSGD(OWBaseLearner):
     def _add_algorithm_to_layout(self, layout):
         # this is part of init, pylint: disable=attribute-defined-outside-init
         grid = QGridLayout()
-        box = gui.widgetBox(None, 'Loss functions', orientation=grid)
+        box = gui.widgetBox(None, '损失函数', orientation=grid)
         layout.addWidget(box)
         # Classfication loss function
         self.cls_loss_function_combo = gui.comboBox(
@@ -119,7 +119,7 @@ class OWSGD(OWBaseLearner):
             label='ε: ', controlWidth=80, alignment=Qt.AlignRight,
             callback=self.settings_changed)
         hbox.layout().addStretch()
-        grid.addWidget(QLabel("Classification: "), 0, 0)
+        grid.addWidget(QLabel("分类:"), 0, 0)
         grid.addWidget(self.cls_loss_function_combo, 0, 1)
         grid.addWidget(hbox, 1, 1)
 
@@ -135,7 +135,7 @@ class OWSGD(OWBaseLearner):
             label='ε: ', controlWidth=80, alignment=Qt.AlignRight,
             callback=self.settings_changed)
         hbox.layout().addStretch()
-        grid.addWidget(QLabel("Regression: "), 2, 0)
+        grid.addWidget(QLabel("回归:"), 2, 0)
         grid.addWidget(self.reg_loss_function_combo, 2, 1)
         grid.addWidget(hbox, 3, 1)
 
@@ -145,7 +145,7 @@ class OWSGD(OWBaseLearner):
 
     def _add_regularization_to_layout(self, layout):
         # this is part of init, pylint: disable=attribute-defined-outside-init
-        box = gui.widgetBox(None, 'Regularization')
+        box = gui.widgetBox(None, '正则化')
         layout.addWidget(box)
         hlayout = gui.hBox(box)
         self.penalty_combo = gui.comboBox(
@@ -154,14 +154,14 @@ class OWSGD(OWBaseLearner):
             callback=self._on_regularization_change)
         self.l1_ratio_box = gui.spin(
             hlayout, self, 'l1_ratio', 0, 1., 1e-2, spinType=float,
-            label='Mixing: ', controlWidth=80,
+            label='混合:', controlWidth=80,
             alignment=Qt.AlignRight, callback=self.settings_changed).box
 
         hbox = gui.indentedBox(
             box, sep=self._foc_frame_width(), orientation=Qt.Horizontal)
         self.alpha_spin = gui.spin(
             hbox, self, 'alpha', 0, 10., .1e-4, spinType=float, controlWidth=80,
-            label='Strength (α): ', alignment=Qt.AlignRight,
+            label='强度 (α):', alignment=Qt.AlignRight,
             callback=self.settings_changed)
         hbox.layout().addStretch()
 
@@ -170,32 +170,32 @@ class OWSGD(OWBaseLearner):
 
     def _add_learning_params_to_layout(self, layout):
         # this is part of init, pylint: disable=attribute-defined-outside-init
-        box = gui.widgetBox(None, 'Optimization')
+        box = gui.widgetBox(None, '优化')
         layout.addWidget(box)
         self.learning_rate_combo = gui.comboBox(
-            box, self, 'learning_rate_index', label='Learning rate: ',
+            box, self, 'learning_rate_index', label='学习率:',
             items=list(zip(*self.learning_rates))[0],
             orientation=Qt.Horizontal, callback=self._on_learning_rate_change)
         self.eta0_spin = gui.spin(
             box, self, 'eta0', 1e-4, 1., 1e-4, spinType=float,
-            label='Initial learning rate (η<sub>0</sub>): ',
+            label='初始学习率 (η<sub>0</sub>):',
             alignment=Qt.AlignRight, controlWidth=80,
             callback=self.settings_changed)
         self.power_t_spin = gui.spin(
             box, self, 'power_t', 0, 1., 1e-4, spinType=float,
-            label='Inverse scaling exponent (t): ',
+            label='逆缩放指数 (t):',
             alignment=Qt.AlignRight, controlWidth=80,
             callback=self.settings_changed)
         gui.separator(box, height=12)
 
         self.max_iter_spin = gui.spin(
-            box, self, 'max_iter', 1, MAXINT - 1, label='Number of iterations: ',
+            box, self, 'max_iter', 1, MAXINT - 1, label='迭代次数:',
             controlWidth=80, alignment=Qt.AlignRight,
             callback=self.settings_changed)
 
         self.tol_spin = gui.spin(
             box, self, 'tol', 0, 10., .1e-3, spinType=float, controlWidth=80,
-            label='Tolerance (stopping criterion): ', checked='tol_enabled',
+            label='容差 (停止准则):', checked='tol_enabled',
             alignment=Qt.AlignRight, callback=self.settings_changed)
         gui.separator(box, height=12)
 
@@ -203,11 +203,11 @@ class OWSGD(OWBaseLearner):
         # spin box on OSX
         self.shuffle_cbx = gui.checkBox(
             gui.hBox(box), self, 'shuffle',
-            'Shuffle data after each iteration',
+            '每次迭代后打乱数据',
             callback=self._on_shuffle_change)
         self.random_seed_spin = gui.spin(
             box, self, 'random_state', 0, MAXINT,
-            label='Fixed seed for random shuffling: ', controlWidth=80,
+            label='随机打乱的固定种子:', controlWidth=80,
             alignment=Qt.AlignRight, callback=self.settings_changed,
             checked='use_random_state', checkCallback=self.settings_changed)
 
@@ -297,40 +297,40 @@ class OWSGD(OWBaseLearner):
     def get_learner_parameters(self):
         params = OrderedDict({})
         # Classification loss function
-        params['Classification loss function'] = self.cls_losses[
+        params['分类损失函数'] = self.cls_losses[
             self.cls_loss_function_index][0]
         if self.cls_losses[self.cls_loss_function_index][1] in (
                 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'):
-            params['Epsilon (ε) for classification'] = self.cls_epsilon
+            params['分类的 Epsilon (ε)'] = self.cls_epsilon
         # Regression loss function
-        params['Regression loss function'] = self.reg_losses[
+        params['回归损失函数'] = self.reg_losses[
             self.reg_loss_function_index][0]
         if self.reg_losses[self.reg_loss_function_index][1] in (
                 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'):
-            params['Epsilon (ε) for regression'] = self.reg_epsilon
+            params['回归的 Epsilon (ε)'] = self.reg_epsilon
 
-        params['Regularization'] = self.penalties[self.penalty_index][0]
+        params['正则化'] = self.penalties[self.penalty_index][0]
         # Regularization strength
         if self.penalties[self.penalty_index][1] in ('l1', 'l2', 'elasticnet'):
-            params['Regularization strength (α)'] = self.alpha
+            params['正则化强度 (α)'] = self.alpha
         # Elastic Net mixing
         if self.penalties[self.penalty_index][1] in ('elasticnet',):
-            params['Elastic Net mixing parameter (L1 ratio)'] = self.l1_ratio
+            params['弹性网络混合参数 (L1 比例)'] = self.l1_ratio
 
-        params['Learning rate'] = self.learning_rates[
+        params['学习率'] = self.learning_rates[
             self.learning_rate_index][0]
         # Eta
         if self.learning_rates[self.learning_rate_index][1] in \
                 ('constant', 'invscaling'):
-            params['Initial learning rate (η<sub>0</sub>)'] = self.eta0
+            params['初始学习率 (η<sub>0</sub>)'] = self.eta0
         # t
         if self.learning_rates[self.learning_rate_index][1] in \
                 ('invscaling',):
-            params['Inverse scaling exponent (t)'] = self.power_t
+            params['逆缩放指数 (t)'] = self.power_t
 
-        params['Shuffle data after each iteration'] = bool_str(self.shuffle)
+        params['每次迭代后打乱数据'] = bool_str(self.shuffle)
         if self.use_random_state:
-            params['Random seed for shuffling'] = self.random_state
+            params['打乱的随机种子'] = self.random_state
 
         return list(params.items())
 
@@ -347,7 +347,7 @@ class OWSGD(OWBaseLearner):
                 names = ["intercept"] + \
                         [attr.name for attr in self.model.domain.attributes]
                 coeffs = Table.from_list(domain, list(zip(cfs, names)))
-                coeffs.name = "coefficients"
+                coeffs.name = "系数"
         self.Outputs.coefficients.send(coeffs)
 
     @classmethod

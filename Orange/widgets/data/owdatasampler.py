@@ -17,22 +17,22 @@ from Orange.util import Reprable
 
 
 class OWDataSampler(OWWidget):
-    name = "Data Sampler"
-    description = "Randomly draw a subset of data points " \
-                  "from the input dataset."
+    name = "数据采样 Data Sampler"
+    description = "随机抽取数据点子集" \
+                  "来自输入数据集。"
     icon = "icons/DataSampler.svg"
     priority = 100
-    category = "Transform"
-    keywords = "data sampler, random"
+    category = "变换"
+    keywords = "数据采样，随机"
 
     _MAX_SAMPLE_SIZE = 2 ** 31 - 1
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data_sample = Output("Data Sample", Table, default=True)
-        remaining_data = Output("Remaining Data", Table)
+        data_sample = Output("数据样本", Table, default=True)
+        remaining_data = Output("剩余数据", Table)
 
     want_main_area = False
     resizing_enabled = False
@@ -63,19 +63,19 @@ class OWDataSampler(OWWidget):
 
     class Information(OWWidget.Information):
         compatibility_mode = Msg(
-            "Compatibility mode\n"
-            "New versions of widget have swapped outputs for cross validation"
+            "兼容模式\n"
+            "新版小部件已交换交叉验证的输出"
         )
 
     class Warning(OWWidget.Warning):
-        could_not_stratify = Msg("Stratification failed.\n{}")
-        bigger_sample = Msg('Sample is bigger than input.')
+        could_not_stratify = Msg("分层失败。\n{}")
+        bigger_sample = Msg('样本大于输入。')
 
     class Error(OWWidget.Error):
-        too_many_folds = Msg("Number of subsets exceeds data size.")
-        sample_larger_than_data = Msg("Sample can't be larger than data.")
-        not_enough_to_stratify = Msg("Data is too small to stratify.")
-        no_data = Msg("Dataset is empty.")
+        too_many_folds = Msg("子集数量超过了数据大小。")
+        sample_larger_than_data = Msg("样本不能大于数据。")
+        not_enough_to_stratify = Msg("数据太小无法分层。")
+        no_data = Msg("数据集为空。")
 
     def __init__(self):
         super().__init__()
@@ -86,7 +86,7 @@ class OWDataSampler(OWWidget):
         self.indices = None
         self.sampled_instances = self.remaining_instances = None
 
-        self.sampling_box = gui.vBox(self.controlArea, "Sampling Type")
+        self.sampling_box = gui.vBox(self.controlArea, "采样类型")
         sampling = gui.radioButtons(self.sampling_box, self, "sampling_type",
                                     callback=self.sampling_type_changed)
 
@@ -103,18 +103,18 @@ class OWDataSampler(OWWidget):
             minValue=0, maxValue=100, ticks=10, labelFormat="%d %%",
             callback=set_sampling_type(self.FixedProportion))
 
-        gui.appendRadioButton(sampling, "Fixed sample size")
+        gui.appendRadioButton(sampling, "固定样本大小")
         ibox = gui.indentedBox(sampling)
         self.sampleSizeSpin = gui.spin(
-            ibox, self, "sampleSizeNumber", label="Instances: ",
+            ibox, self, "sampleSizeNumber", label="实例: ",
             minv=0, maxv=self._MAX_SAMPLE_SIZE,
             callback=set_sampling_type(self.FixedSize),
             controlWidth=90)
         gui.checkBox(
-            ibox, self, "replacement", "Sample with replacement",
+            ibox, self, "replacement", "有放回采样",
             callback=set_sampling_type(self.FixedSize))
 
-        gui.appendRadioButton(sampling, "Cross validation")
+        gui.appendRadioButton(sampling, "交叉验证")
         form = QFormLayout(
             formAlignment=Qt.AlignLeft | Qt.AlignTop,
             labelAlignment=Qt.AlignLeft,
@@ -131,17 +131,17 @@ class OWDataSampler(OWWidget):
         form.addRow("Unused subset:" if not self.compatibility_mode
                     else "Selected subset:", self.selected_fold_spin)
 
-        gui.appendRadioButton(sampling, "Bootstrap")
+        gui.appendRadioButton(sampling, "自助法")
 
-        self.sql_box = gui.vBox(self.controlArea, "Sampling Type")
+        self.sql_box = gui.vBox(self.controlArea, "采样类型")
         sampling = gui.radioButtons(self.sql_box, self, "sampling_type",
                                     callback=self.sampling_type_changed)
         gui.appendRadioButton(sampling, "Time:")
         ibox = gui.indentedBox(sampling)
         spin = gui.spin(ibox, self, "sampleSizeSqlTime", minv=1, maxv=3600,
                         callback=set_sampling_type(self.SqlTime))
-        spin.setSuffix(" sec")
-        gui.appendRadioButton(sampling, "Percentage")
+        spin.setSuffix(" 秒")
+        gui.appendRadioButton(sampling, "百分比")
         ibox = gui.indentedBox(sampling)
         spin = gui.spin(ibox, self, "sampleSizeSqlPercentage", spinType=float,
                         minv=0.0001, maxv=100, step=0.1, decimals=4,
@@ -149,20 +149,20 @@ class OWDataSampler(OWWidget):
         spin.setSuffix(" %")
         self.sql_box.setVisible(False)
 
-        self.options_box = gui.vBox(self.controlArea, "Options", addSpaceBefore=False)
+        self.options_box = gui.vBox(self.controlArea, "选项", addSpaceBefore=False)
         self.cb_seed = gui.checkBox(
             self.options_box, self, "use_seed",
-            "Replicable (deterministic) sampling",
+            "可复制 (确定性) 采样",
             callback=self.settings_changed)
         self.cb_stratify = gui.checkBox(
             self.options_box, self, "stratify",
-            "Stratify sample (when possible)", callback=self.settings_changed)
+            "分层采样 (如果可能)", callback=self.settings_changed)
         self.cb_sql_dl = gui.checkBox(
-            self.options_box, self, "sql_dl", "Download data to local memory",
+            self.options_box, self, "sql_dl", "下载数据到本地内存",
             callback=self.settings_changed)
         self.cb_sql_dl.setVisible(False)
 
-        gui.button(self.buttonsArea, self, "Sample Data",
+        gui.button(self.buttonsArea, self, "采样数据",
                    callback=self.commit)
 
     def sampling_type_changed(self):
@@ -311,14 +311,14 @@ class OWDataSampler(OWWidget):
 
     def send_report(self):
         if self.sampling_type == self.FixedProportion:
-            tpe = f"Random sample with {self.sampleSizePercentage} % of data"
+            tpe = f"随机采样 {self.sampleSizePercentage} % 的数"
         elif self.sampling_type == self.FixedSize:
             if self.sampleSizeNumber == 1:
-                tpe = "Random data instance"
+                tpe = "随即数据实例"
             else:
-                tpe = f"Random sample with {self.sampleSizeNumber} data instances"
+                tpe = f"随即有放回采样{self.sampleSizeNumber} "
                 if self.replacement:
-                    tpe += ", with replacement"
+                    tpe += "数据实例"
         elif self.sampling_type == self.CrossValidation:
             tpe = f"{self.number_of_folds}-fold cross-validation " \
                   f"without subset #{self.selectedFold}"
@@ -330,12 +330,12 @@ class OWDataSampler(OWWidget):
             tpe += ", stratified (if possible)"
         if self.use_seed:
             tpe += ", deterministic"
-        items = [("Sampling type", tpe)]
+        items = [("采样类型", tpe)]
         if self.sampled_instances is not None:
             items += [
-                ("Input", f"{len(self.data)} {pl(len(self.data), 'instance')}"),
-                ("Sample", f"{self.sampled_instances} {pl(self.sampled_instances, 'instance')}"),
-                ("Remaining", f"{self.remaining_instances} {pl(self.remaining_instances, 'instance')}"),
+                ("输入", f"{len(self.data)} {pl(len(self.data), 'instance')}"),
+                ("样本", f"{self.sampled_instances} {pl(self.sampled_instances, 'instance')}"),
+                ("剩余", f"{self.remaining_instances} {pl(self.remaining_instances, 'instance')}"),
             ]
         self.report_items(items)
 

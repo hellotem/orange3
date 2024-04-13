@@ -33,16 +33,16 @@ def check_results_adequacy(results, error_group, check_nan=True):
         return None
     elif not results.domain.has_discrete_class:
         error_group.invalid_results(
-            "Categorical target variable is required.")
+            "需要分类目标变量。")
     elif not results.actual.size:
         error_group.invalid_results(
-            "Empty result on input. Nothing to display.")
+            "输入结果为空。没有可显示的内容。")
     elif check_nan and (anynan(results.actual) or
                         anynan(results.predicted) or
                         (results.probabilities is not None and
                          anynan(results.probabilities))):
         error_group.invalid_results(
-            "Results contain invalid values.")
+            "结果包含无效值。")
     else:
         return results
 
@@ -284,9 +284,9 @@ class ScoreTable(OWComponent, QObject):
         self.model.setColumnCount(3 + len(scorers))
         SelectMenuRole = SelectableColumnsHeader.SelectMenuRole
         ShownHintRole = SelectableColumnsHeader.ShownHintRole
-        for i, name, long_name, id_, in ((0, "Model", "Model", "Model_"),
-                                         (1, "Train", "Train time [s]", "Train_"),
-                                         (2, "Test", "Test time [s]", "Test_")):
+        for i, name, long_name, id_, in ((0, "模型", "模型", "Model_"),
+                                         (1, "训练", "训练时间 [s]", "Train_"),
+                                         (2, "测试", "测试时间 [s]", "Test_")):
             item = QStandardItem(name)
             item.setData((long_name, i != 0), SelectMenuRole)
             item.setData(id_, ShownHintRole)

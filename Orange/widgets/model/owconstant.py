@@ -5,16 +5,16 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 
 class OWConstant(OWBaseLearner):
-    name = "Constant"
-    description = "Predict the most frequent class or mean value " \
-                  "from the training set."
+    name = "常数 Constant"
+    description = "预测最频繁的类或平均值" \
+                  "来自训练集。"
     icon = "icons/Constant.svg"
     replaces = [
         "Orange.widgets.classify.owmajority.OWMajority",
         "Orange.widgets.regression.owmean.OWMean",
     ]
     priority = 10
-    keywords = "constant, majority, mean"
+    keywords = "常数、多数、平均值"
 
     LEARNER = ConstantLearner
 

@@ -33,7 +33,7 @@ def run_freeviz(data: Table, projector: FreeViz, state: TaskState):
     res = Result(projector=projector, projection=None)
     step, steps = 0, MAX_ITERATIONS
     initial = res.projector.components_.T
-    state.set_status("Calculating...")
+    state.set_status("计算中...")
     while True:
         # Needs a copy because projection should not be modified inplace.
         # If it is modified inplace, the widget and the thread hold a
@@ -123,14 +123,14 @@ class InitType(IntEnum):
 
     @staticmethod
     def items():
-        return ["Circular", "Random"]
+        return ["环形", "随机"]
 
 
 class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
     MAX_INSTANCES = 10000
 
     name = "FreeViz"
-    description = "Displays FreeViz projection"
+    description = "显示 FreeViz 投影"
     icon = "icons/Freeviz.svg"
     priority = 240
     keywords = "freeviz, viz"
@@ -145,20 +145,20 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
     GravityValues = [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5]
 
     class Error(OWAnchorProjectionWidget.Error):
-        no_class_var = widget.Msg("Data must have a target variable.")
+        no_class_var = widget.Msg("数据必须有目标变量")
         multiple_class_vars = widget.Msg(
-            "Data must have a single target variable.")
+            "数据必须有单个目标变量")
         not_enough_class_vars = widget.Msg(
-            "Target variable must have at least two unique values.")
+            "目标变量必须至少有两个唯一值")
         features_exceeds_instances = widget.Msg(
-            "Number of features exceeds the number of instances.")
-        too_many_data_instances = widget.Msg("Data is too large.")
-        constant_data = widget.Msg("All data columns are constant.")
-        not_enough_features = widget.Msg("At least two features are required.")
+            "特征数超过实例数")
+        too_many_data_instances = widget.Msg("数据太大")
+        constant_data = widget.Msg("所有数据列都是常数")
+        not_enough_features = widget.Msg("至少需要两个特征")
 
     class Warning(OWAnchorProjectionWidget.Warning):
-        removed_features = widget.Msg("Categorical features with more than"
-                                      " two values are not shown.")
+        removed_features = widget.Msg("分类特征值数量超过"
+                                      " 两个值时不显示")
 
     def __init__(self):
         OWAnchorProjectionWidget.__init__(self)
@@ -175,7 +175,7 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
         )
 
     def __add_controls_start_box(self):
-        box = gui.vBox(self.controlArea, box="Optimize", spacing=0)
+        box = gui.vBox(self.controlArea, box="优化", spacing=0)
         gui.comboBox(
             box, self, "initialization", label="Initialization:",
             items=InitType.items(), orientation=Qt.Horizontal,
@@ -184,7 +184,7 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
         )
         box2 = gui.hBox(box)
         gui.checkBox(
-            box2, self, "balance", "Gravity",
+            box2, self, "balance", "重力",
             callback=self.__gravity_changed)
         self.grav_slider = gui.hSlider(
             box2, self, "gravity_index",
@@ -196,7 +196,7 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
                 for x in self.GravityValues))
         self.gravity_label.setAlignment(Qt.AlignRight)
         self.__update_gravity_label()
-        self.run_button = gui.button(box, self, "Start", self._toggle_run)
+        self.run_button = gui.button(box, self, "开始", self._toggle_run)
 
     @property
     def effective_variables(self):
@@ -238,7 +238,7 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
         if self.task is not None:
             self.cancel()
             self.graph.set_sample_size(None)
-            self.run_button.setText("Resume")
+            self.run_button.setText("恢复")
             self.commit.deferred()
         else:
             self._run()
@@ -247,7 +247,7 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
         if self.data is None:
             return
         self.graph.set_sample_size(self.SAMPLE_SIZE)
-        self.run_button.setText("Stop")
+        self.run_button.setText("停止")
         self.start(run_freeviz, self.effective_data, self.projector)
 
     # ConcurrentWidgetMixin
@@ -265,14 +265,14 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
         self.projector = result.projector
         self.projection = result.projection
         self.graph.set_sample_size(None)
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
         self.__optimized = True
         self.commit.deferred()
 
     def on_exception(self, ex: Exception):
         self.Error.proj_error(ex)
         self.graph.set_sample_size(None)
-        self.run_button.setText("Start")
+        self.run_button.setText("开始 ")
 
     # OWAnchorProjectionWidget
     @OWAnchorProjectionWidget.Inputs.data
@@ -331,7 +331,7 @@ class OWFreeViz(OWAnchorProjectionWidget, ConcurrentWidgetMixin):
     def enable_controls(self):
         super().enable_controls()
         self.run_button.setEnabled(self.data is not None)
-        self.run_button.setText("Start")
+        self.run_button.setText("开始")
 
     def get_coordinates_data(self):
         embedding = self.get_embedding()

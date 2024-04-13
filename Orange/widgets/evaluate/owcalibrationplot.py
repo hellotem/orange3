@@ -32,35 +32,35 @@ MetricDefinition = namedtuple(
     ("name", "functions", "short_names", "explanation"))
 
 Metrics = [MetricDefinition(*args) for args in (
-    ("Calibration curve", None, (), ""),
-    ("Classification accuracy", (Curves.ca, ), (), ""),
-    ("F1", (Curves.f1, ), (), ""),
-    ("Sensitivity and specificity",
+    ("校准曲线", None, (), ""),
+    ("分类准确率", (Curves.ca, ), (), ""),
+    ("F1 分数", (Curves.f1, ), (), ""),
+    ("敏感性和特异性",
      (Curves.sensitivity, Curves.specificity),
-     ("sens", "spec"),
-     "<p><b>Sensitivity</b> (falling) is the proportion of correctly "
-     "detected positive instances (TP&nbsp;/&nbsp;P).</p>"
-     "<p><b>Specificity</b> (rising) is the proportion of detected "
-     "negative instances (TN&nbsp;/&nbsp;N).</p>"),
-    ("Precision and recall",
+     ("敏感性", "特异性"),
+     "<p><b>敏感性</b>(下降)是正确检测 "
+     "阳性实例的比例(TP&nbsp;/&nbsp;P)。</p>"
+     "<p><b>特异性</b>(上升)是检测 "
+     "阴性实例的比例(TN&nbsp;/&nbsp;N)。</p>"),
+    ("精确率和召回率",
      (Curves.precision, Curves.recall),
-     ("prec", "recall"),
-     "<p><b>Precision</b> (rising) is the fraction of retrieved instances "
-     "that are relevant, TP&nbsp;/&nbsp;(TP&nbsp;+&nbsp;FP).</p>"
-     "<p><b>Recall</b> (falling) is the proportion of discovered relevant "
-     "instances, TP&nbsp;/&nbsp;P.</p>"),
-    ("Pos and neg predictive value",
+     ("精确率 ", "召回率"),
+     "<p><b>精确率</b>(上升)是检索实例 "
+     "相关性的比例, TP&nbsp;/&nbsp;(TP&nbsp;+&nbsp;FP)。</p>"
+     "<p><b>召回率</b>(下降)是发现相关 "
+     "实例的比例, TP&nbsp;/&nbsp;P。</p>"),
+    ("阳性和阴性预测值",
      (Curves.ppv, Curves.npv),
-     ("PPV", "TPV"),
-     "<p><b>Positive predictive value</b> (rising) is the proportion of "
-     "correct positives, TP&nbsp;/&nbsp;(TP&nbsp;+&nbsp;FP).</p>"
-     "<p><b>Negative predictive value</b> is the proportion of correct "
-     "negatives, TN&nbsp;/&nbsp;(TN&nbsp;+&nbsp;FN).</p>"),
-    ("True and false positive rate",
+     ("阳性预测值", "真阴性值"),
+     "<p><b>阳性预测值</b>(上升)是 "
+     "正确阳性的比例, TP&nbsp;/&nbsp;(TP&nbsp;+&nbsp;FP)。</p>"
+     "<p><b>阴性预测值</b>是正确 "
+     "阴性的比例, TN&nbsp;/&nbsp;(TN&nbsp;+&nbsp;FN)。</p>"),
+    ("真阳性率和假阳性率",
      (Curves.tpr, Curves.fpr),
-     ("TPR", "FPR"),
-     "<p><b>True and false positive rate</b> are proportions of detected "
-     "and omitted positive instances</p>"),
+     ("真阳性率", "假阳性率"),
+     "<p><b>真阳性率和假阳性率</b>是检测 "
+     "和遗漏阳性实例的比例</p>"),
 )]
 
 
@@ -93,39 +93,39 @@ class ParameterSetter(CommonParameterSetter):
 
 
 class OWCalibrationPlot(widget.OWWidget):
-    name = "Calibration Plot"
-    description = "Calibration plot based on evaluation of classifiers."
+    name = "校准曲线图 Calibration Plot"
+    description = "基于分类器评估的校准曲线图。"
     icon = "icons/CalibrationPlot.svg"
     priority = 1030
-    keywords = "calibration plot"
+    keywords = "校准曲线图"
 
     class Inputs:
-        evaluation_results = Input("Evaluation Results", Results)
+        evaluation_results = Input("评估结果", Results)
 
     class Outputs:
-        calibrated_model = Output("Calibrated Model", Model)
+        calibrated_model = Output("校准模型", Model)
 
     class Error(widget.OWWidget.Error):
-        non_discrete_target = Msg("Calibration plot requires a categorical "
-                                  "target variable.")
-        empty_input = widget.Msg("Empty result on input. Nothing to display.")
+        non_discrete_target = Msg("校准曲线需要分类 "
+                                  "目标变量。")
+        empty_input = widget.Msg("输入结果为空。无需显示。")
         nan_classes = \
-            widget.Msg("Remove test data instances with unknown classes.")
+            widget.Msg("删除具有未知类的测试数据实例。")
         all_target_class = widget.Msg(
-            "All data instances belong to target class.")
+            "所有数据实例都属于目标类。")
         no_target_class = widget.Msg(
-            "No data instances belong to target class.")
+            "没有数据实例属于目标类。")
 
     class Warning(widget.OWWidget.Warning):
         omitted_folds = widget.Msg(
-            "Test folds where all data belongs to (non)-target are not shown.")
+            "所有数据属于(非)目标的测试折叠未显示。")
         omitted_nan_prob_points = widget.Msg(
-            "Instance for which the model couldn't compute probabilities are"
-            "skipped.")
-        no_valid_data = widget.Msg("No valid data for model(s) {}")
+            "模型无法计算概率的实例会"
+            "跳过。")
+        no_valid_data = widget.Msg("模型 {} 没有有效数据")
 
     class Information(widget.OWWidget.Information):
-        no_output = Msg("Can't output a model: {}")
+        no_output = Msg("无法输出模型: {}")
 
     settingsHandler = EvaluationResultsContextHandler()
     target_index = settings.ContextSetting(0)
@@ -151,25 +151,25 @@ class OWCalibrationPlot(widget.OWWidget):
 
         self._last_score_value = -1
 
-        box = gui.vBox(self.controlArea, box="Settings")
+        box = gui.vBox(self.controlArea, box="设置")
         self.target_cb = gui.comboBox(
             box, self, "target_index", label="Target:",
             orientation=Qt.Horizontal, callback=self.target_index_changed,
             contentsLength=8, searchable=True)
         gui.checkBox(
-            box, self, "display_rug", "Show rug",
+            box, self, "display_rug", "显示小横纹",
             callback=self._on_display_rug_changed)
         gui.checkBox(
-            box, self, "fold_curves", "Curves for individual folds",
+            box, self, "fold_curves", "单个折叠的曲线",
             callback=self._replot)
 
         self.classifiers_list_box = gui.listBox(
             self.controlArea, self, "selected_classifiers", "classifier_names",
-            box="Classifier", selectionMode=QListWidget.ExtendedSelection,
+            box="分类器", selectionMode=QListWidget.ExtendedSelection,
             callback=self._on_selection_changed)
         self.classifiers_list_box.setMaximumHeight(100)
 
-        box = gui.vBox(self.controlArea, "Metrics")
+        box = gui.vBox(self.controlArea, "指标")
         combo = gui.comboBox(
             box, self, "score", items=(metric.name for metric in Metrics),
             callback=self.score_changed)
@@ -183,10 +183,10 @@ class OWCalibrationPlot(widget.OWWidget):
 
         gui.radioButtons(
             box, self, value="output_calibration",
-            btnLabels=("Sigmoid calibration", "Isotonic calibration"),
-            label="Output model calibration", callback=self.commit.deferred)
+            btnLabels=("Sigmoid 校准", "等渗校准"),
+            label="输出模型校准", callback=self.commit.deferred)
 
-        self.info_box = gui.widgetBox(self.controlArea, "Info")
+        self.info_box = gui.widgetBox(self.controlArea, "信息")
         self.info_label = gui.widgetLabel(self.info_box)
 
         gui.rubber(self.controlArea)
@@ -278,8 +278,8 @@ class OWCalibrationPlot(widget.OWWidget):
             self.info_box.show()
 
         axis = self.plot.getAxis("bottom")
-        axis.setLabel("Predicted probability" if self.score == 0
-                      else "Threshold probability to classify as positive")
+        axis.setLabel("预测概率" if self.score == 0
+                      else "分类为正的概率阈值")
 
         axis = self.plot.getAxis("left")
         axis.setLabel(Metrics[self.score].name)
@@ -511,11 +511,11 @@ class OWCalibrationPlot(widget.OWWidget):
         if self.results is None:
             return
         self.report_items((
-            ("Target class", self.target_cb.currentText()),
-            ("Output model calibration",
+            ("目标类", self.target_cb.currentText()),
+            ("输出模型校准",
              self.score == 0
-             and ("Sigmoid calibration",
-                  "Isotonic calibration")[self.output_calibration])
+             and ("Sigmoid 校准",
+                  "等渗校准")[self.output_calibration])
         ))
         caption = report.list_legend(self.classifiers_list_box,
                                      self.selected_classifiers)

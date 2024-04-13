@@ -153,17 +153,17 @@ class ColumnType(enum.Enum):
     Possible column types
     """
     # Skip column
-    Skip = "Skip"
+    Skip = "跳过"
     # Autodetect column type
-    Auto = "Auto"
+    Auto = "自动"
     # Numeric (real) column
-    Numeric = "Numeric"
+    Numeric = "数值"
     # Categorical column
-    Categorical = "Categorical"
+    Categorical = "分类"
     # Text column
-    Text = "Text"
+    Text = "文本"
     # Date time column
-    Time = "Time"
+    Time = "时间"
 
 
 class LineEdit(QLineEdit):
@@ -245,10 +245,10 @@ class CSVOptionsWidget(QWidget):
     DelimiterOther = DelimiterSpace + 2  # note DelimiterSpace + 1 is reserved
 
     PresetDelimiters = [
-        ("Tab", "\t"),
-        ("Comma", ","),
-        ("Semicolon", ";"),
-        ("Space", " "),
+        ("制表符", "\t"),
+        ("逗号", ","),
+        ("分号", ";"),
+        ("空格", " "),
     ]
 
     #: Signal emitted when the format (dialect) changes
@@ -269,20 +269,20 @@ class CSVOptionsWidget(QWidget):
         form = QFormLayout()
         self.encoding_cb = QComboBox(
             objectName="encoding-combo-box",
-            toolTip="Select file text encoding",
+            toolTip="选择文件文本编码",
         )
         self.__set_visible_codecs(encodings.list_selected_encodings())
         self.encoding_cb.activated.connect(self.__on_encoding_activated)
 
         self.delimiter_cb = QComboBox(
             objectName="delimiter-combo-box",
-            toolTip="Select cell delimiter character."
+            toolTip="选择单元格分隔符字符"
         )
         self.delimiter_cb.addItems(
             [name for name, _ in CSVOptionsWidget.PresetDelimiters]
         )
         self.delimiter_cb.insertSeparator(self.delimiter_cb.count())
-        self.delimiter_cb.addItem("Other")
+        self.delimiter_cb.addItem("其他")
 
         self.delimiter_cb.setCurrentIndex(self._delimiter_idx)
         self.delimiter_cb.activated.connect(self.__on_delimiter_idx_activated)
@@ -315,10 +315,10 @@ class CSVOptionsWidget(QWidget):
         quotelayout.setContentsMargins(0, 0, 0, 0)
         quotelayout.addWidget(self.quoteedit)
 
-        form.addRow("Encoding", self.encoding_cb)
+        form.addRow("编码", self.encoding_cb)
         form.addRow(QFrame(self, frameShape=QFrame.HLine))
-        form.addRow("Cell delimiter", delimlayout)
-        form.addRow("Quote character", self.quoteedit)
+        form.addRow("单元格分隔符", delimlayout)
+        form.addRow("引号字符", self.quoteedit)
         self.setLayout(form)
 
     def dialect(self):
@@ -446,7 +446,7 @@ class CSVOptionsWidget(QWidget):
 
         w = encodings.SelectEncodingsWidget(
             self, Qt.Tool,
-            windowTitle="Customize Encodings List",
+            windowTitle="自定义编码列表",
             objectName="-encoding-selection-tool-window"
         )
         w.setAttribute(Qt.WA_DeleteOnClose)
@@ -469,7 +469,7 @@ class CSVOptionsWidget(QWidget):
         for c in codecs:
             cb.addItem(encodings.display_name(c), userData=c)
         cb.insertSeparator(cb.count())
-        cb.addItem("Customize Encodings List...", userData=...)
+        cb.addItem("自定义编码列表...", userData=...)
         idx = cb.findData(current, Qt.UserRole)
         if idx != -1:
             cb.setCurrentIndex(idx)
@@ -629,16 +629,16 @@ class CSVImportWidget(QWidget):
         number_sep_layout = QHBoxLayout()
         self.grouping_sep_edit_cb = TextEditCombo(
             editable=True, objectName="grouping-separator-combo-box",
-            toolTip="Thousands group separator",
+            toolTip="千位分组符",
             minimumContentsLength=1,
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon
         )
         items = [
-            {Qt.DisplayRole: "None", Qt.EditRole: "",
-             Qt.ToolTipRole: "No separator"},
+            {Qt.DisplayRole: "无", Qt.EditRole: "",
+             Qt.ToolTipRole: "无分隔符"},
             {Qt.DisplayRole: ".", Qt.EditRole: "."},
             {Qt.DisplayRole: ",", Qt.EditRole: ","},
-            {Qt.DisplayRole: "Space", Qt.EditRole: " "},
+            {Qt.DisplayRole: "空格", Qt.EditRole: " "},
             {Qt.DisplayRole: "'", Qt.EditRole: "'"},
         ]
         m = QStandardItemModel(self)
@@ -656,7 +656,7 @@ class CSVImportWidget(QWidget):
 
         self.decimal_sep_edit_cb = TextEditCombo(
             editable=True, objectName="decimal-separator-combo-box",
-            toolTip="Decimal separator",
+            toolTip="小数分隔符",
             minimumContentsLength=1,
             sizeAdjustPolicy=QComboBox.AdjustToMinimumContentsLengthWithIcon
         )
@@ -679,19 +679,19 @@ class CSVImportWidget(QWidget):
             self.__on_column_type_edit_activated
         )
         types = [
-            {Qt.DisplayRole: "Auto",
-             Qt.ToolTipRole: "The type will be determined automatically based "
-                             "on column contents.",
+            {Qt.DisplayRole: "自动",
+             Qt.ToolTipRole: "类型将根据列内容自动确定"
+                             "自动确定",
              Qt.UserRole: ColumnType.Auto},
-            {Qt.DisplayRole: "Numeric", Qt.UserRole: ColumnType.Numeric},
-            {Qt.DisplayRole: "Categorical",
+            {Qt.DisplayRole: "数值", Qt.UserRole: ColumnType.Numeric},
+            {Qt.DisplayRole: "分类",
              Qt.UserRole: ColumnType.Categorical},
-            {Qt.DisplayRole: "Text", Qt.UserRole: ColumnType.Text},
-            {Qt.DisplayRole: "Datetime", Qt.UserRole: ColumnType.Time},
+            {Qt.DisplayRole: "文本", Qt.UserRole: ColumnType.Text},
+            {Qt.DisplayRole: "日期时间", Qt.UserRole: ColumnType.Time},
             {Qt.AccessibleDescriptionRole: "separator"},
-            {Qt.DisplayRole: "Ignore",
+            {Qt.DisplayRole: "忽略",
              Qt.UserRole: ColumnType.Skip,
-             Qt.ToolTipRole: "The column will not be loaded"}
+             Qt.ToolTipRole: "该列将不被载入"}
         ]
         typemodel = QStandardItemModel(self)
         for itemdata in types:
@@ -704,7 +704,7 @@ class CSVImportWidget(QWidget):
         self.column_type_edit_cb.setCurrentIndex(-1)
 
         form.addRow(QFrame(frameShape=QFrame.HLine))
-        form.addRow("Column type", self.column_type_edit_cb)
+        form.addRow("列类型", self.column_type_edit_cb)
         layout.addWidget(self.dataview)
         # Overlay error message widget in the bottom left corner of the data
         # view
@@ -1731,7 +1731,7 @@ def format_exception(err):
 
 @format_exception.register(csv.Error)
 def format_exception_csv(err):
-    return "CSV parsing error: " + str(err)
+    return "CSV 解析错误: " + str(err)
 
 
 _to_datetime = None

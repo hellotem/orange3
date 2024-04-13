@@ -104,8 +104,8 @@ class ParametersWidget(QWidget):
         self.__layout = QGridLayout()
         box.layout().addLayout(self.__layout)
 
-        self.__labels = [QLabel("Name"), QLabel("Initial value"),
-                         QLabel("Lower bound"), QLabel("Upper bound")]
+        self.__labels = [QLabel("名称"), QLabel("初始值"),
+                         QLabel("下界"), QLabel("上界")]
         self.__layout.addWidget(self.__labels[0], 0, self.NAME)
         self.__layout.addWidget(self.__labels[1], 0, self.INITIAL)
         self.__layout.addWidget(self.__labels[2], 0, self.LOWER, 1, 2)
@@ -243,29 +243,29 @@ class ParametersWidget(QWidget):
 
 
 class OWCurveFit(OWBaseLearner):
-    name = "Curve Fit"
-    description = "Fit a function to data."
+    name = "曲线拟合 Curve Fit"
+    description = "将函数拟合到数据。"
     icon = "icons/CurveFit.svg"
     priority = 90
-    keywords = "curve fit, function"
+    keywords = "曲线拟合、函数"
 
     class Outputs(OWBaseLearner.Outputs):
-        coefficients = Output("Coefficients", Table, explicit=True)
+        coefficients = Output("系数", Table, explicit=True)
 
     class Warning(OWBaseLearner.Warning):
-        duplicate_parameter = Msg("Duplicated parameter name.")
-        unused_parameter = Msg("Unused parameter '{}' in "
-                               "'Parameters' declaration.")
-        data_missing = Msg("Provide data on the input.")
+        duplicate_parameter = Msg("参数名重复。")
+        unused_parameter = Msg("未使用参数 '{}' 在"
+                               "'参数'声明中。")
+        data_missing = Msg("在输入端提供数据。")
 
     class Error(OWBaseLearner.Error):
-        invalid_exp = Msg("Invalid expression.")
-        no_parameter = Msg("Missing a fitting parameter.\n"
-                           "Use 'Feature Constructor' widget instead.")
-        unknown_parameter = Msg("Unknown parameter '{}'.\n"
-                                "Declare the parameter in 'Parameters' box")
-        parameter_in_attrs = Msg("Some parameters and features have the same "
-                                 "name '{}'.")
+        invalid_exp = Msg("无效表达式。")
+        no_parameter = Msg("缺少拟合参数。\n"
+                           '请使用"特征构造器"小部件。 ')
+        unknown_parameter = Msg("未知参数 '{}'。\n"
+                                '在"参数"框中声明该参数')
+        parameter_in_attrs = Msg("某些参数和特征具有相同的"
+                                 "名称 '{}'。")
 
     LEARNER = CurveFitLearner
     supports_sparse = False
@@ -273,9 +273,9 @@ class OWCurveFit(OWBaseLearner):
     parameters: Mapping[str, Tuple[Any, ...]] = Setting({}, schema_only=True)
     expression: str = Setting("", schema_only=True)
 
-    FEATURE_PLACEHOLDER = "Select Feature"
-    PARAM_PLACEHOLDER = "Select Parameter"
-    FUNCTION_PLACEHOLDER = "Select Function"
+    FEATURE_PLACEHOLDER = "选择特征"
+    PARAM_PLACEHOLDER = "选择参数"
+    FUNCTION_PLACEHOLDER = "选择函数"
 
     _feature: Optional[ContinuousVariable] = None
     _parameter: str = PARAM_PLACEHOLDER
@@ -304,16 +304,16 @@ class OWCurveFit(OWBaseLearner):
         self.Warning.data_missing()
 
     def add_main_layout(self):
-        box = gui.vBox(self.controlArea, "Parameters")
+        box = gui.vBox(self.controlArea, "参数")
         self.__param_widget = ParametersWidget(self)
         self.__param_widget.sigDataChanged.connect(
             self.__on_parameters_changed)
         box.layout().addWidget(self.__param_widget)
 
-        function_box = gui.vBox(self.controlArea, box="Expression")
+        function_box = gui.vBox(self.controlArea, box="表达式")
         self.__expression_edit = gui.lineEdit(
             function_box, self, "expression",
-            placeholderText="Expression...", callback=self.settings_changed
+            placeholderText="表达式...", callback=self.settings_changed
         )
         hbox = gui.hBox(function_box)
         combo_options = dict(sendSelectedValue=True, searchable=True,
@@ -474,7 +474,7 @@ class OWCurveFit(OWBaseLearner):
         return learner
 
     def get_learner_parameters(self) -> Tuple[Tuple[str, Any]]:
-        return (("Expression", self.expression),)
+        return (("表达式", self.expression),)
 
     def update_model(self):
         super().update_model()
@@ -490,7 +490,7 @@ class OWCurveFit(OWBaseLearner):
             dom = data.domain
             cont_attrs = [a for a in dom.attributes if a.is_continuous]
             if len(cont_attrs) == 0:
-                self.Error.data_error("Data has no continuous features.")
+                self.Error.data_error("数据没有连续特征。")
             elif not self.learner:
                 # create dummy learner in order to check data
                 self.learner = self.LEARNER(lambda: 1, [], [])

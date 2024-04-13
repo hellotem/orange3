@@ -296,16 +296,16 @@ class GetGroups:
 
 
 class OWSOM(OWWidget):
-    name = "Self-Organizing Map"
-    description = "Computation of self-organizing map."
+    name = "自组织映射 Self-Organizing Map"
+    description = "计算自组织映射"
     icon = "icons/SOM.svg"
     keywords = "self-organizing map, som"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选择的数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     settingsHandler = DomainContextHandler()
@@ -332,22 +332,22 @@ class OWSOM(OWWidget):
 
     class Information(OWWidget.Information):
         modified = Msg(
-            'The parameter settings have been changed. Press "Start" to '
-            "rerun with the new settings."
+            '参数设置已更改。按"开始"以'
+            "使用新设置重新运行"
         )
 
     class Warning(OWWidget.Warning):
-        ignoring_disc_variables = Msg("SOM ignores categorical variables.")
+        ignoring_disc_variables = Msg("SOM 忽略分类变量")
         missing_colors = \
-            Msg("Some data instances have undefined value of '{}'.")
+            Msg("有些数据实例的 '{}' 值未定义")
         no_defined_colors = \
-            Msg("'{}' has no defined values.")
+            Msg("'{}' 没有定义值")
         missing_values = Msg("{}")
-        single_attribute = Msg("Data contains a single numeric column.")
+        single_attribute = Msg("数据仅包含一个数值列")
 
     class Error(OWWidget.Error):
-        no_numeric_variables = Msg("Data contains no numeric columns.")
-        not_enough_data = Msg("SOM needs at least two data rows without missing values.")
+        no_numeric_variables = Msg("数据不包含数值列")
+        not_enough_data = Msg("SOM 需要至少两行无缺失值的数据")
 
     def __init__(self):
         super().__init__()
@@ -369,13 +369,13 @@ class OWSOM(OWWidget):
 
         box = gui.vBox(self.controlArea, box="SOM")
         shape = gui.comboBox(
-            box, self, "", items=("Hexagonal grid", "Square grid"))
+            box, self, "", items=("六边形网格", "正方形网格"))
         shape.setCurrentIndex(1 - self.hexagonal)
         shape.currentIndexChanged.connect(self.on_parameter_change)
 
         box2 = gui.indentedBox(box, 10)
         auto_dim = gui.checkBox(
-            box2, self, "auto_dimension", "Set dimensions automatically",
+            box2, self, "auto_dimension", "自动设置维度",
             callback=self.on_auto_dimension_changed)
         self.manual_box = box3 = gui.hBox(box2)
         spinargs = dict(
@@ -402,29 +402,29 @@ class OWSOM(OWWidget):
             box,
             self,
             "initialization",
-            items=("Initialize with PCA", "Random initialization", "Replicable random"),
+            items=("使用 PCA 初始化", "随机初始化", "可复制的随机"),
             callback=self.on_parameter_change,
         )
 
         start = gui.button(
-            box, self, "Restart", callback=self.restart_som_pressed,
+            box, self, "重新启动", callback=self.restart_som_pressed,
             sizePolicy=(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed))
 
         self.opt_controls = self.OptControls(
             shape, auto_dim, self.spin_x, self.spin_y, initialization, start
         )
 
-        box = gui.vBox(self.controlArea, "Color")
+        box = gui.vBox(self.controlArea, "颜色")
         gui.comboBox(
             box, self, "attr_color", searchable=True,
             callback=self.on_attr_color_change,
-            model=DomainModel(placeholder="(Same color)",
+            model=DomainModel(placeholder="(相同颜色)",
                               valid_types=DomainModel.PRIMITIVE))
         gui.checkBox(
-            box, self, "pie_charts", label="Show pie charts",
+            box, self, "pie_charts", label="显示饼图",
             callback=self.on_pie_chart_change)
         gui.checkBox(
-            box, self, "size_by_instances", label="Size by number of instances",
+            box, self, "size_by_instances", label="按实例数大小显示",
             callback=self.on_attr_size_change)
 
         gui.rubber(self.controlArea)
@@ -461,7 +461,7 @@ class OWSOM(OWWidget):
             missing = len(data) - len(self.data)
             if missing:
                 self.Warning.missing_values(
-                    f'{missing} data {pl(missing, "instance")} with undefined value(s) {pl(missing, "is|are")} not shown.')
+                    f'{missing} 个 {pl(missing, "实例")} 由于值未定义而未显示')
 
         cont_x = self.cont_x.copy() if self.cont_x is not None else None
         self.data = self.cont_x = None
@@ -672,7 +672,7 @@ class OWSOM(OWWidget):
         c = self.opt_controls
         c.shape.setEnabled(enable)
         c.auto_dim.setEnabled(enable)
-        c.start.setText("Start" if enable else "Stop")
+        c.start.setText("开始" if enable else "停止")
 
     def update_layout(self):
         self.set_legend_pos()
@@ -722,7 +722,7 @@ class OWSOM(OWWidget):
                     continue
                 ellipse = ColoredCircle(r / 2, color, 0)
                 ellipse.setPos(x + (y % 2) * fx, y * fy)
-                ellipse.setToolTip(f"{n} instances")
+                ellipse.setToolTip(f"{n} 个实例")
                 self.elements.addToGroup(ellipse)
 
     def _get_color_column(self):
@@ -1032,9 +1032,9 @@ class OWSOM(OWWidget):
             self.Outputs.selected_data.send(None)
 
         if ngroups > 1:
-            sel_domain = make_domain(grp_values + ["Unselected", ], ngroups, 1)
+            sel_domain = make_domain(grp_values + ["未选择", ], ngroups, 1)
         else:
-            sel_domain = make_domain(("No", "Yes"), 0, 0)
+            sel_domain = make_domain(("否", "是"), 0, 0)
         self.Outputs.annotated_data.send(
             lazy_table_transform(sel_domain, self.data))
 
@@ -1130,7 +1130,7 @@ class OWSOM(OWWidget):
         self.report_plot()
         if self.colors:
             self.report_caption(
-                f"Self-organizing map colored by '{self.attr_color.name}'")
+                f"按 '{self.attr_color.name}' 着色的自组织映射")
 
     @classmethod
     def migrate_settings(cls, settings, _):

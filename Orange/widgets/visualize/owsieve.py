@@ -67,19 +67,19 @@ class SieveRank(VizRankDialogAttrPair):
 
 
 class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
-    name = "Sieve Diagram"
-    description = "Visualize the observed and expected frequencies " \
-                  "for a combination of values."
+    name = "筛分图 Sieve Diagram"
+    description = "可视化观测到和预期的频率 " \
+                  "用于值的组合。"
     icon = "icons/SieveDiagram.svg"
     priority = 200
-    keywords = "sieve diagram"
+    keywords = "筛分图"
 
     class Inputs:
-        data = Input("Data", Table, default=True)
-        features = Input("Features", AttributeList)
+        data = Input("数据", Table, default=True)
+        features = Input("特征", AttributeList)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     graph_name = "canvas"  # QGraphicsScene
@@ -113,7 +113,7 @@ class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
         gui.comboBox(value="attr_x", **combo_args)
         gui.widgetLabel(self.attr_box, "\u2717", sizePolicy=fixed_size)
         gui.comboBox(value="attr_y", **combo_args)
-        button = self.vizrank_button("Score Combinations")
+        button = self.vizrank_button("评分组合")
         self.attr_box.layout().addWidget(button)
         self.vizrankSelectionChanged.connect(self.set_attr)
         button.setSizePolicy(*fixed_size)
@@ -267,7 +267,7 @@ class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
         features = [f for f in self.input_features if f in self.domain_model]
         if not features:
             self.warning(
-                "Features from the input signal are not present in the data")
+                "输入信号中的特征在数据中不存在")
             return
         old_attrs = self.attr_x, self.attr_y
         self.attr_x, self.attr_y = [f for f in (features * 2)[:2]]
@@ -417,7 +417,7 @@ class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
             def _oper(attr, txt):
                 if self.data.domain[attr.name] == ddomain[attr.name]:
                     return " = "
-                return " " if txt[0] in "<≥" else " in "
+                return " " if txt[0] in "<≥" else " 在 "
 
             xt, yt = ["<b>{attr}{eq}{val_name}</b>: {obs}/{n} ({p:.0f} %)".format(
                 attr=to_html(attr.name),
@@ -429,9 +429,9 @@ class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
                       for attr, val_name, prob in [(attr_x, xval_name, chi.probs_x[x]),
                                                    (attr_y, yval_name, chi.probs_y[y])]]
 
-            ct = """<b>combination of values: </b><br/>
-                   &nbsp;&nbsp;&nbsp;expected {exp} ({p_exp:.0f} %)<br/>
-                   &nbsp;&nbsp;&nbsp;observed {obs} ({p_obs:.0f} %)""".format(
+            ct = """<b>值组合: </b><br/>
+                   &nbsp;&nbsp;&nbsp;预期 {exp} ({p_exp:.0f} %)<br/>
+                   &nbsp;&nbsp;&nbsp;观测 {obs} ({p_obs:.0f} %)""".format(
                        exp=fmt(chi.expected[y, x]),
                        p_exp=100 * chi.expected[y, x] / n,
                        obs=fmt(chi.observed[y, x]),
@@ -460,12 +460,12 @@ class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
         square_size = max(square_size, 10)
         self.canvasView.setSceneRect(0, 0, view.width(), view.height())
         if not disc_x.values or not disc_y.values:
-            text_ = "Features {} and {} have no values".format(disc_x, disc_y) \
+            text_ = "特征 {} 和 {} 没有值".format(disc_x, disc_y) \
                 if not disc_x.values and \
                    not disc_y.values and \
                           disc_x != disc_y \
                 else \
-                    "Feature {} has no values".format(
+                    "特征 {} 没有值".format(
                         disc_x if not disc_x.values else disc_y)
             text(text_, view.width() / 2 + 70, view.height() / 2,
                  Qt.AlignRight | Qt.AlignVCenter)
@@ -519,7 +519,7 @@ class OWSieveDiagram(OWWidget, VizRankMixin(SieveRank)):
 
     def get_widget_name_extension(self):
         if self.data is not None:
-            return "{} vs {}".format(self.attr_x.name, self.attr_y.name)
+            return "{} 对 {}".format(self.attr_x.name, self.attr_y.name)
         return None
 
     def send_report(self):

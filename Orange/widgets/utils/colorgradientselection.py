@@ -71,9 +71,9 @@ class ColorGradientSelection(QWidget):
         slider = self.slider = IntervalSlider(
             int(low * 100), int(high * 100), minimum=0, maximum=100,
             tickPosition=QSlider.NoTicks,
-            toolTip=self.tr("Low gradient threshold"),
-            whatsThis=self.tr("Applying a low threshold will squeeze the "
-                              "gradient from the lower end")
+            toolTip=self.tr("低梯度阈值"),
+            whatsThis=self.tr("应用较低阈值会压缩"
+                              "低端的梯度")
         )
         form.addRow(self.tr("Range:"), slider)
         self.slider.intervalChanged.connect(self.__on_slider_moved)

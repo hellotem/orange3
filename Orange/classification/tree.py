@@ -204,8 +204,8 @@ class TreeLearner(Learner):
                 for attr in data.domain.attributes):
             # No fallback in the script; widgets can prevent this error
             # by providing a fallback and issue a warning about doing so
-            raise ValueError("Exhaustive binarization does not handle "
-                             "attributes with more than {} values".
+            raise ValueError("穷尽二值化不能处理"
+                             "值多于 {} 的属性".
                              format(self.MAX_BINARIZATION))
 
         active_inst = np.nonzero(~np.isnan(data.Y))[0].astype(np.int32)

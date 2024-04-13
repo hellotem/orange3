@@ -298,15 +298,15 @@ class InfiniteLine(pg.InfiniteLine):
 
 
 class OWROCAnalysis(widget.OWWidget):
-    name = "ROC Analysis"
-    description = "Display the Receiver Operating Characteristics curve " \
-                  "based on the evaluation of classifiers."
+    name = "ROC分析 ROC Analysis"
+    description = "显示受试者工作特征曲线" \
+                  "基于分类器的评估。"
     icon = "icons/ROCAnalysis.svg"
     priority = 1010
-    keywords = "roc analysis, analyse"
+    keywords = "roc分析,分析"
 
     class Inputs:
-        evaluation_results = Input("Evaluation Results", Orange.evaluation.Results)
+        evaluation_results = Input("评估结果", Orange.evaluation.Results)
 
     class Outputs:
         calibrated_model = Output("Calibrated Model", Model)
@@ -348,14 +348,14 @@ class OWROCAnalysis(widget.OWWidget):
         self._perf_line = None
         self._tooltip_cache = None
 
-        box = gui.vBox(self.controlArea, "Plot")
+        box = gui.vBox(self.controlArea, "绘图")
         self.target_cb = gui.comboBox(
             box, self, "target_index",
-            label="Target", orientation=Qt.Horizontal,
+            label="目标", orientation=Qt.Horizontal,
             callback=self._on_target_changed,
             contentsLength=8, searchable=True)
 
-        gui.widgetLabel(box, "Classifiers")
+        gui.widgetLabel(box, "分类器")
         line_height = 4 * QFontMetrics(self.font()).lineSpacing()
         self.classifiers_list_box = gui.listBox(
             box, self, "selected_classifiers", "classifier_names",
@@ -363,24 +363,24 @@ class OWROCAnalysis(widget.OWWidget):
             callback=self._on_classifiers_changed,
             sizeHint=QSize(0, line_height))
 
-        abox = gui.vBox(self.controlArea, "Curves")
+        abox = gui.vBox(self.controlArea, "曲线")
         gui.comboBox(abox, self, "roc_averaging",
-                     items=["Merge Predictions from Folds", "Mean TP Rate",
-                            "Mean TP and FP at Threshold", "Show Individual Curves"],
+                     items=["合并来自折叠的预测", "平均真阳性率",
+                            "阈值下的平均真阳性和假阳性", "显示单独曲线"],
                      callback=self._replot)
 
         gui.checkBox(abox, self, "display_convex_curve",
-                     "Show convex ROC curves", callback=self._replot)
+                     "显示凸ROC曲线", callback=self._replot)
         gui.checkBox(abox, self, "display_convex_hull",
-                     "Show ROC convex hull", callback=self._replot)
+                     "显示ROC凸包", callback=self._replot)
 
-        box = gui.vBox(self.controlArea, "Analysis")
+        box = gui.vBox(self.controlArea, "分析")
 
         gui.checkBox(box, self, "display_def_threshold",
-                     "Default threshold (0.5) point",
+                     "默认阈值 (0.5) 点",
                      callback=self._on_display_def_threshold_changed)
 
-        gui.checkBox(box, self, "display_perf_line", "Show performance line",
+        gui.checkBox(box, self, "display_perf_line", "显示性能线",
                      callback=self._on_display_perf_line_changed)
         grid = QGridLayout()
         gui.indentedBox(box, orientation=grid)
@@ -418,12 +418,12 @@ class OWROCAnalysis(widget.OWWidget):
 
         axis = self.plot.getAxis("bottom")
         axis.setTickFont(tickfont)
-        axis.setLabel("FP Rate (1-Specificity)")
+        axis.setLabel("假阳性率 (1-特异性)")
         axis.setGrid(16)
 
         axis = self.plot.getAxis("left")
         axis.setTickFont(tickfont)
-        axis.setLabel("TP Rate (Sensitivity)")
+        axis.setLabel("真阳性率 (灵敏度)")
         axis.setGrid(16)
 
         self.plot.showGrid(True, True, alpha=0.2)
@@ -636,9 +636,9 @@ class OWROCAnalysis(widget.OWWidget):
         warning = ""
         if not all(c.is_valid for c in hull_curves):
             if any(c.is_valid for c in hull_curves):
-                warning = "Some ROC curves are undefined"
+                warning = "某些ROC曲线未定义"
             else:
-                warning = "All ROC curves are undefined"
+                warning = "所有ROC曲线未定义"
         self.warning(warning)
 
     def _update_axes_ticks(self):
@@ -718,7 +718,7 @@ class OWROCAnalysis(widget.OWWidget):
 
         if valid_thresh:
             clf_names = self.classifier_names
-            msg = "Thresholds:\n" + "\n".join(["({:s}) {:.3f}".format(clf_names[i], thresh)
+            msg = "阈值:\n" + "\n".join(["({:s}) {:.3f}".format(clf_names[i], thresh)
                                                for i, thresh in zip(valid_clf, valid_thresh)])
             QToolTip.showText(QCursor.pos(), msg)
             self._tooltip_cache = (pt, valid_thresh, valid_clf, ave_mode)
@@ -799,11 +799,11 @@ class OWROCAnalysis(widget.OWWidget):
         if self.results is None:
             return
         items = OrderedDict()
-        items["Target class"] = self.target_cb.currentText()
+        items["目标类"] = self.target_cb.currentText()
         if self.display_perf_line:
-            items["Costs"] = \
-                "FP = {}, FN = {}".format(self.fp_cost, self.fn_cost)
-            items["Target probability"] = "{} %".format(self.target_prior)
+            items["成本"] = \
+                "假阳性 = {}，假阴性 = {}".format(self.fp_cost, self.fn_cost)
+            items["目标概率"] = "{} %".format(self.target_prior)
         caption = report.list_legend(self.classifiers_list_box,
                                      self.selected_classifiers)
         self.report_items(items)

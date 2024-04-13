@@ -65,7 +65,7 @@ class ViolinPlotViewBox(pg.ViewBox):
 
 
 class ParameterSetter(CommonParameterSetter):
-    BOTTOM_AXIS_LABEL, IS_VERTICAL_LABEL = "Bottom axis", "Vertical tick text"
+    BOTTOM_AXIS_LABEL, IS_VERTICAL_LABEL = "底轴", "垂直刻度文本"
 
     def __init__(self, master):
         self.master: ViolinPlot = master
@@ -725,27 +725,27 @@ class ViolinPlot(PlotWidget):
 
 
 class OWViolinPlot(OWWidget):
-    name = "Violin Plot"
-    description = "Visualize the distribution of feature" \
-                  " values in a violin plot."
+    name = "小提琴图 Violin Plot"
+    description = "可视化特征值" \
+                  "在小提琴图中的分布。"
     icon = "icons/ViolinPlot.svg"
     priority = 110
-    keywords = "violin plot, kernel, density"
+    keywords = "小提琴图,核,密度"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     class Error(OWWidget.Error):
-        no_cont_features = Msg("Plotting requires a numeric feature.")
-        not_enough_instances = Msg("Plotting requires at least two instances.")
+        no_cont_features = Msg("绘图需要数值特征。")
+        not_enough_instances = Msg("绘图需要至少两个实例。")
 
     KERNELS = ["gaussian", "epanechnikov", "linear"]
-    KERNEL_LABELS = ["Normal", "Epanechnikov", "Linear"]
-    SCALE_LABELS = ["Area", "Count", "Width"]
+    KERNEL_LABELS = ["正态", "Epanechnikov", "线性"]
+    SCALE_LABELS = ["面积", "计数", "宽度"]
 
     settingsHandler = DomainContextHandler()
     value_var = ContextSetting(None)
@@ -819,7 +819,7 @@ class OWViolinPlot(OWWidget):
             self.__value_var_changed
         )
 
-        self._group_var_model = VariableListModel(placeholder="None")
+        self._group_var_model = VariableListModel(placeholder="无")
         sorted_model = SortProxyModel(sortRole=Qt.UserRole)
         sorted_model.setSourceModel(self._group_var_model)
         sorted_model.sort(0)
@@ -832,42 +832,42 @@ class OWViolinPlot(OWWidget):
             self.__group_var_changed
         )
 
-        box = gui.vBox(self.controlArea, "Variable")
+        box = gui.vBox(self.controlArea, "变量")
         box.layout().addWidget(self._value_var_view)
         gui.checkBox(box, self, "order_by_importance",
-                     "Order by relevance to subgroups",
-                     tooltip="Order by 𝜒² or ANOVA over the subgroups",
+                     "按与子组相关性排序",
+                     tooltip="按子组的卡方或ANOVA排序",
                      callback=self.apply_value_var_sorting)
 
-        box = gui.vBox(self.controlArea, "Subgroups")
+        box = gui.vBox(self.controlArea, "子组")
         box.layout().addWidget(self._group_var_view)
         gui.checkBox(box, self, "order_grouping_by_importance",
-                     "Order by relevance to variable",
-                     tooltip="Order by 𝜒² or ANOVA over the variable values",
+                     "按与变量相关性排序",
+                     tooltip="按变量值的卡方或ANOVA排序",
                      callback=self.apply_group_var_sorting)
 
-        box = gui.vBox(self.controlArea, "Display",
+        box = gui.vBox(self.controlArea, "显示",
                        sizePolicy=(QSizePolicy.Minimum, QSizePolicy.Maximum))
-        gui.checkBox(box, self, "show_box_plot", "Box plot",
+        gui.checkBox(box, self, "show_box_plot", "箱线图",
                      callback=self.__show_box_plot_changed)
-        gui.checkBox(box, self, "show_strip_plot", "Density dots",
+        gui.checkBox(box, self, "show_strip_plot", "密度点",
                      callback=self.__show_strip_plot_changed)
-        gui.checkBox(box, self, "show_rug_plot", "Density lines",
+        gui.checkBox(box, self, "show_rug_plot", "密度线",
                      callback=self.__show_rug_plot_changed)
         self._order_violins_cb = gui.checkBox(
-            box, self, "order_violins", "Order subgroups",
+            box, self, "order_violins", "排序子组",
             callback=self.__order_violins_changed,
         )
         gui.checkBox(
-            box, self, "show_grid", "Show grid",
+            box, self, "show_grid", "显示网格",
             callback=self.__show_grid_changed,
         )
         gui.radioButtons(box, self, "orientation_index",
-                         ["Horizontal", "Vertical"], label="Orientation: ",
+                         ["水平", "垂直"], label="方向: ",
                          orientation=Qt.Horizontal,
                          callback=self.__orientation_changed)
 
-        box = gui.vBox(self.controlArea, "Density Estimation",
+        box = gui.vBox(self.controlArea, "密度估计",
                        sizePolicy=(QSizePolicy.Minimum, QSizePolicy.Maximum))
         gui.comboBox(box, self, "kernel_index", items=self.KERNEL_LABELS,
                      label="Kernel:", labelWidth=60, orientation=Qt.Horizontal,

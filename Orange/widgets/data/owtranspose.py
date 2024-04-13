@@ -33,25 +33,25 @@ def run(data: Table,
 
 
 class OWTranspose(OWWidget, ConcurrentWidgetMixin):
-    name = "Transpose"
-    description = "Transpose data table."
-    category = "Transform"
+    name = "转置 Transpose"
+    description = "转置数据表。"
+    category = "变换"
     icon = "icons/Transpose.svg"
     priority = 110
-    keywords = "transpose"
+    keywords = "转置"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        data = Output("Data", Table, dynamic=False)
+        data = Output("数据", Table, dynamic=False)
 
     GENERIC, FROM_VAR = range(2)
 
     resizing_enabled = False
     want_main_area = False
 
-    DEFAULT_PREFIX = "Feature"
+    DEFAULT_PREFIX = "特征"
 
     settingsHandler = DomainContextHandler()
     feature_type = ContextSetting(GENERIC)
@@ -61,10 +61,10 @@ class OWTranspose(OWWidget, ConcurrentWidgetMixin):
     auto_apply = Setting(True)
 
     class Warning(OWWidget.Warning):
-        duplicate_names = Msg("Values are not unique.\nTo avoid multiple "
-                              "features with the same name, values \nof "
-                              "'{}' have been augmented with indices.")
-        discrete_attrs = Msg("Categorical features have been encoded as numbers.")
+        duplicate_names = Msg("值不唯一。\n为避免多个 "
+                              "具有相同名称的特征,值 \n的 "
+                              "'{}' 已使用索引增强。")
+        discrete_attrs = Msg("分类特征已编码为数字。")
 
     class Error(OWWidget.Error):
         value_error = Msg("{}")
@@ -76,14 +76,14 @@ class OWTranspose(OWWidget, ConcurrentWidgetMixin):
 
         # self.apply is changed later, pylint: disable=unnecessary-lambda
         box = gui.radioButtons(
-            self.controlArea, self, "feature_type", box="Feature names",
+            self.controlArea, self, "feature_type", box="特征名称",
             callback=self.commit.deferred)
 
-        button = gui.appendRadioButton(box, "Generic")
+        button = gui.appendRadioButton(box, "通用")
         edit = gui.lineEdit(
             gui.indentedBox(box, gui.checkButtonOffsetHint(button)), self,
             "feature_name",
-            placeholderText="Type a prefix ...", toolTip="Custom feature name")
+            placeholderText="输入一个前缀 ...", toolTip="自定义特征名称")
         edit.editingFinished.connect(self._apply_editing)
 
         self.meta_button = gui.appendRadioButton(box, "From variable:")
@@ -97,7 +97,7 @@ class OWTranspose(OWWidget, ConcurrentWidgetMixin):
 
         self.remove_check = gui.checkBox(
             gui.indentedBox(box, gui.checkButtonOffsetHint(button)), self,
-            "remove_redundant_inst", "Remove redundant instance",
+            "remove_redundant_inst", "删除冗余实例",
             callback=self.commit.deferred)
 
         gui.auto_apply(self.buttonsArea, self)
@@ -169,12 +169,12 @@ class OWTranspose(OWWidget, ConcurrentWidgetMixin):
         if self.feature_type == self.GENERIC:
             names = self.feature_name or self.DEFAULT_PREFIX
         else:
-            names = "from variable"
+            names = "从变量"
             if self.feature_names_column:
                 names += "  '{}'".format(self.feature_names_column.name)
-        self.report_items("", [("Feature names", names)])
+        self.report_items("", [("特征名称", names)])
         if self.data:
-            self.report_data("Data", self.data)
+            self.report_data("数据", self.data)
 
 
 if __name__ == "__main__":  # pragma: no cover

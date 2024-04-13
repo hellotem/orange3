@@ -60,9 +60,9 @@ class OWProjectionWidgetBase(OWWidget, openclass=True):
 
     class Information(OWWidget.Information):
         missing_size = Msg(
-            "Points with undefined '{}' are shown in smaller size")
+            "未定义 '{}' 的点显示为较小尺寸")
         missing_shape = Msg(
-            "Points with undefined '{}' are shown as crossed circles")
+            "未定义 '{}' 的点显示为带叉的圆圈")
 
     def __init__(self):
         super().__init__()
@@ -155,7 +155,7 @@ class OWProjectionWidgetBase(OWWidget, openclass=True):
         infrequent[np.argsort(dist)[:-(max_categories-1)]] = True
         if return_labels:
             return [value for value, infreq in zip(attr.values, infrequent)
-                    if not infreq] + ["Other"]
+                    if not infreq] + ["其他"]
         else:
             result = all_data.copy()
             freq_vals = [i for i, f in enumerate(infrequent) if not f]
@@ -308,14 +308,14 @@ class OWProjectionWidgetBase(OWWidget, openclass=True):
             n_vars = len(_vars)
             if n_vars > max_shown:
                 over = n_vars - max_shown + 1
-                cols[-1] = f"... and {over} {pl(over, 'other')}"
+                cols[-1] = f"...和 {over} {pl(over, '其他')}"
             return f"<b>{name}</b>:<br/>" + "<br/>".join(cols)
 
         dom = self.data.domain
         parts = (
-            (f"{pl(len(dom.class_vars), 'Class|Classes')}", 4, dom.class_vars),
-            (f"{pl(len(dom.metas), 'Meta')}", 4, dom.metas),
-            (f"{pl(len(dom.attributes), 'Feature')}", 10, dom.attributes))
+            (f"{pl(len(dom.class_vars), '类|类')}", 4, dom.class_vars),
+            (f"{pl(len(dom.metas), '元')}", 4, dom.metas),
+            (f"{pl(len(dom.attributes), '特征')}", 10, dom.attributes))
 
         point_data = self.data[point_id]
         return "<br/>".join(show_part(point_data, *columns)
@@ -338,7 +338,7 @@ class OWProjectionWidgetBase(OWWidget, openclass=True):
         text = "<hr/>".join(self._point_tooltip(point_id)
                             for point_id in point_ids[:MAX_POINTS_IN_TOOLTIP])
         if len(point_ids) > MAX_POINTS_IN_TOOLTIP:
-            text = f"{len(point_ids)} instances<hr/>{text}<hr/>..."
+            text = f"{len(point_ids)} 个实例<hr/>{text}<hr/>..."
         return text
 
     def keyPressEvent(self, event):
@@ -362,23 +362,23 @@ class OWDataProjectionWidget(OWProjectionWidgetBase, openclass=True):
     of points.
     """
     class Inputs:
-        data = Input("Data", Table, default=True)
-        data_subset = Input("Data Subset", Table)
+        data = Input("数据", Table, default=True)
+        data_subset = Input("数据子集", Table)
 
     class Outputs:
-        selected_data = Output("Selected Data", Table, default=True)
+        selected_data = Output("选定数据", Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     class Warning(OWProjectionWidgetBase.Warning):
         too_many_labels = Msg(
-            "Too many labels to show (zoom in or label only selected)")
+            "显示的标签太多(放大或只标记选定项)")
         subset_not_subset = Msg(
-            "Subset data contains some instances that do not appear in "
+            "数据子集包含一些在输入数据中不存在的实例: "
             "input data")
         subset_independent = Msg(
-            "No subset data instances appear in input data")
+            "数据子集中的实例在输入数据中不存在")
         transparent_subset = Msg(
-            "Increase opacity if subset is difficult to see")
+            "如果难以看清子集,请增加不透明度")
 
     settingsHandler = DomainContextHandler()
     selection = Setting(None, schema_only=True)
@@ -599,7 +599,7 @@ class OWDataProjectionWidget(OWProjectionWidgetBase, openclass=True):
 
     @staticmethod
     def _get_selected_data(data, selection, group_sel):
-        return create_groups_table(data, group_sel, False, "Group") \
+        return create_groups_table(data, group_sel, False, "分组") \
             if len(selection) else None
 
     @staticmethod
@@ -627,11 +627,11 @@ class OWDataProjectionWidget(OWProjectionWidgetBase, openclass=True):
 
     def _get_send_report_caption(self):
         return report.render_items_vert((
-            ("Color", self._get_caption_var_name(self.attr_color)),
-            ("Label", self._get_caption_var_name(self.attr_label)),
-            ("Shape", self._get_caption_var_name(self.attr_shape)),
-            ("Size", self._get_caption_var_name(self.attr_size)),
-            ("Jittering", self.graph.jitter_size != 0 and
+            ("颜色", self._get_caption_var_name(self.attr_color)),
+            ("标签", self._get_caption_var_name(self.attr_label)),
+            ("形状", self._get_caption_var_name(self.attr_shape)),
+            ("大小", self._get_caption_var_name(self.attr_size)),
+            ("抖动", self.graph.jitter_size != 0 and
              "{} %".format(self.graph.jitter_size))))
 
     # Customize plot
@@ -667,13 +667,13 @@ class OWAnchorProjectionWidget(OWDataProjectionWidget, openclass=True):
     graph = SettingProvider(OWGraphWithAnchors)
 
     class Outputs(OWDataProjectionWidget.Outputs):
-        components = Output("Components", Table)
+        components = Output("组件", Table)
 
     class Error(OWDataProjectionWidget.Error):
-        sparse_data = Msg("Sparse data is not supported")
-        no_valid_data = Msg("No projection due to no valid data")
-        no_instances = Msg("At least two data instances are required")
-        proj_error = Msg("An error occurred while projecting data.\n{}")
+        sparse_data = Msg("不支持稀疏数据")
+        no_valid_data = Msg("由于无有效数据,无法投影")
+        no_instances = Msg("至少需要两个数据实例")
+        proj_error = Msg("投影数据时发生错误。\n{}")
 
     def __init__(self):
         self.projector = self.projection = None
@@ -764,7 +764,7 @@ class OWAnchorProjectionWidget(OWDataProjectionWidget, openclass=True):
             domain = Domain(self.effective_variables, metas=meta_attrs)
             components = Table(domain, self._send_components_x().copy(),
                                metas=self._send_components_metas())
-            components.name = "components"
+            components.name = "组件"
         self.Outputs.components.send(components)
 
     def _send_components_x(self):

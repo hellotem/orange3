@@ -5,19 +5,19 @@ from Orange.widgets.utils.widgetpreview import WidgetPreview
 
 
 class OWSaveDistances(OWSaveBase):
-    name = "Save Distance Matrix"
-    description = "Save distance matrix to an output file."
+    name = "保存距离矩阵 Save Distance Matrix"
+    description = "将距离矩阵保存到输出文件"
     icon = "icons/SaveDistances.svg"
     keywords = "save distance matrix, distance matrix, save"
 
-    filters = ["Excel File (*.xlsx)", "Distance File (*.dst)"]
+    filters = ["Excel 文件 (*.xlsx)", "距离文件 (*.dst)"]
 
     class Warning(OWSaveBase.Warning):
-        table_not_saved = Msg("Associated data was not saved.")
-        part_not_saved = Msg("Data associated with {} was not saved.")
+        table_not_saved = Msg("相关联的数据未保存")
+        part_not_saved = Msg("与 {} 相关联的数据未保存")
 
     class Inputs:
-        distances = Input("Distances", DistMatrix)
+        distances = Input("距离", DistMatrix)
 
     @Inputs.distances
     def set_distances(self, data):
@@ -30,22 +30,22 @@ class OWSaveDistances(OWSaveBase):
         skip_row = not dist.has_row_labels() and dist.row_items is not None
         skip_col = not dist.has_col_labels() and dist.col_items is not None
         self.Warning.table_not_saved(shown=skip_row and skip_col)
-        self.Warning.part_not_saved("columns" if skip_col else "rows",
+        self.Warning.part_not_saved("列" if skip_col else "行",
                                     shown=skip_row != skip_col,)
 
     def send_report(self):
         self.report_items((
-            ("Input", "none" if self.data is None else self._description()),
-            ("File name", self.filename or "not set")))
+            ("输入", "无" if self.data is None else self._description()),
+            ("文件名", self.filename or "未设置")))
 
     def _description(self):
         dist = self.data
-        labels = " and ".join(
-            filter(None, (dist.row_items is not None and "row",
-                          dist.col_items is not None and "column")))
+        labels = " 和 ".join(
+            filter(None, (dist.row_items is not None and "行",
+                          dist.col_items is not None and "列")))
         if labels:
-            labels = f"; {labels} labels"
-        return f"{len(dist)}-dimensional matrix{labels}"
+            labels = f"; {labels} 标签"
+        return f"{len(dist)}维矩阵{labels}"
 
 
 if __name__ == "__main__":

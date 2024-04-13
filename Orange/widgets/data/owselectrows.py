@@ -130,19 +130,19 @@ class FilterDiscreteType(enum.Enum):
 
 
 class OWSelectRows(widget.OWWidget):
-    name = "Select Rows"
-    description = "Select rows from the data based on values of variables."
+    name = "选择行 Select Rows"
+    description = "根据变量的值从数据中选择行。"
     icon = "icons/SelectRows.svg"
     priority = 100
-    category = "Transform"
-    keywords = "select rows, filter"
+    category = "变换"
+    keywords = "选择行,过滤"
 
     class Inputs:
-        data = Input("Data", Table)
+        data = Input("数据", Table)
 
     class Outputs:
-        matching_data = Output("Matching Data", Table, default=True)
-        unmatched_data = Output("Unmatched Data", Table)
+        matching_data = Output("匹配数据", Table, default=True)
+        unmatched_data = Output("不匹配数据", Table)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Table)
 
     want_main_area = False
@@ -158,39 +158,39 @@ class OWSelectRows(widget.OWWidget):
 
     Operators = {
         ContinuousVariable: [
-            (FilterContinuous.Equal, "equals", "equal"),
-            (FilterContinuous.NotEqual, "is not", "are not"),
-            (FilterContinuous.Less, "is below", "are below"),
-            (FilterContinuous.LessEqual, "is at most", "are at most"),
-            (FilterContinuous.Greater, "is greater than", "are greater than"),
-            (FilterContinuous.GreaterEqual, "is at least", "are at least"),
-            (FilterContinuous.Between, "is between", "are between"),
-            (FilterContinuous.Outside, "is outside", "are outside"),
-            (FilterContinuous.IsDefined, "is defined", "are defined"),
+            (FilterContinuous.Equal, "等于", "等于"),
+            (FilterContinuous.NotEqual, "不是", "不是"),
+            (FilterContinuous.Less, "低于", "低于"),
+            (FilterContinuous.LessEqual, "最多为", "最多为"),
+            (FilterContinuous.Greater, "大于", "大于"),
+            (FilterContinuous.GreaterEqual, "至少为", "至少为"),
+            (FilterContinuous.Between, "介于", "介于"),
+            (FilterContinuous.Outside, "在外部", "在外部"),
+            (FilterContinuous.IsDefined, "已定义", "已定义"),
         ],
         DiscreteVariable: [
-            (FilterDiscreteType.Equal, "is"),
-            (FilterDiscreteType.NotEqual, "is not"),
-            (FilterDiscreteType.In, "is one of"),
-            (FilterDiscreteType.IsDefined, "is defined")
+            (FilterDiscreteType.Equal, "是"),
+            (FilterDiscreteType.NotEqual, "不是"),
+            (FilterDiscreteType.In, "是其中之一"),
+            (FilterDiscreteType.IsDefined, "已定义")
         ],
         StringVariable: [
-            (FilterString.Equal, "equals", "equal"),
-            (FilterString.NotEqual, "is not", "are not"),
-            (FilterString.Less, "is before", "are before"),
-            (FilterString.LessEqual, "is equal or before", "are equal or before"),
-            (FilterString.Greater, "is after", "are after"),
-            (FilterString.GreaterEqual, "is equal or after", "are equal or after"),
-            (FilterString.Between, "is between", "are between"),
-            (FilterString.Outside, "is outside", "are outside"),
-            (FilterString.Contains, "contains", "contain"),
-            (FilterString.NotContain, "does not contain", "do not contain"),
-            (FilterString.StartsWith, "begins with", "begin with"),
-            (FilterString.NotStartsWith, "does not begin with", "do not begin with"),
-            (FilterString.EndsWith, "ends with", "end with"),
-            (FilterString.NotEndsWith, "does not end with", "do not end with"),
-            (FilterString.IsDefined, "is defined", "are defined"),
-            (FilterString.NotIsDefined, "is not defined", "are not defined"),
+            (FilterString.Equal, "等于", "等于"),
+            (FilterString.NotEqual, "不是", "不是"),
+            (FilterString.Less, "早于", "早于"),
+            (FilterString.LessEqual, "等于或早于", "等于或早于"),
+            (FilterString.Greater, "晚于", "晚于"),
+            (FilterString.GreaterEqual, "等于或晚于", "等于或晚于"),
+            (FilterString.Between, "介于", "介于"),
+            (FilterString.Outside, "在外部", "在外部"),
+            (FilterString.Contains, "包含", "包含"),
+            (FilterString.NotContain, "不包含", "不包含"),
+            (FilterString.StartsWith, "以...开头", "以...开头"),
+            (FilterString.NotStartsWith, "不以...开头", "不以...开头"),
+            (FilterString.EndsWith, "以...结尾", "以...结尾"),
+            (FilterString.NotEndsWith, "不以...结尾", "不以...结尾"),
+            (FilterString.IsDefined, "已定义", "已定义"),
+            (FilterString.NotIsDefined, "未定义", "未定义"),
         ]
     }
 
@@ -198,11 +198,11 @@ class OWSelectRows(widget.OWWidget):
 
     AllTypes = {}
     for _all_name, _all_type, _all_ops in (
-            ("All variables", 0,
-             [(None, "are defined")]),
-            ("All numeric variables", 2,
+            ("所有变量", 0,
+             [(None, "已定义")]),
+            ("所有数值变量", 2,
              [(v, t) for v, _, t in Operators[ContinuousVariable]]),
-            ("All string variables", 3,
+            ("所有字符串变量", 3,
              [(v, t) for v, _, t in Operators[StringVariable]])):
         Operators[_all_name] = _all_ops
         AllTypes[_all_name] = _all_type
@@ -226,7 +226,7 @@ class OWSelectRows(widget.OWWidget):
             [list(self.AllTypes), DomainModel.Separator,
              DomainModel.CLASSES, DomainModel.ATTRIBUTES, DomainModel.METAS])
 
-        box = gui.vBox(self.controlArea, 'Conditions', stretch=100)
+        box = gui.vBox(self.controlArea, '条件', stretch=100)
         self.cond_list = QTableWidget(
             box, showGrid=False, selectionMode=QTableWidget.NoSelection)
         box.layout().addWidget(self.cond_list)
@@ -242,20 +242,20 @@ class OWSelectRows(widget.OWWidget):
         box2 = gui.hBox(box)
         gui.rubber(box2)
         self.add_button = gui.button(
-            box2, self, "Add Condition", callback=self.add_row)
+            box2, self, "添加条件", callback=self.add_row)
         self.add_all_button = gui.button(
-            box2, self, "Add All Variables", callback=self.add_all)
+            box2, self, "添加所有变量", callback=self.add_all)
         self.remove_all_button = gui.button(
-            box2, self, "Remove All", callback=self.remove_all)
+            box2, self, "全部移除", callback=self.remove_all)
         gui.rubber(box2)
 
         box_setting = gui.vBox(self.buttonsArea)
         self.cb_pa = gui.checkBox(
             box_setting, self, "purge_attributes",
-            "Remove unused values and constant features",
+            "删除未使用的值和常量特征",
             callback=self.conditions_changed)
         self.cb_pc = gui.checkBox(
-            box_setting, self, "purge_classes", "Remove unused classes",
+            box_setting, self, "purge_classes", "删除未使用的类",
             callback=self.conditions_changed)
 
         self.report_button.setFixedWidth(120)
@@ -299,9 +299,9 @@ class OWSelectRows(widget.OWWidget):
         if self.cond_list.rowCount():
             Mb = QMessageBox
             if Mb.question(
-                    self, "Remove existing filters",
-                    "This will replace the existing filters with "
-                    "filters for all variables.", Mb.Ok | Mb.Cancel) != Mb.Ok:
+                    self, "移除已有过滤器",
+                    "该操作将把现有过滤器替换为"
+                    "所有变量过滤器", Mb.Ok | Mb.Cancel) != Mb.Ok:
                 return
             self.remove_all()
         for attr in self.variable_model[len(self.AllTypes) + 1:]:
@@ -448,12 +448,12 @@ class OWSelectRows(widget.OWWidget):
         if box and vtype == box.var_type:
             lc = self._get_lineedit_contents(box) + lc
 
-        if "defined" in oper_combo.currentText():
+        if "已定义" in oper_combo.currentText():
             label = QLabel()
             label.var_type = vtype
             self.cond_list.setCellWidget(oper_combo.row, 2, label)
         elif var is not None and var.is_discrete:
-            if oper_combo.currentText().endswith(" one of"):
+            if oper_combo.currentText().endswith("其中之一"):
                 if selected_values:
                     lc = list(selected_values)
                 button = DropDownToolButton(self, var, lc)
@@ -476,12 +476,12 @@ class OWSelectRows(widget.OWWidget):
             if vtype == 2:  # continuous:
                 box.controls = [add_numeric(lc[0])]
                 if oper > 5:
-                    gui.widgetLabel(box, " and ")
+                    gui.widgetLabel(box, " 和 ")
                     box.controls.append(add_numeric(lc[1]))
             elif vtype == 3:  # string:
                 box.controls = [add_textual(lc[0])]
                 if oper in [6, 7]:
-                    gui.widgetLabel(box, " and ")
+                    gui.widgetLabel(box, " 和 ")
                     box.controls.append(add_textual(lc[1]))
             elif vtype == 4:  # time:
                 def invalidate_datetime():
@@ -506,7 +506,7 @@ class OWSelectRows(widget.OWWidget):
                 box.layout().addWidget(w)
                 w.dateTimeChanged.connect(datetime_changed)
                 if oper > 5:
-                    gui.widgetLabel(box, " and ")
+                    gui.widgetLabel(box, " 和 ")
                     w_ = DateTimeWidget(self, column, datetime_format)
                     w_.set_datetime(lc[1])
                     box.layout().addWidget(w_)
@@ -584,8 +584,8 @@ class OWSelectRows(widget.OWWidget):
         try:
             floats, ok = zip(*[parse(v) for v in values])
             if not all(ok):
-                raise ValueError('Some values could not be parsed as floats'
-                                 f' in the current locale: {values}')
+                raise ValueError('某些值无法解析为浮点数'
+                                 f'在当前语言环境中: {values}')
         except TypeError:
             floats = values  # values already floats
         assert all(isinstance(v, float) for v in floats)
@@ -690,16 +690,16 @@ class OWSelectRows(widget.OWWidget):
 
     def send_report(self):
         if not self.data:
-            self.report_paragraph("No data.")
+            self.report_paragraph("无数据。")
             return
 
         pdesc = None
         describe_domain = False
         for d in (self.data_desc, self.match_desc, self.nonmatch_desc):
-            if not d or not d["Data instances"]:
+            if not d or not d["数据实例"]:
                 continue
             ndesc = d.copy()
-            del ndesc["Data instances"]
+            del ndesc["数据实例"]
             if pdesc is not None and pdesc != ndesc:
                 describe_domain = True
             pdesc = ndesc
@@ -718,14 +718,14 @@ class OWSelectRows(widget.OWWidget):
             if oper == len(names) - 1:
                 conditions.append("{} {}".format(attr_name, name))
             elif var_type == 1:  # discrete
-                if name == "is one of":
+                if name == "是其中之一":
                     valnames = [attr.values[v - 1] for v in values]
                     if not valnames:
                         continue
                     if len(valnames) == 1:
                         valstr = valnames[0]
                     else:
-                        valstr = f"{', '.join(valnames[:-1])} or {valnames[-1]}"
+                        valstr = f"{', '.join(valnames[:-1])} 或 {valnames[-1]}"
                     conditions.append(f"{attr} is {valstr}")
                 elif values and values[0]:
                     value = values[0] - 1
@@ -742,25 +742,25 @@ class OWSelectRows(widget.OWWidget):
         if describe_domain:
             items.update(self.data_desc)
         else:
-            items["Instances"] = self.data_desc["Data instances"]
-        items["Condition"] = " AND ".join(conditions) or "no conditions"
-        self.report_items("Data", items)
+            items["实例"] = self.data_desc["数据实例"]
+        items["条件"] = " 和 ".join(conditions) or "无条件"
+        self.report_items("数据", items)
         if describe_domain:
-            self.report_items("Matching data", self.match_desc)
-            self.report_items("Non-matching data", self.nonmatch_desc)
+            self.report_items("匹配数据", self.match_desc)
+            self.report_items("不匹配数据", self.nonmatch_desc)
         else:
             match_inst = \
                 bool(self.match_desc) and \
-                self.match_desc["Data instances"]
+                self.match_desc["数据实例"]
             nonmatch_inst = \
                 bool(self.nonmatch_desc) and \
-                self.nonmatch_desc["Data instances"]
+                self.nonmatch_desc["数据实例"]
             self.report_items(
-                "Output",
-                (("Matching data",
-                  f"{match_inst} {pl(match_inst, 'instance')}" if match_inst else "None"),
-                 ("Non-matching data",
-                  nonmatch_inst > 0 and f"{nonmatch_inst} {pl(nonmatch_inst, 'instance')}")))
+                "输出",
+                (("匹配数据",
+                  f"{match_inst} {pl(match_inst, '实例')}" if match_inst else "无"),
+                 ("不匹配数据",
+                  nonmatch_inst > 0 and f"{nonmatch_inst} {pl(nonmatch_inst, '实例')}")))
 
     @classmethod
     def migrate_context(cls, context, version):

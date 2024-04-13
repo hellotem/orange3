@@ -48,7 +48,7 @@ class InputValidationError(ValueError):
 
 
 class NoGroupVariable(InputValidationError):
-    message = "Input does not have any suitable labels"
+    message = "输入没有任何合适的标签"
 
 
 class ValidationError(InputValidationError):
@@ -58,19 +58,19 @@ class ValidationError(InputValidationError):
 
 
 class OWSilhouettePlot(widget.OWWidget):
-    name = "Silhouette Plot"
-    description = "Visually assess cluster quality and " \
-                  "the degree of cluster membership."
+    name = "轮廓图 Silhouette Plot"
+    description = "直观评估聚类质量和 " \
+                  "聚类隶属度。"
 
     icon = "icons/SilhouettePlot.svg"
     priority = 300
-    keywords = "silhouette plot"
+    keywords = "轮廓图"
 
     class Inputs:
-        data = Input("Data", (Orange.data.Table, Orange.misc.DistMatrix))
+        data = Input("数据", (Orange.data.Table, Orange.misc.DistMatrix))
 
     class Outputs:
-        selected_data = Output("Selected Data", Orange.data.Table, default=True)
+        selected_data = Output("选定数据", Orange.data.Table, default=True)
         annotated_data = Output(ANNOTATED_DATA_SIGNAL_NAME, Orange.data.Table)
 
     replaces = [
@@ -96,25 +96,25 @@ class OWSilhouettePlot(widget.OWWidget):
 
     pending_selection = settings.Setting(None, schema_only=True)
 
-    Distances = [("Euclidean", Orange.distance.Euclidean),
-                 ("Manhattan", Orange.distance.Manhattan),
-                 ("Cosine", Orange.distance.Cosine)]
+    Distances = [("欧几里德", Orange.distance.Euclidean),
+                 ("曼哈顿", Orange.distance.Manhattan),
+                 ("余弦", Orange.distance.Cosine)]
 
     graph_name = "scene"  # QGraphicsScene
 
     class Error(widget.OWWidget.Error):
-        need_two_clusters = Msg("Need at least two non-empty clusters")
-        singleton_clusters_all = Msg("All clusters are singletons")
-        memory_error = Msg("Not enough memory")
-        value_error = Msg("Distances could not be computed: '{}'")
+        need_two_clusters = Msg("需要至少两个非空聚类")
+        singleton_clusters_all = Msg("所有聚类都是单个实例")
+        memory_error = Msg("内存不足")
+        value_error = Msg("无法计算距离: '{}'")
         input_validation_error = Msg("{}")
-        not_symmetric = widget.Msg("Distance matrix is not symmetric.")
+        not_symmetric = widget.Msg("距离矩阵不对称")
 
     class Warning(widget.OWWidget.Warning):
         missing_cluster_assignment = Msg(
-            "{} instance{s} omitted (missing cluster assignment)")
-        nan_distances = Msg("{} instance{s} omitted (undefined distances)")
-        ignoring_categorical = Msg("Ignoring categorical features")
+            "{} 个实例被忽略(缺少聚类分配)")
+        nan_distances = Msg("{} 个实例被忽略(距离未定义)")
+        ignoring_categorical = Msg("忽略分类特征")
 
     def __init__(self):
         super().__init__()
@@ -139,7 +139,7 @@ class OWSilhouettePlot(widget.OWWidget):
         controllayout = self.controlArea.layout()
         assert isinstance(controllayout, QVBoxLayout)
         self._distances_gui_box = distbox = gui.widgetBox(
-            None, "Distance"
+            None, "距离"
         )
         self._distances_gui_cb = gui.comboBox(
             distbox, self, "distance_idx",
@@ -147,19 +147,19 @@ class OWSilhouettePlot(widget.OWWidget):
             orientation=Qt.Horizontal, callback=self._invalidate_distances)
         controllayout.addWidget(distbox)
 
-        box = gui.vBox(self.controlArea, "Grouping")
+        box = gui.vBox(self.controlArea, "分组")
         self.cluster_var_model = itemmodels.VariableListModel(
-            parent=self, placeholder="(None)")
+            parent=self, placeholder="(无)")
         self.cluster_var_cb = gui.comboBox(
             box, self, "cluster_var", contentsLength=14,
             searchable=True, callback=self._invalidate_scores,
             model=self.cluster_var_model
         )
         gui.checkBox(
-            box, self, "group_by_cluster", "Show in groups",
+            box, self, "group_by_cluster", "按组显示",
             callback=self._replot)
 
-        box = gui.vBox(self.controlArea, "Bars")
+        box = gui.vBox(self.controlArea, "条形图")
         gui.widgetLabel(box, "Bar width:")
         gui.hSlider(
             box, self, "bar_size", minValue=1, maxValue=10, step=1,
@@ -173,7 +173,7 @@ class OWSilhouettePlot(widget.OWWidget):
             model=self.annotation_var_model)
         ibox = gui.indentedBox(box, 5)
         self.ann_hidden_warning = warning = gui.widgetLabel(
-            ibox, "(increase the width to show)")
+            ibox, "(增加宽度以显示)")
         ibox.setFixedWidth(ibox.sizeHint().width())
         warning.setVisible(False)
 
@@ -227,12 +227,12 @@ class OWSilhouettePlot(widget.OWWidget):
 
     def _set_distances(self, distances: DistMatrix):
         if not distances.is_symmetric():
-            raise ValidationError("Distance matrix is not symmetric.")
+            raise ValidationError("距离矩阵不对称")
         if isinstance(distances.row_items, Orange.data.Table) and \
                 distances.axis == 1:
             data = distances.row_items
         else:
-            raise ValidationError("Input matrix does not have associated data")
+            raise ValidationError("输入矩阵没有关联数据")
 
         if data is not None:
             self._setup_control_models(data.domain)
@@ -496,7 +496,7 @@ class OWSilhouettePlot(widget.OWWidget):
                 scores = self._silhouette
 
             domain = self.data.domain
-            proposed = "Silhouette ({})".format(escape(self.cluster_var.name))
+            proposed = "轮廓 ({})".format(escape(self.cluster_var.name))
             names = [var.name for var in itertools.chain(domain.attributes,
                                                          domain.class_vars,
                                                          domain.metas)]
@@ -527,11 +527,11 @@ class OWSilhouettePlot(widget.OWWidget):
             return
 
         self.report_plot()
-        caption = "Silhouette plot " \
-                  f"({self.Distances[self.distance_idx][0]} distance), " \
-                  f"clustered by '{self.cluster_var.name}'"
+        caption = "轮廓图 " \
+                  f"({self.Distances[self.distance_idx][0]} 距离), " \
+                  f"按 '{self.cluster_var.name}' 聚类"
         if self.annotation_var and self._silplot.rowNamesVisible():
-            caption += f", annotated with '{self.annotation_var.name}'"
+            caption += f", 带注释 '{self.annotation_var.name}'"
         self.report_caption(caption)
 
     def onDeleteWidget(self):
