@@ -12,6 +12,7 @@ from sklearn.metrics import silhouette_samples, silhouette_score
 
 from Orange.clustering import KMeans
 from Orange.clustering.kmeans import KMeansModel
+from Orange.clustering.spectral import SpectralClustering, SpectralClusteringModel
 from Orange.data import Table, Domain, DiscreteVariable, ContinuousVariable
 from Orange.data.util import get_unique_names, array_equal
 from Orange.preprocess import Normalize
@@ -24,6 +25,7 @@ from Orange.widgets.utils.concurrent import ThreadExecutor, FutureSetWatcher
 from Orange.widgets.utils.sql import check_sql_input
 from Orange.widgets.utils.widgetpreview import WidgetPreview
 from Orange.widgets.widget import Input, Output
+import pdb
 
 
 RANDOM_STATE = 0
@@ -98,7 +100,7 @@ class NotEnoughData(ValueError):
     pass
 
 
-class OWKMeans(widget.OWWidget):
+class OWKSpectralClustering(widget.OWWidget):
     name = "谱聚类 Spectral Clustering"
     description = "图谱理论的聚类算法"
     icon = "icons/SpectralClustering.svg"
@@ -113,7 +115,6 @@ class OWKMeans(widget.OWWidget):
             ANNOTATED_DATA_SIGNAL_NAME, Table, default=True,
             replaces=["注释后的数据"]
         )
-        centroids = Output("质心", Table)
 
     class Error(widget.OWWidget.Error):
         failed = widget.Msg("聚类失败\n错误: {}")
@@ -141,6 +142,11 @@ class OWKMeans(widget.OWWidget):
     k_from = Setting(2)
     k_to = Setting(8)
     optimize_k = Setting(False)
+    n_components = Setting(3)
+    affinity = 'rbf'# Setting('rbf', schema_only=True)
+    n_neighbors = Setting(10)
+    gamma = Setting(1.0)
+
     max_iterations = Setting(300)
     n_init = Setting(10)
     smart_init = Setting(0)  # KMeans++
@@ -203,25 +209,35 @@ class OWKMeans(widget.OWWidget):
         gui.checkBox(box, self, "normalize", "归一化列",
                      callback=self.invalidate)
 
-        box = gui.vBox(self.controlArea, "初始化")
+
+        box = gui.vBox(self.controlArea, "核函数")
         gui.comboBox(
-            box, self, "smart_init", items=[m[0] for m in self.INIT_METHODS],
+            box, self, "smart_init", items=["knn", "rbf", "precomputed"],
             callback=self.invalidate)
 
         layout = QGridLayout()
+        
         gui.widgetBox(box, orientation=layout)
-        layout.addWidget(gui.widgetLabel(None, "重新运行:"), 0, 0, Qt.AlignLeft)
+        layout.addWidget(gui.widgetLabel(None, "components:"), 0, 0, Qt.AlignLeft)
         sb = gui.hBox(None, margin=0)
         layout.addWidget(sb, 0, 1)
         gui.lineEdit(
-            sb, self, "n_init", controlWidth=60,
+            sb, self, "n_components", controlWidth=60,
             valueType=int, validator=QIntValidator(), callback=self.invalidate)
         layout.addWidget(
-            gui.widgetLabel(None, "最大迭代次数:"), 1, 0, Qt.AlignLeft)
+            gui.widgetLabel(None, "n_neighbors"), 1, 0, Qt.AlignLeft)
         sb = gui.hBox(None, margin=0)
         layout.addWidget(sb, 1, 1)
         gui.lineEdit(
-            sb, self, "max_iterations", controlWidth=60, valueType=int,
+            sb, self, "n_neighbors", controlWidth=60, valueType=int,
+            validator=QIntValidator(), callback=self.invalidate)
+        
+        layout.addWidget(
+            gui.widgetLabel(None, "gamma"), 2, 0, Qt.AlignLeft)
+        sb = gui.hBox(None, margin=0)
+        layout.addWidget(sb, 2, 1)
+        gui.lineEdit(
+            sb, self, "gamma", controlWidth=60, valueType=int,
             validator=QIntValidator(), callback=self.invalidate)
 
         box = gui.vBox(self.mainArea, box="轮廓得分")
@@ -282,15 +298,18 @@ class OWKMeans(widget.OWWidget):
         return len(self.data.domain.attributes)
 
     @staticmethod
-    def _compute_clustering(data, k, init, n_init, max_iter, random_state):
-        # type: (Table, int, str, int, int, bool) -> KMeansModel
+    def _compute_clustering(data, k, n_components, gamma, affinity, n_neighbors, n_init, random_state):
+        # type (Table, int, int, str, int, int, bool) -> KMeansModel
         if k > len(data):
             raise NotEnoughData()
-
-        model = KMeans(
-            n_clusters=k, init=init, n_init=n_init, max_iter=max_iter,
+        # pdb.set_trace()
+        model = SpectralClustering(n_clusters=k, n_components=n_components, gamma=gamma, affinity=affinity, n_neighbors=n_neighbors,
             random_state=random_state, preprocessors=[]
         ).get_model(data)
+        # model = KMeans(
+        #     n_clusters=k, init=init, n_init=n_init, max_iter=max_iter,
+        #     random_state=random_state, preprocessors=[]
+        # ).get_model(data)
 
         if data.X.shape[0] <= SILHOUETTE_MAX_SAMPLES:
             model.silhouette_samples = silhouette_samples(data.X, model.labels)
@@ -360,9 +379,11 @@ class OWKMeans(widget.OWWidget):
             self._compute_clustering,
             data=preprocessed_data,
             k=k,
-            init=self.INIT_METHODS[self.smart_init][1],
+            n_components=self.n_components,
+            gamma=self.gamma,
+            affinity=self.affinity,
+            n_neighbors=self.n_neighbors,
             n_init=self.n_init,
-            max_iter=self.max_iterations,
             random_state=RANDOM_STATE,
         ) for k in ks]
         watcher = FutureSetWatcher(futures)
@@ -514,7 +535,7 @@ class OWKMeans(widget.OWWidget):
         km = self.clusterings.get(k)
         if self.data is None or km is None or isinstance(km, str):
             self.Outputs.annotated_data.send(None)
-            self.Outputs.centroids.send(None)
+            # self.Outputs.centroids.send(None)
             return
 
         domain = self.data.domain
@@ -561,19 +582,19 @@ class OWKMeans(widget.OWWidget):
         # the widget, it can be modified, so the widget should preferrably
         # output a copy. The number of centroids is small, hence copying it is
         # cheap.
-        centroids = Table(
-            centroid_domain, km.centroids.copy(), None,
-            np.hstack((np.full((km.k, len(domain.metas)), np.nan),
-                       np.arange(km.k).reshape(km.k, 1),
-                       clust_scores))
-        )
-        if self.data.name == Table.name:
-            centroids.name = "质心"
-        else:
-            centroids.name = f"{self.data.name} 质心"
+        # centroids = Table(
+        #     centroid_domain, km.centroids.copy(), None,
+        #     np.hstack((np.full((km.k, len(domain.metas)), np.nan),
+        #                np.arange(km.k).reshape(km.k, 1),
+        #                clust_scores))
+        # )
+        # if self.data.name == Table.name:
+        #     centroids.name = "质心"
+        # else:
+        #     centroids.name = f"{self.data.name} 质心"
 
         self.Outputs.annotated_data.send(new_table)
-        self.Outputs.centroids.send(centroids)
+        # self.Outputs.centroids.send(centroids)
 
     @Inputs.data
     @check_sql_input
@@ -616,4 +637,4 @@ class OWKMeans(widget.OWWidget):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    WidgetPreview(OWKMeans).run(Table("heart_disease"))
+    WidgetPreview(OWKSpectralClustering).run(Table("heart_disease"))

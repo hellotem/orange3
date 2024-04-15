@@ -636,7 +636,16 @@ class RandomForestModel(Model):
         List[Tree]
         """
 
+class SSLBase:
+    """Base class for SSL (classification and regression) learners
+    """
+    def __init__(self, n_neigbhors=10, kernel="rbf", gamma=20, alpha=0.9, max_iter=30,
+                preprocessors=None):
+        super().__init__(preprocessors=preprocessors)
+        self.params = vars()
 
+    def fit(self, X, Y):
+        return super().fit(X, Y)
 class KNNBase:
     """Base class for KNN (classification and regression) learners
     """
